@@ -98,29 +98,6 @@ VITE_API_URL=http://localhost:3000/api
 - **Vite** - Build tool
 - **ESLint** - Code linting
 
-## 🎯 Funcionalidades Implementadas
-
-### Alcance Mínimo ✅
-
-- CRUD Simples (Categoría Habitación, Servicios, Ciudad)
-- CRUD Dependientes (Habitaciones, Huéspedes)
-- Listados con filtros
-- Casos de uso: Reservar, Check-in
-
-### Alcance Aprobado (En desarrollo)
-
-- CRUD completos de todas las entidades
-- Check-out y procesamiento de pagos
-- Modificación de reservas
-- Consumo de servicios
-
-### Alcance Adicional Voluntario (Próximas fases)
-
-- Listados complejos
-- Notificaciones por email
-- Reportes
-- Validación en tiempo real
-
 ## 🔗 Rutas de la Aplicación
 
 | Ruta            | Página       | Descripción                      |

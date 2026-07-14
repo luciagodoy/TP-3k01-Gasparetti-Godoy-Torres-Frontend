@@ -1,0 +1,193 @@
+/* Dashboard Styles */
+.dashboard-page {
+  display: grid;
+  gap: 2rem;
+}
+
+.dashboard-page {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 1.5rem;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(255, 252, 248, 0.96), rgba(244, 238, 229, 0.96));
+  border-radius: 32px;
+  padding: 2.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(176, 138, 94, 0.14);
+}
+
+.hero-content {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.95rem;
+}
+
+.hero-section h1 {
+  margin: 0;
+  font-size: clamp(2.8rem, 4vw, 4.2rem);
+  line-height: 1.02;
+  color: #2c241b;
+  font-weight: 800;
+}
+
+.hero-section p {
+  margin: 0;
+  color: #6f5e52;
+  font-size: 1.05rem;
+  max-width: 720px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.dashboard-header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin: 3rem auto 2.25rem;
+  padding: 2.5rem 2rem;
+  border-radius: 32px;
+  overflow: hidden;
+  background-image: linear-gradient(180deg, rgba(255, 253, 249, 0.95), rgba(255, 253, 249, 0.95)), url('../assets/hero.png');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(176, 138, 94, 0.16);
+  box-shadow: var(--shadow);
+}
+
+.dashboard-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(240, 220, 190, 0.3), transparent 35%), radial-gradient(circle at bottom right, rgba(111, 74, 45, 0.12), transparent 35%);
+  pointer-events: none;
+}
+
+.dashboard-header h2 {
+  position: relative;
+  font-size: clamp(2.8rem, 3.5vw, 4rem);
+  color: #2c241b;
+  margin: 0 0 0.2rem 0;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 800;
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.dashboard-header p {
+  position: relative;
+  font-size: clamp(1rem, 1.3vw, 1.3rem);
+  color: #6f5e52;
+  margin: 0;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.menu-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  min-height: 220px;
+  background: linear-gradient(180deg, rgba(255, 253, 249, 0.95), rgba(255, 253, 249, 0.95)), url('../assets/hero.png');
+  background-size: 180%;
+  background-position: center;
+  border-radius: 24px;
+  padding: 2rem;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 16px 40px rgba(44, 36, 26, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid rgba(176, 138, 94, 0.12);
+}
+
+.menu-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.8), transparent 45%);
+  pointer-events: none;
+}
+
+.menu-card > * {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  width: 100%;
+}
+
+.menu-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 48px rgba(44, 36, 26, 0.14);
+  border-color: rgba(176, 138, 94, 0.2);
+}
+
+.menu-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.menu-card h3 {
+  font-size: 1.45rem;
+  margin: 0.5rem 0;
+  color: #2c241b;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.menu-card p {
+  color: #6f5e52;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .hero-section {
+    grid-template-columns: 1fr;
+  }
+}

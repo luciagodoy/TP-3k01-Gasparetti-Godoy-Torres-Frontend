@@ -7,9 +7,8 @@ export default function MainLayout() {
     { to: '/reservas', label: 'Reservas' },
     { to: '/habitaciones', label: 'Habitaciones' },
     { to: '/huespedes', label: 'Huéspedes' },
-    { to: '/servicios', label: 'Servicios' },
-    { to: '/empleados', label: 'Empleados' },
     { to: '/categorias', label: 'Categorías' },
+    { to: '/checkin', label: 'Check-in/out' },
   ];
 
   return (

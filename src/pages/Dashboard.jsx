@@ -6,9 +6,8 @@ export default function Dashboard() {
     { title: 'Reservas', icon: '📅', path: '/reservas', description: 'Gestionar reservas' },
     { title: 'Habitaciones', icon: '🛏️', path: '/habitaciones', description: 'Administrar habitaciones' },
     { title: 'Huéspedes', icon: '👥', path: '/huespedes', description: 'Gestionar huéspedes' },
-    { title: 'Servicios', icon: '🛎️', path: '/servicios', description: 'Servicios adicionales' },
+    { title: 'Categorías', icon: '🏷️', path: '/categorias', description: 'Categorías de habitación' },
     { title: 'Check-in/out', icon: '🚪', path: '/checkin', description: 'Entrada y salida' },
-    { title: 'Empleados', icon: '👔', path: '/empleados', description: 'Personal del hotel' },
   ];
 
   return (

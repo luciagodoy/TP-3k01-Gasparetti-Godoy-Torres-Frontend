@@ -2,26 +2,29 @@ import { useEffect, useState } from 'react';
 import api from '../services/api';
 import '../styles/pages.css';
 
+const emptyForm = {
+  habitacionId: '',
+  huespedId: '',
+  fechaInicio: '',
+  fechaFin: '',
+  montoTotal: '',
+};
+
 export default function Reservas() {
   const [reservas, setReservas] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    habitacionId: '',
-    huespedId: '',
-    fechaEntrada: '',
-    fechaSalida: '',
-    cantidadPersonas: 1,
-  });
+  const [formData, setFormData] = useState(emptyForm);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [huespedes, setHuespedes] = useState([]);
+  const [habitaciones, setHabitaciones] = useState([]);
 
   const fetchReservas = async () => {
     setError(null);
     try {
-      const response = await api.get('/reservas');
-      setReservas(response.data || []);
+      const data = await api.get('/reservas');
+      setReservas(data || []);
     } catch (err) {
       setError(err.message);
     }
@@ -30,8 +33,18 @@ export default function Reservas() {
   const fetchHuespedes = async () => {
     setError(null);
     try {
-      const response = await api.get('/huespedes');
-      setHuespedes(response.data || []);
+      const data = await api.get('/huespedes');
+      setHuespedes(data || []);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const fetchHabitaciones = async () => {
+    setError(null);
+    try {
+      const data = await api.get('/habitaciones');
+      setHabitaciones(data || []);
     } catch (err) {
       setError(err.message);
     }
@@ -40,14 +53,12 @@ export default function Reservas() {
   useEffect(() => {
     fetchReservas();
     fetchHuespedes();
+    fetchHabitaciones();
   }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'cantidadPersonas' ? Number(value) : value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCreateReservation = async (e) => {
@@ -55,7 +66,7 @@ export default function Reservas() {
     setError(null);
     setMessage(null);
 
-    if (!formData.habitacionId || !formData.huespedId || !formData.fechaEntrada || !formData.fechaSalida) {
+    if (!formData.habitacionId || !formData.huespedId || !formData.fechaInicio || !formData.fechaFin || !formData.montoTotal) {
       setError('Completa todos los campos requeridos.');
       return;
     }
@@ -65,12 +76,12 @@ export default function Reservas() {
       await api.post('/reservas', {
         habitacionId: Number(formData.habitacionId),
         huespedId: Number(formData.huespedId),
-        fechaEntrada: formData.fechaEntrada,
-        fechaSalida: formData.fechaSalida,
-        cantidadPersonas: formData.cantidadPersonas,
+        fechaInicio: formData.fechaInicio,
+        fechaFin: formData.fechaFin,
+        montoTotal: parseFloat(formData.montoTotal),
       });
       setMessage('Reserva creada correctamente.');
-      setFormData({ habitacionId: '', huespedId: '', fechaEntrada: '', fechaSalida: '', cantidadPersonas: 1 });
+      setFormData(emptyForm);
       setShowForm(false);
       fetchReservas();
     } catch (err) {
@@ -86,13 +97,18 @@ export default function Reservas() {
     setLoading(true);
     try {
       await api.delete(`/reservas/${id}`);
-      setMessage('Reserva cancelada correctamente.');
+      setMessage('Reserva eliminada correctamente.');
       fetchReservas();
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const nombreHuesped = (huespedId) => {
+    const huesped = huespedes.find((h) => h.id === huespedId);
+    return huesped ? huesped.usuario?.username || `#${huespedId}` : huespedId;
   };
 
   return (
@@ -111,14 +127,15 @@ export default function Reservas() {
         <div className="form-container">
           <form onSubmit={handleCreateReservation}>
             <div className="form-group">
-              <label>ID de Habitación</label>
-              <input
-                type="number"
-                name="habitacionId"
-                value={formData.habitacionId}
-                onChange={handleInputChange}
-                placeholder="Ej: 1"
-              />
+              <label>Habitación</label>
+              <select name="habitacionId" value={formData.habitacionId} onChange={handleInputChange}>
+                <option value="">Seleccionar habitación</option>
+                {habitaciones.map((hab) => (
+                  <option key={hab.id} value={hab.id}>
+                    {hab.numero} {hab.categoria ? `- ${hab.categoria.denominacion}` : ''}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label>Huésped</label>
@@ -126,27 +143,28 @@ export default function Reservas() {
                 <option value="">Seleccionar huésped</option>
                 {huespedes.map((huesped) => (
                   <option key={huesped.id} value={huesped.id}>
-                    {huesped.nombre} {huesped.apellido} ({huesped.documentoId})
+                    {huesped.usuario?.username} ({huesped.documentoIdentidad})
                   </option>
                 ))}
               </select>
             </div>
             <div className="form-group">
-              <label>Fecha de Entrada</label>
-              <input type="date" name="fechaEntrada" value={formData.fechaEntrada} onChange={handleInputChange} />
+              <label>Fecha de Inicio</label>
+              <input type="date" name="fechaInicio" value={formData.fechaInicio} onChange={handleInputChange} />
             </div>
             <div className="form-group">
-              <label>Fecha de Salida</label>
-              <input type="date" name="fechaSalida" value={formData.fechaSalida} onChange={handleInputChange} />
+              <label>Fecha de Fin</label>
+              <input type="date" name="fechaFin" value={formData.fechaFin} onChange={handleInputChange} />
             </div>
             <div className="form-group">
-              <label>Cantidad de Personas</label>
+              <label>Monto Total</label>
               <input
                 type="number"
-                name="cantidadPersonas"
-                value={formData.cantidadPersonas}
+                step="0.01"
+                name="montoTotal"
+                value={formData.montoTotal}
                 onChange={handleInputChange}
-                min="1"
+                placeholder="0.00"
               />
             </div>
             <button type="submit" className="btn btn-success" disabled={loading}>
@@ -164,36 +182,32 @@ export default function Reservas() {
               <th>ID</th>
               <th>Huésped</th>
               <th>Habitación</th>
-              <th>Entrada</th>
-              <th>Salida</th>
+              <th>Inicio</th>
+              <th>Fin</th>
               <th>Estado</th>
               <th>Monto</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {reservas.map((reserva) => {
-              const huesped = reserva.Huesped ? `${reserva.Huesped.nombre} ${reserva.Huesped.apellido}` : reserva.huespedId;
-              const habitacion = reserva.Habitacion ? reserva.Habitacion.numero : reserva.habitacionId;
-              return (
-                <tr key={reserva.id}>
-                  <td>{reserva.id}</td>
-                  <td>{huesped}</td>
-                  <td>{habitacion}</td>
-                  <td>{new Date(reserva.fechaEntrada).toLocaleDateString()}</td>
-                  <td>{new Date(reserva.fechaSalida).toLocaleDateString()}</td>
-                  <td>
-                    <span className={`badge badge-${reserva.estado}`}>{reserva.estado}</span>
-                  </td>
-                  <td>{reserva.montoTotal ? `$${reserva.montoTotal}` : '-'}</td>
-                  <td>
-                    <button className="btn btn-small btn-danger" onClick={() => handleDelete(reserva.id)} disabled={loading}>
-                      Cancelar
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+            {reservas.map((reserva) => (
+              <tr key={reserva.id}>
+                <td>{reserva.id}</td>
+                <td>{nombreHuesped(reserva.huespedId)}</td>
+                <td>{reserva.habitacion ? reserva.habitacion.numero : reserva.habitacionId}</td>
+                <td>{new Date(reserva.fechaInicio).toLocaleDateString()}</td>
+                <td>{new Date(reserva.fechaFin).toLocaleDateString()}</td>
+                <td>
+                  <span className={`badge badge-${reserva.estado}`}>{reserva.estado}</span>
+                </td>
+                <td>{reserva.montoTotal ? `$${reserva.montoTotal}` : '-'}</td>
+                <td>
+                  <button className="btn btn-small btn-danger" onClick={() => handleDelete(reserva.id)} disabled={loading}>
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

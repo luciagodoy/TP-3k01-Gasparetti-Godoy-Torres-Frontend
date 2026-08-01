@@ -23,7 +23,17 @@ export default function Categorias() {
   };
 
   useEffect(() => {
-    fetchCategorias();
+    const loadCategorias = async () => {
+      setError(null);
+      try {
+        const data = await api.get('/categorias');
+        setCategorias(data || []);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    loadCategorias();
   }, []);
 
   const handleChange = (e) => {

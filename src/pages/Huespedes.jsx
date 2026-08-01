@@ -21,6 +21,8 @@ export default function Huespedes() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedHuesped, setSelectedHuesped] = useState(null);
 
   const fetchHuespedes = async () => {
     setError(null);
@@ -35,6 +37,11 @@ export default function Huespedes() {
   useEffect(() => {
     fetchHuespedes();
   }, []);
+
+  const filteredHuespedes = huespedes.filter((huesped) => {
+    const searchValue = `${huesped.usuario?.username || ''} ${huesped.usuario?.email || ''} ${huesped.documentoIdentidad || ''} ${huesped.ciudad || ''}`.toLowerCase();
+    return searchTerm ? searchValue.includes(searchTerm.toLowerCase()) : true;
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -199,7 +206,17 @@ export default function Huespedes() {
       )}
 
       <div className="list-container">
-        <h3>Huéspedes</h3>
+        <div className="list-header">
+          <h3>Huéspedes</h3>
+          <div className="filter-row">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar por nombre, email, documento o ciudad"
+            />
+          </div>
+        </div>
         <table className="table">
           <thead>
             <tr>
@@ -212,7 +229,7 @@ export default function Huespedes() {
             </tr>
           </thead>
           <tbody>
-            {huespedes.map((huesped) => (
+            {filteredHuespedes.map((huesped) => (
               <tr key={huesped.id}>
                 <td>{huesped.usuario?.username}</td>
                 <td>{huesped.usuario?.email}</td>
@@ -231,6 +248,22 @@ export default function Huespedes() {
             ))}
           </tbody>
         </table>
+        {selectedHuesped && (
+          <div className="details-card">
+            <h4>Detalle del huésped seleccionado</h4>
+            <p><strong>ID:</strong> {selectedHuesped.id}</p>
+            <p><strong>Usuario:</strong> {selectedHuesped.usuario?.username}</p>
+            <p><strong>Email:</strong> {selectedHuesped.usuario?.email}</p>
+            <p><strong>Teléfono:</strong> {selectedHuesped.telefono || '-'}</p>
+            <p><strong>Documento:</strong> {selectedHuesped.documentoIdentidad}</p>
+            <p><strong>Ciudad:</strong> {selectedHuesped.ciudad}</p>
+            <p><strong>Provincia:</strong> {selectedHuesped.provincia}</p>
+            <p><strong>País:</strong> {selectedHuesped.pais}</p>
+            <button className="btn btn-secondary" onClick={() => setSelectedHuesped(null)}>
+              Cerrar detalle
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

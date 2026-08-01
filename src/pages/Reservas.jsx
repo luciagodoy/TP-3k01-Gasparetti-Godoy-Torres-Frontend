@@ -19,6 +19,9 @@ export default function Reservas() {
   const [loading, setLoading] = useState(false);
   const [huespedes, setHuespedes] = useState([]);
   const [habitaciones, setHabitaciones] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [estadoFiltro, setEstadoFiltro] = useState('');
+  const [selectedReserva, setSelectedReserva] = useState(null);
 
   const fetchReservas = async () => {
     setError(null);
@@ -55,6 +58,13 @@ export default function Reservas() {
     fetchHuespedes();
     fetchHabitaciones();
   }, []);
+
+  const filteredReservas = reservas.filter((r) => {
+    const searchValue = `${r.id} ${r.huesped?.usuario?.username || r.huespedId || ''} ${r.habitacion?.numero || r.habitacionId || ''} ${r.estado || ''}`.toLowerCase();
+    const matchesSearch = searchTerm ? searchValue.includes(searchTerm.toLowerCase()) : true;
+    const matchesEstado = estadoFiltro ? r.estado === estadoFiltro : true;
+    return matchesSearch && matchesEstado;
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -175,7 +185,24 @@ export default function Reservas() {
       )}
 
       <div className="list-container">
-        <h3>Reservas</h3>
+        <div className="list-header">
+          <h3>Reservas</h3>
+          <div className="filter-row">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar por ID, huésped, habitación o estado"
+            />
+            <select value={estadoFiltro} onChange={(e) => setEstadoFiltro(e.target.value)}>
+              <option value="">Todos los estados</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="check-in">Check-in</option>
+              <option value="check-out">Check-out</option>
+              <option value="cancelada">Cancelada</option>
+            </select>
+          </div>
+        </div>
         <table className="table">
           <thead>
             <tr>
@@ -190,8 +217,8 @@ export default function Reservas() {
             </tr>
           </thead>
           <tbody>
-            {reservas.map((reserva) => (
-              <tr key={reserva.id}>
+            {filteredReservas.map((reserva) => (
+              <tr key={reserva.id} onClick={() => setSelectedReserva(reserva)} className={selectedReserva?.id === reserva.id ? 'selected-row' : ''}>
                 <td>{reserva.id}</td>
                 <td>{nombreHuesped(reserva.huespedId)}</td>
                 <td>{reserva.habitacion ? reserva.habitacion.numero : reserva.habitacionId}</td>
@@ -202,7 +229,7 @@ export default function Reservas() {
                 </td>
                 <td>{reserva.montoTotal ? `$${reserva.montoTotal}` : '-'}</td>
                 <td>
-                  <button className="btn btn-small btn-danger" onClick={() => handleDelete(reserva.id)} disabled={loading}>
+                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(reserva.id); }} disabled={loading}>
                     Eliminar
                   </button>
                 </td>
@@ -210,6 +237,21 @@ export default function Reservas() {
             ))}
           </tbody>
         </table>
+        {selectedReserva && (
+          <div className="details-card">
+            <h4>Detalle de la reserva seleccionada</h4>
+            <p><strong>ID:</strong> {selectedReserva.id}</p>
+            <p><strong>Huésped:</strong> {selectedReserva.huesped?.usuario?.username ?? selectedReserva.huespedId}</p>
+            <p><strong>Habitación:</strong> {selectedReserva.habitacion ? selectedReserva.habitacion.numero : selectedReserva.habitacionId}</p>
+            <p><strong>Inicio:</strong> {new Date(selectedReserva.fechaInicio).toLocaleDateString()}</p>
+            <p><strong>Fin:</strong> {new Date(selectedReserva.fechaFin).toLocaleDateString()}</p>
+            <p><strong>Estado:</strong> {selectedReserva.estado}</p>
+            <p><strong>Monto total:</strong> ${selectedReserva.montoTotal}</p>
+            <button className="btn btn-secondary" onClick={() => setSelectedReserva(null)}>
+              Cerrar detalle
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

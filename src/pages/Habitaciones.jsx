@@ -13,6 +13,9 @@ export default function Habitaciones() {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [estadoFiltro, setEstadoFiltro] = useState('');
+  const [selectedHabitacion, setSelectedHabitacion] = useState(null);
 
   const fetchHabitaciones = async () => {
     setError(null);
@@ -38,6 +41,13 @@ export default function Habitaciones() {
     fetchHabitaciones();
     fetchCategorias();
   }, []);
+
+  const filteredHabitaciones = habitaciones.filter((hab) => {
+    const searchValue = `${hab.numero} ${hab.piso} ${hab.estadoDisponibilidad} ${hab.categoria?.denominacion || ''}`.toLowerCase();
+    const matchesSearch = searchTerm ? searchValue.includes(searchTerm.toLowerCase()) : true;
+    const matchesEstado = estadoFiltro ? hab.estadoDisponibilidad === estadoFiltro : true;
+    return matchesSearch && matchesEstado;
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -180,7 +190,23 @@ export default function Habitaciones() {
       )}
 
       <div className="list-container">
-        <h3>Habitaciones</h3>
+        <div className="list-header">
+          <h3>Habitaciones</h3>
+          <div className="filter-row">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar por número, categoría o estado"
+            />
+            <select value={estadoFiltro} onChange={(e) => setEstadoFiltro(e.target.value)}>
+              <option value="">Todos los estados</option>
+              <option value="disponible">Disponible</option>
+              <option value="ocupada">Ocupada</option>
+              <option value="mantenimiento">Mantenimiento</option>
+            </select>
+          </div>
+        </div>
         <table className="table">
           <thead>
             <tr>
@@ -192,7 +218,7 @@ export default function Habitaciones() {
             </tr>
           </thead>
           <tbody>
-            {habitaciones.map((hab) => (
+            {filteredHabitaciones.map((hab) => (
               <tr key={hab.id}>
                 <td>{hab.numero}</td>
                 <td>{hab.piso}</td>
@@ -210,6 +236,20 @@ export default function Habitaciones() {
             ))}
           </tbody>
         </table>
+        {selectedHabitacion && (
+          <div className="details-card">
+            <h4>Detalle de la habitación seleccionada</h4>
+            <p><strong>ID:</strong> {selectedHabitacion.id}</p>
+            <p><strong>Número:</strong> {selectedHabitacion.numero}</p>
+            <p><strong>Piso:</strong> {selectedHabitacion.piso}</p>
+            <p><strong>Categoría:</strong> {selectedHabitacion.categoria?.denominacion || selectedHabitacion.categoriaId}</p>
+            <p><strong>Estado:</strong> {selectedHabitacion.estadoDisponibilidad}</p>
+            <p><strong>Capacidad:</strong> {selectedHabitacion.categoria?.capacidadPersonas ?? '-'}</p>
+            <button className="btn btn-secondary" onClick={() => setSelectedHabitacion(null)}>
+              Cerrar detalle
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

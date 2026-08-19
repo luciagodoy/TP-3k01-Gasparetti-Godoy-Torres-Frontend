@@ -1,3 +1,4 @@
+
 .room-filters {
   display: flex;
   flex-wrap: wrap;
@@ -8,7 +9,13 @@
 
 .room-filters .form-group {
   margin-bottom: 0;
-  min-width: 160px;
+  min-width: 100%;
+}
+
+@media (min-width: 480px) {
+  .room-filters .form-group {
+    min-width: 160px;
+  }
 }
 
 .room-grid {

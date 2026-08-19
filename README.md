@@ -50,36 +50,61 @@ npm run preview
 npm run lint
 ```
 
+### Tests
+
+```bash
+npm test          # tests unitarios/de componentes (Vitest + Testing Library)
+npm run test:watch
+npm run test:e2e   # tests end-to-end en un navegador real (Playwright)
+```
+
+Los tests end-to-end levantan el propio servidor de desarrollo (`npm run dev`) automáticamente;
+no requieren que el backend esté corriendo, porque cubren flujos que no dependen de una API real
+(validación de formularios, ruteo, redirecciones de rutas protegidas).
+
 ## 📁 Estructura del Proyecto
 
 ```
 frontend/
 ├── src/
-│   ├── components/        # Componentes reutilizables
-│   ├── pages/            # Páginas principales
-│   │   ├── Dashboard.jsx  # Página principal
-│   │   ├── Reservas.jsx   # Gestión de reservas
-│   │   ├── Habitaciones.jsx
-│   │   ├── Huespedes.jsx
-│   │   ├── Servicios.jsx
-│   │   ├── CheckIn.jsx
-│   │   ├── Empleados.jsx
+│   ├── components/        # Componentes reutilizables (ProtectedRoute, etc.)
+│   ├── context/           # AuthContext: sesión, usuario logueado, perfil de huésped
+│   ├── pages/              # Páginas
+│   │   ├── Dashboard.jsx
+│   │   ├── Login.jsx / Registro.jsx        # autenticación y alta de huésped
+│   │   ├── BuscarHabitaciones.jsx          # búsqueda pública de habitaciones
+│   │   ├── Reservar.jsx / MisReservas.jsx  # reserva y autogestión del huésped logueado
+│   │   ├── Reservas.jsx / Habitaciones.jsx / Huespedes.jsx / Categorias.jsx / CheckIn.jsx  # panel admin
 │   │   └── NotFound.jsx
 │   ├── layouts/
-│   │   └── MainLayout.jsx # Layout principal con navegación
+│   │   └── MainLayout.jsx # Layout principal con navegación (según sesión y rol)
 │   ├── services/
-│   │   └── api.js        # Servicio de API
+│   │   └── api.js        # Servicio de API (con fallback a datos mock si el backend no responde)
 │   ├── styles/           # Estilos CSS
-│   ├── hooks/            # Custom React hooks
+│   ├── test/              # Setup de tests unitarios
 │   ├── App.jsx
 │   └── main.jsx
+├── e2e/                   # Tests end-to-end (Playwright)
 ├── public/               # Archivos estáticos
 ├── index.html
 ├── vite.config.js
+├── playwright.config.js
 ├── eslint.config.js
 ├── package.json
 └── README.md
 ```
+
+## 🔐 Autenticación y roles
+
+Hay dos niveles de acceso, resueltos por el backend:
+
+- **Huésped** (cualquier usuario logueado): puede buscar y reservar habitaciones, agregar
+  servicios a su reserva y ver/cancelar sus propias reservas en "Mis Reservas".
+- **Admin**: accede además al panel de gestión (Reservas, Habitaciones, Huéspedes, Categorías,
+  Check-in/out), protegido con `<ProtectedRoute roles={['admin']} />` en `App.jsx`.
+
+El primer usuario admin lo crea el backend automáticamente al arrancar (ver el README del
+backend, sección "Cuenta admin inicial").
 
 ## 🔧 Configuración
 
@@ -93,22 +118,28 @@ VITE_API_URL=http://localhost:3000/api
 
 ## 📦 Dependencias
 
-- **React 18+** - Librería UI
-- **React Router DOM** - Routing
+- **React 19** - Librería UI
+- **React Router DOM 7** - Routing
 - **Vite** - Build tool
 - **ESLint** - Code linting
+- **Vitest + Testing Library** - Tests unitarios/de componentes
+- **Playwright** - Tests end-to-end
 
 ## 🔗 Rutas de la Aplicación
 
-| Ruta            | Página       | Descripción                      |
-| --------------- | ------------ | -------------------------------- |
-| `/`             | Dashboard    | Página principal                 |
-| `/reservas`     | Reservas     | Gestión de reservas              |
-| `/habitaciones` | Habitaciones | Gestión de habitaciones          |
-| `/huespedes`    | Huéspedes    | Gestión de huéspedes             |
-| `/servicios`    | Servicios    | Gestión de servicios adicionales |
-| `/checkin`      | Check-in/out | Procesar entrada y salida        |
-| `/empleados`    | Empleados    | Gestión de empleados             |
+| Ruta            | Página             | Acceso  | Descripción                    |
+| ---------------- | ------------------ | ------- | ------------------------------- |
+| `/`              | Dashboard          | Público | Página principal                |
+| `/buscar`        | BuscarHabitaciones | Público | Búsqueda de habitaciones        |
+| `/login`         | Login              | Público | Iniciar sesión                  |
+| `/registro`      | Registro           | Público | Alta de cuenta de huésped       |
+| `/reservar`      | Reservar           | Huésped | Reservar + agregar servicios    |
+| `/mis-reservas`  | MisReservas        | Huésped | Ver/cancelar reservas propias   |
+| `/reservas`      | Reservas           | Admin   | Gestión de todas las reservas   |
+| `/habitaciones`  | Habitaciones       | Admin   | Gestión de habitaciones         |
+| `/huespedes`     | Huéspedes          | Admin   | Gestión de huéspedes            |
+| `/categorias`    | Categorías         | Admin   | Categorías de habitación        |
+| `/checkin`       | Check-in/out       | Admin   | Procesar entrada y salida       |
 
 ## 🎨 Estilos
 

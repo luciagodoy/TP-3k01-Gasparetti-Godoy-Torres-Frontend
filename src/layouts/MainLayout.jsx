@@ -9,11 +9,15 @@ export default function MainLayout() {
   const navItems = [
     { to: '/', label: 'Dashboard' },
     { to: '/buscar', label: 'Buscar Habitaciones' },
-    { to: '/reservas', label: 'Reservas' },
-    { to: '/habitaciones', label: 'Habitaciones' },
-    { to: '/huespedes', label: 'Huéspedes' },
-    { to: '/categorias', label: 'Categorías' },
-    { to: '/checkin', label: 'Check-in/out' },
+    ...(user?.role === 'admin'
+      ? [
+          { to: '/reservas', label: 'Reservas' },
+          { to: '/habitaciones', label: 'Habitaciones' },
+          { to: '/huespedes', label: 'Huéspedes' },
+          { to: '/categorias', label: 'Categorías' },
+          { to: '/checkin', label: 'Check-in/out' },
+        ]
+      : []),
     ...(user ? [{ to: '/mis-reservas', label: 'Mis Reservas' }] : []),
   ];
 

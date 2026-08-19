@@ -77,61 +77,74 @@ class ApiService {
   }
 
   async get(endpoint) {
+    let response;
     try {
-      const response = await fetch(`${this.baseURL}${endpoint}`, {
+      response = await fetch(`${this.baseURL}${endpoint}`, {
         method: 'GET',
         headers: this.headers,
       });
-      return await this._handleResponse(response);
-    } catch (error) {
+    } catch {
       return this._mockResponse(endpoint, 'GET');
     }
+    return await this._handleResponse(response);
   }
 
   async post(endpoint, data) {
+    let response;
     try {
-      const response = await fetch(`${this.baseURL}${endpoint}`, {
+      response = await fetch(`${this.baseURL}${endpoint}`, {
         method: 'POST',
         headers: this.headers,
         body: JSON.stringify(data),
       });
-      return await this._handleResponse(response);
-    } catch (error) {
+    } catch {
       return this._mockResponse(endpoint, 'POST', data);
     }
+    return await this._handleResponse(response);
   }
 
   async put(endpoint, data) {
+    let response;
     try {
-      const response = await fetch(`${this.baseURL}${endpoint}`, {
+      response = await fetch(`${this.baseURL}${endpoint}`, {
         method: 'PUT',
         headers: this.headers,
         body: JSON.stringify(data),
       });
-      return await this._handleResponse(response);
-    } catch (error) {
+    } catch {
       return this._mockResponse(endpoint, 'PUT', data);
     }
+    return await this._handleResponse(response);
   }
 
   async delete(endpoint) {
+    let response;
     try {
-      const response = await fetch(`${this.baseURL}${endpoint}`, {
+      response = await fetch(`${this.baseURL}${endpoint}`, {
         method: 'DELETE',
         headers: this.headers,
       });
-      return await this._handleResponse(response);
-    } catch (error) {
+    } catch {
       return this._mockResponse(endpoint, 'DELETE');
     }
+    return await this._handleResponse(response);
   }
-
   async _handleResponse(response) {
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || `HTTP Error: ${response.status}`);
+      if (response.status === 401 && this._onUnauthorized) {
+        this._onUnauthorized();
+      }
+      const err = new Error(error.error || error.mensaje || `HTTP Error: ${response.status}`);
+      err.status = response.status;
+      throw err;
     }
+    if (response.status === 204) return null;
     return await response.json();
+  }
+
+  onUnauthorized(callback) {
+    this._onUnauthorized = callback;
   }
 
   _mockResponse(endpoint, method, data = null) {

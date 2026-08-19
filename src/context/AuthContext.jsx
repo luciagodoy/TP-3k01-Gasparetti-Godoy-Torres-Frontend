@@ -21,6 +21,16 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
+    api.onUnauthorized(() => {
+      localStorage.removeItem(STORAGE_KEY);
+      api.clearAuthToken();
+      setToken(null);
+      setUser(null);
+      setHuesped(null);
+    });
+  }, []);
+
+  useEffect(() => {
     const restore = async () => {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {

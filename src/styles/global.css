@@ -4,18 +4,25 @@
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 18px;
   line-height: 1.7;
-  background-color: #f4eee6;
-  color: #2c241b;
-  --bg: #f4eee6;
-  --surface: #fffdf9;
-  --surface-soft: #f7f1e1;
-  --primary: #6f4a2d;
-  --primary-soft: rgba(111, 74, 45, 0.16);
-  --accent: #b08a5e;
-  --text: #2c241b;
-  --muted: #6f5e52;
-  --border: #d9c6b0;
-  --shadow: 0 24px 60px rgba(44, 36, 26, 0.12);
+  background-color: #f7f4ee;
+  color: #17181a;
+
+  --bg: #f7f4ee;
+  --surface: #ffffff;
+  --surface-soft: #efebe0;
+  --text: #17181a;
+  --muted: #5c584f;
+  --border: #ded8c7;
+  --shadow: 0 24px 60px rgba(20, 20, 18, 0.10);
+
+  /* Four Seasons-inspired accents: near-black deep forest green + restrained brass gold */
+  --primary: #14261f;
+  --primary-dark: #0b1712;
+  --primary-soft: rgba(20, 38, 31, 0.08);
+  --accent: #a3894f;
+  --accent-soft: rgba(163, 137, 79, 0.18);
+  --accent-green: #2f5d45;
+  --accent-green-soft: rgba(47, 93, 69, 0.14);
 }
 
 * {
@@ -30,7 +37,7 @@ html {
 
 body {
   min-height: 100vh;
-  background: radial-gradient(circle at top, rgba(176, 138, 94, 0.08), transparent 24%), linear-gradient(180deg, #f7efe6 0%, #efe3d8 100%);
+  background: radial-gradient(circle at top, rgba(20, 38, 31, 0.05), transparent 24%), linear-gradient(180deg, #f9f6f0 0%, #f0ebdd 100%);
   color: var(--text);
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-synthesis: none;
@@ -44,12 +51,11 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Libre Franklin', 'Inter', system-ui, sans-serif;
   color: var(--text);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  line-height: 1.02;
-  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  font-weight: 600;
 }
 
 p,
@@ -59,6 +65,19 @@ input,
 select,
 textarea {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Small, uppercase, letter-spaced micro-labels — the one place uppercase tracking
+   still belongs, contrasted against the calmer serif headings above. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.85rem;
 }
 
 a {

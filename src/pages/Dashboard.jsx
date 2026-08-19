@@ -3,24 +3,29 @@ import '../styles/dashboard.css';
 
 export default function Dashboard() {
   const menuItems = [
-    { title: 'Reservas', icon: '📅', path: '/reservas', description: 'Gestionar reservas' },
-    { title: 'Habitaciones', icon: '🛏️', path: '/habitaciones', description: 'Administrar habitaciones' },
-    { title: 'Huéspedes', icon: '👥', path: '/huespedes', description: 'Gestionar huéspedes' },
-    { title: 'Categorías', icon: '🏷️', path: '/categorias', description: 'Categorías de habitación' },
-    { title: 'Check-in/out', icon: '🚪', path: '/checkin', description: 'Entrada y salida' },
+    { title: 'Buscar Habitaciones', path: '/buscar', description: 'Explorar y reservar' },
+    { title: 'Reservas', path: '/reservas', description: 'Gestionar reservas' },
+    { title: 'Habitaciones', path: '/habitaciones', description: 'Administrar habitaciones' },
+    { title: 'Huéspedes', path: '/huespedes', description: 'Gestionar huéspedes' },
+    { title: 'Categorías', path: '/categorias', description: 'Categorías de habitación' },
+    { title: 'Check-in/out', path: '/checkin', description: 'Entrada y salida' },
   ];
 
   return (
     <div className="dashboard-page">
       <div className="dashboard-header">
-        <h2>Bienvenido al Sistema de Gestión Hotelera</h2>
-        <p>Selecciona una opción para comenzar</p>
+        <span className="eyebrow">Bienvenido</span>
+        <h2>Una estadía a tu manera</h2>
+        <p>Explorá habitaciones, reservá en minutos y gestioná tu estadía de principio a fin.</p>
+        <div className="hero-actions">
+          <Link to="/buscar" className="btn btn-primary">Buscar Habitaciones</Link>
+          <Link to="/mis-reservas" className="btn btn-secondary">Mis Reservas</Link>
+        </div>
       </div>
 
       <div className="menu-grid">
         {menuItems.map((item) => (
           <Link key={item.path} to={item.path} className="menu-card">
-            <div className="menu-icon">{item.icon}</div>
             <h3>{item.title}</h3>
             <p>{item.description}</p>
           </Link>

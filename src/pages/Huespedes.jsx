@@ -8,13 +8,13 @@ const emptyForm = {
   password: '',
   telefono: '',
   documentoIdentidad: '',
-  ciudad: '',
-  provincia: '',
+  ciudadId: '',
   pais: 'Argentina',
 };
 
 export default function Huespedes() {
   const [huespedes, setHuespedes] = useState([]);
+  const [ciudades, setCiudades] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [message, setMessage] = useState(null);
@@ -34,12 +34,22 @@ export default function Huespedes() {
     }
   };
 
+  const fetchCiudades = async () => {
+    try {
+      const data = await api.get('/ciudades');
+      setCiudades(data || []);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   useEffect(() => {
     fetchHuespedes();
+    fetchCiudades();
   }, []);
 
   const filteredHuespedes = huespedes.filter((huesped) => {
-    const searchValue = `${huesped.usuario?.username || ''} ${huesped.usuario?.email || ''} ${huesped.documentoIdentidad || ''} ${huesped.ciudad || ''}`.toLowerCase();
+    const searchValue = `${huesped.usuario?.username || ''} ${huesped.usuario?.email || ''} ${huesped.documentoIdentidad || ''} ${huesped.ciudad?.nombre || ''}`.toLowerCase();
     return searchTerm ? searchValue.includes(searchTerm.toLowerCase()) : true;
   });
 
@@ -61,7 +71,7 @@ export default function Huespedes() {
 
     if (editingId) {
       // Solo se pueden editar los datos de perfil; usuario/email/password no se tocan aquí.
-      if (!formData.documentoIdentidad || !formData.ciudad || !formData.provincia) {
+      if (!formData.documentoIdentidad || !formData.ciudadId) {
         setError('Completa todos los campos requeridos.');
         return;
       }
@@ -70,8 +80,7 @@ export default function Huespedes() {
         await api.put(`/huespedes/${editingId}`, {
           telefono: formData.telefono || null,
           documentoIdentidad: formData.documentoIdentidad,
-          ciudad: formData.ciudad,
-          provincia: formData.provincia,
+          ciudadId: Number(formData.ciudadId),
           pais: formData.pais,
         });
         setMessage('Huésped actualizado correctamente.');
@@ -85,7 +94,7 @@ export default function Huespedes() {
       return;
     }
 
-    if (!formData.username || !formData.email || !formData.password || !formData.documentoIdentidad || !formData.ciudad || !formData.provincia) {
+    if (!formData.username || !formData.email || !formData.password || !formData.documentoIdentidad || !formData.ciudadId) {
       setError('Completa todos los campos requeridos.');
       return;
     }
@@ -98,8 +107,7 @@ export default function Huespedes() {
         password: formData.password,
         telefono: formData.telefono || null,
         documentoIdentidad: formData.documentoIdentidad,
-        ciudad: formData.ciudad,
-        provincia: formData.provincia,
+        ciudadId: Number(formData.ciudadId),
         pais: formData.pais,
       });
       setMessage('Huésped creado correctamente.');
@@ -134,8 +142,7 @@ export default function Huespedes() {
       password: '',
       telefono: huesped.telefono || '',
       documentoIdentidad: huesped.documentoIdentidad,
-      ciudad: huesped.ciudad || '',
-      provincia: huesped.provincia || '',
+      ciudadId: huesped.ciudadId ?? huesped.ciudad?.id ?? '',
       pais: huesped.pais || 'Argentina',
     });
     setEditingId(huesped.id);
@@ -188,11 +195,14 @@ export default function Huespedes() {
             </div>
             <div className="form-group">
               <label>Ciudad</label>
-              <input type="text" name="ciudad" value={formData.ciudad} onChange={handleInputChange} placeholder="Ciudad" />
-            </div>
-            <div className="form-group">
-              <label>Provincia</label>
-              <input type="text" name="provincia" value={formData.provincia} onChange={handleInputChange} placeholder="Provincia" />
+              <select name="ciudadId" value={formData.ciudadId} onChange={handleInputChange}>
+                <option value="">Seleccionar ciudad</option>
+                {ciudades.map((ciudad) => (
+                  <option key={ciudad.id} value={ciudad.id}>
+                    {ciudad.nombre} ({ciudad.provincia?.nombre})
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label>País</label>
@@ -235,7 +245,7 @@ export default function Huespedes() {
                 <td>{huesped.usuario?.email}</td>
                 <td>{huesped.telefono || '-'}</td>
                 <td>{huesped.documentoIdentidad}</td>
-                <td>{huesped.ciudad} / {huesped.provincia} / {huesped.pais}</td>
+                <td>{huesped.ciudad?.nombre} / {huesped.ciudad?.provincia?.nombre} / {huesped.pais}</td>
                 <td>
                   <button className="btn btn-small" onClick={() => handleEdit(huesped)}>
                     Editar
@@ -256,8 +266,8 @@ export default function Huespedes() {
             <p><strong>Email:</strong> {selectedHuesped.usuario?.email}</p>
             <p><strong>Teléfono:</strong> {selectedHuesped.telefono || '-'}</p>
             <p><strong>Documento:</strong> {selectedHuesped.documentoIdentidad}</p>
-            <p><strong>Ciudad:</strong> {selectedHuesped.ciudad}</p>
-            <p><strong>Provincia:</strong> {selectedHuesped.provincia}</p>
+            <p><strong>Ciudad:</strong> {selectedHuesped.ciudad?.nombre}</p>
+            <p><strong>Provincia:</strong> {selectedHuesped.ciudad?.provincia?.nombre}</p>
             <p><strong>País:</strong> {selectedHuesped.pais}</p>
             <button className="btn btn-secondary" onClick={() => setSelectedHuesped(null)}>
               Cerrar detalle

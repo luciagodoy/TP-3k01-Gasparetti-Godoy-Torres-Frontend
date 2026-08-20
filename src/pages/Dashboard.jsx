@@ -1,14 +1,20 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/useAuth';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const esStaff = user?.role === 'empleado' || user?.role === 'admin';
+
   const menuItems = [
     { title: 'Buscar Habitaciones', path: '/buscar', description: 'Explorar y reservar' },
-    { title: 'Reservas', path: '/reservas', description: 'Gestionar reservas' },
-    { title: 'Habitaciones', path: '/habitaciones', description: 'Administrar habitaciones' },
-    { title: 'Huéspedes', path: '/huespedes', description: 'Gestionar huéspedes' },
-    { title: 'Categorías', path: '/categorias', description: 'Categorías de habitación' },
-    { title: 'Check-in/out', path: '/checkin', description: 'Entrada y salida' },
+    ...(esStaff ? [
+      { title: 'Reservas', path: '/reservas', description: 'Gestionar reservas' },
+      { title: 'Habitaciones', path: '/habitaciones', description: 'Administrar habitaciones' },
+      { title: 'Huéspedes', path: '/huespedes', description: 'Gestionar huéspedes' },
+      { title: 'Categorías', path: '/categorias', description: 'Categorías de habitación' },
+      { title: 'Check-in/out', path: '/checkin', description: 'Entrada y salida' },
+    ] : []),
   ];
 
   return (

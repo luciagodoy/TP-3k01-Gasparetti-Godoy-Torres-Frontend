@@ -25,15 +25,20 @@ function App() {
           <Route path="buscar" element={<BuscarHabitaciones />} />
           <Route path="login" element={<Login />} />
           <Route path="registro" element={<Registro />} />
-          <Route path="reservas" element={<Reservas />} />
-          <Route path="habitaciones" element={<Habitaciones />} />
-          <Route path="huespedes" element={<Huespedes />} />
-          <Route path="checkin" element={<CheckIn />} />
-          <Route path="categorias" element={<Categorias />} />
+
           <Route element={<ProtectedRoute />}>
             <Route path="mis-reservas" element={<MisReservas />} />
             <Route path="reservar" element={<Reservar />} />
           </Route>
+
+          <Route element={<ProtectedRoute roles={['empleado', 'admin']} />}>
+            <Route path="reservas" element={<Reservas />} />
+            <Route path="habitaciones" element={<Habitaciones />} />
+            <Route path="huespedes" element={<Huespedes />} />
+            <Route path="checkin" element={<CheckIn />} />
+            <Route path="categorias" element={<Categorias />} />
+          </Route>
+
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

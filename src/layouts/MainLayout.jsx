@@ -6,14 +6,18 @@ export default function MainLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  const esStaff = user?.role === 'empleado' || user?.role === 'admin';
+
   const navItems = [
     { to: '/', label: 'Dashboard' },
     { to: '/buscar', label: 'Buscar Habitaciones' },
-    { to: '/reservas', label: 'Reservas' },
-    { to: '/habitaciones', label: 'Habitaciones' },
-    { to: '/huespedes', label: 'Huéspedes' },
-    { to: '/categorias', label: 'Categorías' },
-    { to: '/checkin', label: 'Check-in/out' },
+    ...(esStaff ? [
+      { to: '/reservas', label: 'Reservas' },
+      { to: '/habitaciones', label: 'Habitaciones' },
+      { to: '/huespedes', label: 'Huéspedes' },
+      { to: '/categorias', label: 'Categorías' },
+      { to: '/checkin', label: 'Check-in/out' },
+    ] : []),
     ...(user ? [{ to: '/mis-reservas', label: 'Mis Reservas' }] : []),
   ];
 

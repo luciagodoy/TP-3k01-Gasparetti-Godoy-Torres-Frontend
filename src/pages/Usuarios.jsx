@@ -11,6 +11,7 @@ export default function Usuarios() {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchUsuarios = async () => {
     setError(null);
@@ -25,6 +26,11 @@ export default function Usuarios() {
   useEffect(() => {
     fetchUsuarios();
   }, []);
+
+  const filteredUsuarios = usuarios.filter((usuario) => {
+    const searchValue = `${usuario.username || ''} ${usuario.email || ''} ${usuario.role || ''}`.toLowerCase();
+    return searchTerm ? searchValue.includes(searchTerm.toLowerCase()) : true;
+  });
 
   const handleRoleChange = async (id, username, role) => {
     const confirmado = window.confirm(
@@ -56,7 +62,17 @@ export default function Usuarios() {
       {error && <div className="alert alert-error">{error}</div>}
 
       <div className="list-container">
-        <h3>Usuarios</h3>
+        <div className="list-header">
+          <h3>Usuarios</h3>
+          <div className="filter-row">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar por usuario, email o rol"
+            />
+          </div>
+        </div>
         <table className="table">
           <thead>
             <tr>
@@ -66,7 +82,7 @@ export default function Usuarios() {
             </tr>
           </thead>
           <tbody>
-            {usuarios.map((usuario) => (
+            {filteredUsuarios.map((usuario) => (
               <tr key={usuario.id}>
                 <td>{usuario.username}</td>
                 <td>{usuario.email}</td>

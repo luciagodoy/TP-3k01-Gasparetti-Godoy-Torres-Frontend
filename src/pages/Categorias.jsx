@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../services/api';
 import '../styles/pages.css';
 
-const emptyForm = { denominacion: '', descripcion: '', capacidadPersonas: 1, imagenUrl: '', precioNoche: '' };
+const emptyForm = { denominacion: '', descripcion: '', capacidadPersonas: 1, imagenesUrl: '', precioNoche: '' };
 
 export default function Categorias() {
   const [categorias, setCategorias] = useState([]);
@@ -65,7 +65,10 @@ export default function Categorias() {
         denominacion: formData.denominacion.trim(),
         descripcion: formData.descripcion.trim() || null,
         capacidadPersonas: formData.capacidadPersonas,
-        imagenUrl: formData.imagenUrl.trim() || null,
+        imagenesUrl: formData.imagenesUrl
+          .split('\n')
+          .map((url) => url.trim())
+          .filter(Boolean),
         precioNoche: parseFloat(formData.precioNoche) || 0,
       };
       if (editingId) {
@@ -89,7 +92,7 @@ export default function Categorias() {
       denominacion: categoria.denominacion,
       descripcion: categoria.descripcion || '',
       capacidadPersonas: categoria.capacidadPersonas,
-      imagenUrl: categoria.imagenUrl || '',
+      imagenesUrl: (categoria.imagenesUrl || []).join('\n'),
       precioNoche: categoria.precioNoche ?? 0,
     });
     setEditingId(categoria.id);
@@ -151,14 +154,14 @@ export default function Categorias() {
             />
           </div>
           <div className="form-group">
-            <label>URL de imagen</label>
-            <input
-              type="text"
-              name="imagenUrl"
-              value={formData.imagenUrl}
+            <label>URLs de imágenes (una por línea)</label>
+            <textarea
+              name="imagenesUrl"
+              value={formData.imagenesUrl}
               onChange={handleChange}
-              placeholder="https://..."
-            />
+              placeholder={'https://...\nhttps://...'}
+              rows={4}
+            ></textarea>
           </div>
           <div className="form-group">
             <label>Precio por noche</label>
@@ -192,7 +195,7 @@ export default function Categorias() {
               <th>Descripción</th>
               <th>Capacidad</th>
               <th>Precio/Noche</th>
-              <th>Imagen</th>
+              <th>Imágenes</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -205,8 +208,15 @@ export default function Categorias() {
                 <td>{categoria.capacidadPersonas}</td>
                 <td>${Number(categoria.precioNoche ?? 0).toFixed(2)}</td>
                 <td>
-                  {categoria.imagenUrl ? (
-                    <img src={categoria.imagenUrl} alt={categoria.denominacion} style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '6px' }} />
+                  {categoria.imagenesUrl?.length ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <img
+                        src={categoria.imagenesUrl[0]}
+                        alt={categoria.denominacion}
+                        style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '6px' }}
+                      />
+                      {categoria.imagenesUrl.length > 1 && <span>+{categoria.imagenesUrl.length - 1}</span>}
+                    </div>
                   ) : '-'}
                 </td>
                 <td>

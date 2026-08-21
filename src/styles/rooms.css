@@ -41,6 +41,57 @@
   background: var(--surface-soft);
 }
 
+.room-card-gallery {
+  position: relative;
+}
+
+.room-card-gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.room-card-gallery-nav.prev {
+  left: 8px;
+}
+
+.room-card-gallery-nav.next {
+  right: 8px;
+}
+
+.room-card-gallery-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.room-card-gallery-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.room-card-gallery-dot.active {
+  background: #fff;
+}
+
 .room-card-image-placeholder {
   width: 100%;
   height: 200px;

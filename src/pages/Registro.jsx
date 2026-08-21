@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import SelectorUbicacion from '../components/SelectorUbicacion';
 import '../styles/pages.css';
 
 const emptyForm = {
@@ -15,24 +16,10 @@ const emptyForm = {
 
 export default function Registro() {
   const [formData, setFormData] = useState(emptyForm);
-  const [ciudades, setCiudades] = useState([]);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const fetchCiudades = async () => {
-    try {
-      const data = await api.get('/ciudades');
-      setCiudades(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchCiudades();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -101,17 +88,10 @@ export default function Registro() {
             <label>Documento de Identidad</label>
             <input type="text" name="documentoIdentidad" value={formData.documentoIdentidad} onChange={handleChange} placeholder="12345678" />
           </div>
-          <div className="form-group">
-            <label>Ciudad</label>
-            <select name="ciudadId" value={formData.ciudadId} onChange={handleChange}>
-              <option value="">Seleccionar ciudad</option>
-              {ciudades.map((ciudad) => (
-                <option key={ciudad.id} value={ciudad.id}>
-                  {ciudad.nombre} ({ciudad.provincia?.nombre})
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectorUbicacion
+            ciudadId={formData.ciudadId}
+            onChange={(ciudadId) => setFormData((prev) => ({ ...prev, ciudadId }))}
+          />
           <div className="form-group">
             <label>País</label>
             <input type="text" name="pais" value={formData.pais} onChange={handleChange} placeholder="País" />

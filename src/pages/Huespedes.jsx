@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
+import SelectorUbicacion from '../components/SelectorUbicacion';
 import '../styles/pages.css';
 
 const emptyForm = {
@@ -14,7 +15,6 @@ const emptyForm = {
 
 export default function Huespedes() {
   const [huespedes, setHuespedes] = useState([]);
-  const [ciudades, setCiudades] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [message, setMessage] = useState(null);
@@ -34,18 +34,8 @@ export default function Huespedes() {
     }
   };
 
-  const fetchCiudades = async () => {
-    try {
-      const data = await api.get('/ciudades');
-      setCiudades(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
   useEffect(() => {
     fetchHuespedes();
-    fetchCiudades();
   }, []);
 
   const filteredHuespedes = huespedes.filter((huesped) => {
@@ -193,17 +183,10 @@ export default function Huespedes() {
               <label>Documento de Identidad</label>
               <input type="text" name="documentoIdentidad" value={formData.documentoIdentidad} onChange={handleInputChange} placeholder="12345678" />
             </div>
-            <div className="form-group">
-              <label>Ciudad</label>
-              <select name="ciudadId" value={formData.ciudadId} onChange={handleInputChange}>
-                <option value="">Seleccionar ciudad</option>
-                {ciudades.map((ciudad) => (
-                  <option key={ciudad.id} value={ciudad.id}>
-                    {ciudad.nombre} ({ciudad.provincia?.nombre})
-                  </option>
-                ))}
-              </select>
-            </div>
+            <SelectorUbicacion
+              ciudadId={formData.ciudadId}
+              onChange={(ciudadId) => setFormData((prev) => ({ ...prev, ciudadId }))}
+            />
             <div className="form-group">
               <label>País</label>
               <input type="text" name="pais" value={formData.pais} onChange={handleInputChange} placeholder="País" />

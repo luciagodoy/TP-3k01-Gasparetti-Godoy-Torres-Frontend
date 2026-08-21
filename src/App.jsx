@@ -7,6 +7,7 @@ import Habitaciones from './pages/Habitaciones';
 import Huespedes from './pages/Huespedes';
 import CheckIn from './pages/CheckIn';
 import Categorias from './pages/Categorias';
+import Usuarios from './pages/Usuarios';
 import Login from './pages/Login';
 import Registro from './pages/Registro';
 import BuscarHabitaciones from './pages/BuscarHabitaciones';
@@ -37,6 +38,10 @@ function App() {
             <Route path="huespedes" element={<Huespedes />} />
             <Route path="checkin" element={<CheckIn />} />
             <Route path="categorias" element={<Categorias />} />
+          </Route>
+
+          <Route element={<ProtectedRoute roles={['admin']} />}>
+            <Route path="usuarios" element={<Usuarios />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

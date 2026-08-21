@@ -18,6 +18,7 @@ export default function MainLayout() {
       { to: '/categorias', label: 'Categorías' },
       { to: '/checkin', label: 'Check-in/out' },
     ] : []),
+    ...(user?.role === 'admin' ? [{ to: '/usuarios', label: 'Usuarios' }] : []),
     ...(user ? [{ to: '/mis-reservas', label: 'Mis Reservas' }] : []),
   ];
 

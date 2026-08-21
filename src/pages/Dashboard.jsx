@@ -15,6 +15,9 @@ export default function Dashboard() {
       { title: 'Categorías', path: '/categorias', description: 'Categorías de habitación' },
       { title: 'Check-in/out', path: '/checkin', description: 'Entrada y salida' },
     ] : []),
+    ...(user?.role === 'admin' ? [
+      { title: 'Usuarios', path: '/usuarios', description: 'Gestionar roles de usuarios' },
+    ] : []),
   ];
 
   return (

@@ -1,5 +1,6 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import crestLogo from '../assets/crest-logo-simple.png';
 import '../styles/layout.css';
 
 export default function MainLayout() {
@@ -7,7 +8,6 @@ export default function MainLayout() {
   const navigate = useNavigate();
 
   const navItems = [
-    { to: '/', label: 'Dashboard' },
     { to: '/buscar', label: 'Buscar Habitaciones' },
     ...(user?.role === 'admin'
       ? [
@@ -30,15 +30,18 @@ export default function MainLayout() {
     <div className="main-layout">
       <header className="navbar">
         <div className="navbar-container">
-          <div className="navbar-brand">
+          <Link to="/" className="navbar-brand">
+            <img src={crestLogo} alt="" className="navbar-crest" />
             <h1>Gestión Hotelera</h1>
-          </div>
+          </Link>
           <nav className="navbar-menu">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
-                className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                className={({ isActive }) =>
+                  `nav-link${item.to === '/buscar' ? ' nav-link-solid' : ''}${isActive ? ' active' : ''}`
+                }
               >
                 {item.label}
               </NavLink>
@@ -51,7 +54,12 @@ export default function MainLayout() {
                 <button className="btn btn-small" onClick={handleLogout}>Cerrar sesión</button>
               </>
             ) : (
-              <NavLink to="/login" className="nav-link">Iniciar sesión</NavLink>
+              <NavLink
+                to="/login"
+                className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
+              >
+                Iniciar sesión
+              </NavLink>
             )}
           </div>
         </div>

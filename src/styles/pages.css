@@ -24,6 +24,12 @@
   font-weight: 400;
 }
 
+.page-crest {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
 .list-header {
   display: flex;
   flex-wrap: wrap;

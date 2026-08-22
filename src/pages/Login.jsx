@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/useAuth';
+import crestLogo from '../assets/crest-logo.png';
 import '../styles/pages.css';
 
 export default function Login() {
@@ -42,6 +43,7 @@ export default function Login() {
   return (
     <div className="page-container">
       <div className="page-header">
+        <img src={crestLogo} alt="" className="page-crest" />
         <h2>Iniciar Sesión</h2>
       </div>
 

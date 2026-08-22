@@ -1,6 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import HeroCarousel from '../components/HeroCarousel';
+import heroSuite from '../assets/hero/hero-suite.jpg';
+import heroResort from '../assets/hero/hero-resort.jpg';
+import heroPool from '../assets/hero/hero-pool.jpg';
 import '../styles/dashboard.css';
+
+const heroImages = [heroSuite, heroResort, heroPool];
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -32,12 +38,14 @@ export default function Dashboard() {
   return (
     <div className="dashboard-page">
       <div className="dashboard-header">
-        <span className="eyebrow">Bienvenido</span>
-        <h2>Una estadía a tu manera</h2>
-        <p>Explorá habitaciones, reservá en minutos y gestioná tu estadía de principio a fin.</p>
-        <div className="hero-actions">
-          <Link to="/buscar" className="btn btn-primary">Buscar Habitaciones</Link>
-          <Link to="/mis-reservas" className="btn btn-secondary">Mis Reservas</Link>
+        <HeroCarousel images={heroImages} />
+        <div className="hero-content">
+          <span className="eyebrow">Bienvenido</span>
+          <h2>Una estadía a tu manera</h2>
+          <div className="hero-actions">
+            <Link to="/buscar" className="btn btn-hero-primary">Buscar Habitaciones</Link>
+            <Link to="/mis-reservas" className="btn btn-hero-secondary">Mis Reservas</Link>
+          </div>
         </div>
       </div>
 

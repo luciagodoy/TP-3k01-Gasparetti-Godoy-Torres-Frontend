@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
+import DateInput from '../components/DateInput';
 import '../styles/pages.css';
 
 const emptyForm = { servicioId: '', precio: '', fechaVigenciaDesde: '', fechaVigenciaHasta: '' };
@@ -148,11 +149,11 @@ export default function PrecioServicios() {
             </div>
             <div className="form-group">
               <label>Vigente desde</label>
-              <input type="date" name="fechaVigenciaDesde" value={formData.fechaVigenciaDesde} onChange={handleChange} />
+              <DateInput name="fechaVigenciaDesde" value={formData.fechaVigenciaDesde} onChange={handleChange} />
             </div>
             <div className="form-group">
               <label>Vigente hasta (opcional)</label>
-              <input type="date" name="fechaVigenciaHasta" value={formData.fechaVigenciaHasta} onChange={handleChange} />
+              <DateInput name="fechaVigenciaHasta" value={formData.fechaVigenciaHasta} onChange={handleChange} min={formData.fechaVigenciaDesde || undefined} />
             </div>
             <button type="submit" className="btn btn-success" disabled={loading}>
               {loading ? 'Guardando...' : editingId ? 'Actualizar' : 'Guardar'}

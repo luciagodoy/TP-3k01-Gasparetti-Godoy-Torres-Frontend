@@ -70,7 +70,6 @@ export default function Huespedes() {
     setMessage(null);
 
     if (editingId) {
-      // Solo se pueden editar los datos de perfil; usuario/email/password no se tocan aquí.
       if (!formData.documentoIdentidad || !formData.ciudadId) {
         setError('Completa todos los campos requeridos.');
         return;

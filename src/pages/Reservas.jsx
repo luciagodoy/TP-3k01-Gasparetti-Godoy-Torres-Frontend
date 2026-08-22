@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
+import DateInput from '../components/DateInput';
 import '../styles/pages.css';
 
 const emptyForm = {
@@ -160,11 +161,11 @@ export default function Reservas() {
             </div>
             <div className="form-group">
               <label>Fecha de Inicio</label>
-              <input type="date" name="fechaInicio" value={formData.fechaInicio} onChange={handleInputChange} />
+              <DateInput name="fechaInicio" value={formData.fechaInicio} onChange={handleInputChange} />
             </div>
             <div className="form-group">
               <label>Fecha de Fin</label>
-              <input type="date" name="fechaFin" value={formData.fechaFin} onChange={handleInputChange} />
+              <DateInput name="fechaFin" value={formData.fechaFin} onChange={handleInputChange} min={formData.fechaInicio || undefined} />
             </div>
             <div className="form-group">
               <label>Monto Total</label>

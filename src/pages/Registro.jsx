@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import crestLogo from '../assets/crest-logo.png';
 import '../styles/pages.css';
 
 const emptyForm = {
@@ -73,6 +74,7 @@ export default function Registro() {
   return (
     <div className="page-container">
       <div className="page-header">
+        <img src={crestLogo} alt="" className="page-crest" />
         <h2>Crear Cuenta</h2>
       </div>
 

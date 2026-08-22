@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/useAuth';
+import DateInput from '../components/DateInput';
 import '../styles/pages.css';
 import '../styles/rooms.css';
 
@@ -82,11 +83,11 @@ export default function BuscarHabitaciones() {
       <div className="room-filters">
         <div className="form-group">
           <label>Fecha de Inicio</label>
-          <input type="date" name="fechaInicio" value={filtros.fechaInicio} onChange={handleFiltroChange} />
+          <DateInput name="fechaInicio" value={filtros.fechaInicio} onChange={handleFiltroChange} min={new Date().toISOString().slice(0, 10)} />
         </div>
         <div className="form-group">
           <label>Fecha de Fin</label>
-          <input type="date" name="fechaFin" value={filtros.fechaFin} onChange={handleFiltroChange} />
+          <DateInput name="fechaFin" value={filtros.fechaFin} onChange={handleFiltroChange} min={filtros.fechaInicio || new Date().toISOString().slice(0, 10)} />
         </div>
         <div className="form-group">
           <label>Categoría</label>

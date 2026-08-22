@@ -6,6 +6,47 @@ import DateInput from '../components/DateInput';
 import '../styles/pages.css';
 import '../styles/rooms.css';
 
+function GaleriaImagenes({ imagenes, alt }) {
+  const [indice, setIndice] = useState(0);
+
+  if (!imagenes || imagenes.length === 0) {
+    return <div className="room-card-image-placeholder">Sin imagen</div>;
+  }
+
+  const anterior = (e) => {
+    e.stopPropagation();
+    setIndice((prev) => (prev === 0 ? imagenes.length - 1 : prev - 1));
+  };
+
+  const siguiente = (e) => {
+    e.stopPropagation();
+    setIndice((prev) => (prev === imagenes.length - 1 ? 0 : prev + 1));
+  };
+
+  return (
+    <div className="room-card-gallery">
+      <img className="room-card-image" src={imagenes[indice]} alt={alt} />
+      {imagenes.length > 1 && (
+        <>
+          <button className="room-card-gallery-nav prev" onClick={anterior} type="button" aria-label="Foto anterior">‹</button>
+          <button className="room-card-gallery-nav next" onClick={siguiente} type="button" aria-label="Foto siguiente">›</button>
+          <div className="room-card-gallery-dots">
+            {imagenes.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                className={`room-card-gallery-dot${i === indice ? ' active' : ''}`}
+                onClick={(e) => { e.stopPropagation(); setIndice(i); }}
+                aria-label={`Ver foto ${i + 1}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function BuscarHabitaciones() {
   const [habitaciones, setHabitaciones] = useState([]);
   const [categorias, setCategorias] = useState([]);
@@ -54,9 +95,11 @@ export default function BuscarHabitaciones() {
     setFiltros((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleReservar = (habitacion) => {
+  const handleReservar = (grupo) => {
+    // Se reserva "una habitación de esta categoría" — se asigna la primera disponible del grupo,
+    // igual que en un hotel real no elegís el número exacto de habitación al reservar.
     const seleccion = {
-      habitacionId: habitacion.id,
+      habitacionId: grupo.habitaciones[0].id,
       fechaInicio: filtros.fechaInicio,
       fechaFin: filtros.fechaFin,
     };
@@ -71,6 +114,20 @@ export default function BuscarHabitaciones() {
     }
     navigate('/reservar', { state: seleccion });
   };
+
+  // Agrupamos las habitaciones encontradas por categoría: a los huéspedes les interesa
+  // el tipo de habitación y cuántas hay disponibles, no el número de habitación puntual.
+  const gruposPorCategoria = habitaciones.reduce((grupos, hab) => {
+    const categoriaId = hab.categoria?.id;
+    if (!categoriaId) return grupos;
+    if (!grupos[categoriaId]) {
+      grupos[categoriaId] = { categoria: hab.categoria, habitaciones: [] };
+    }
+    grupos[categoriaId].habitaciones.push(hab);
+    return grupos;
+  }, {});
+  const listaGrupos = Object.values(gruposPorCategoria);
+  const hayFechas = Boolean(filtros.fechaInicio && filtros.fechaFin);
 
   return (
     <div className="page-container">
@@ -108,24 +165,24 @@ export default function BuscarHabitaciones() {
       </div>
 
       <div className="room-grid">
-        {habitaciones.map((hab) => (
-          <div className="room-card" key={hab.id}>
-            {hab.categoria?.imagenUrl ? (
-              <img className="room-card-image" src={hab.categoria.imagenUrl} alt={hab.categoria?.denominacion} />
-            ) : (
-              <div className="room-card-image-placeholder">Sin imagen</div>
-            )}
+        {listaGrupos.map((grupo) => (
+          <div className="room-card" key={grupo.categoria.id}>
+            <GaleriaImagenes imagenes={grupo.categoria.imagenesUrl} alt={grupo.categoria.denominacion} />
             <div className="room-card-body">
-              <h3 className="room-card-title">{hab.categoria?.denominacion || 'Habitación'}</h3>
-              <p className="room-card-meta">Habitación N° {hab.numero} · Piso {hab.piso}</p>
-              <p className="room-card-meta">Hasta {hab.categoria?.capacidadPersonas} personas</p>
-              {hab.categoria?.descripcion && <p className="room-card-meta">{hab.categoria.descripcion}</p>}
-              <p className="room-card-price">${hab.categoria?.precioNoche ?? 0} / noche</p>
+              <h3 className="room-card-title">{grupo.categoria.denominacion}</h3>
+              <p className="room-card-meta">
+                {hayFechas
+                  ? `${grupo.habitaciones.length} disponible${grupo.habitaciones.length === 1 ? '' : 's'} para esas fechas`
+                  : `${grupo.habitaciones.length} ${grupo.habitaciones.length === 1 ? 'habitación' : 'habitaciones'} en total`}
+              </p>
+              <p className="room-card-meta">Hasta {grupo.categoria.capacidadPersonas} personas</p>
+              {grupo.categoria.descripcion && <p className="room-card-meta">{grupo.categoria.descripcion}</p>}
+              <p className="room-card-price">${grupo.categoria.precioNoche ?? 0} / noche</p>
               <div className="room-card-footer">
                 <button
                   className="btn btn-success"
-                  onClick={() => handleReservar(hab)}
-                  disabled={!filtros.fechaInicio || !filtros.fechaFin}
+                  onClick={() => handleReservar(grupo)}
+                  disabled={!hayFechas}
                 >
                   Reservar
                 </button>
@@ -133,7 +190,7 @@ export default function BuscarHabitaciones() {
             </div>
           </div>
         ))}
-        {!loading && habitaciones.length === 0 && <p>No se encontraron habitaciones disponibles.</p>}
+        {!loading && listaGrupos.length === 0 && <p>No se encontraron habitaciones disponibles.</p>}
       </div>
     </div>
   );

@@ -1,56 +1,25 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/useAuth';
 import DateInput from '../components/DateInput';
+import GaleriaImagenes from '../components/GaleriaImagenes';
 import '../styles/pages.css';
 import '../styles/rooms.css';
-
-function GaleriaImagenes({ imagenes, alt }) {
-  const [indice, setIndice] = useState(0);
-
-  if (!imagenes || imagenes.length === 0) {
-    return <div className="room-card-image-placeholder">Sin imagen</div>;
-  }
-
-  const anterior = (e) => {
-    e.stopPropagation();
-    setIndice((prev) => (prev === 0 ? imagenes.length - 1 : prev - 1));
-  };
-
-  const siguiente = (e) => {
-    e.stopPropagation();
-    setIndice((prev) => (prev === imagenes.length - 1 ? 0 : prev + 1));
-  };
-
-  return (
-    <div className="room-card-gallery">
-      <img className="room-card-image" src={imagenes[indice]} alt={alt} />
-      {imagenes.length > 1 && (
-        <>
-          <button className="room-card-gallery-nav prev" onClick={anterior} type="button" aria-label="Foto anterior">‹</button>
-          <button className="room-card-gallery-nav next" onClick={siguiente} type="button" aria-label="Foto siguiente">›</button>
-          <div className="room-card-gallery-dots">
-            {imagenes.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                className={`room-card-gallery-dot${i === indice ? ' active' : ''}`}
-                onClick={(e) => { e.stopPropagation(); setIndice(i); }}
-                aria-label={`Ver foto ${i + 1}`}
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
 
 export default function BuscarHabitaciones() {
   const [habitaciones, setHabitaciones] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const [filtros, setFiltros] = useState({ fechaInicio: '', fechaFin: '', categoriaId: '', personas: '' });
+  const location = useLocation();
+  // Si venimos del buscador de la landing (BookingBar), llega con los filtros
+  // ya elegidos en location.state; si no, arranca vacío.
+  const [filtros, setFiltros] = useState(() => ({
+    fechaInicio: '',
+    fechaFin: '',
+    categoriaId: '',
+    personas: '',
+    ...(location.state || {}),
+  }));
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const { user, huesped } = useAuth();

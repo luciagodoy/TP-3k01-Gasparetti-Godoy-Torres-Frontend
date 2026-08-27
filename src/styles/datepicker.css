@@ -49,14 +49,17 @@
   justify-content: space-between;
   margin-bottom: 0.75rem;
   font-weight: 700;
-  color: var(--text);
+  color: var(--surface-text);
   text-transform: capitalize;
 }
 
+/* --primary-soft es un tinte oscuro pensado para fondos claros: sobre el
+   fondo oscuro de --surface queda casi invisible, así que estos controles
+   usan un tinte claro propio en vez de la variable compartida. */
 .date-input-header button {
   border: none;
-  background: var(--primary-soft);
-  color: var(--primary);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--surface-text);
   width: 28px;
   height: 28px;
   border-radius: 999px;
@@ -70,7 +73,7 @@
 }
 
 .date-input-header button:hover {
-  background-color: rgba(20, 38, 31, 0.16);
+  background-color: rgba(255, 255, 255, 0.16);
 }
 
 .date-input-weekdays {
@@ -83,7 +86,7 @@
   text-align: center;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--muted);
+  color: var(--surface-muted);
 }
 
 .date-input-grid {
@@ -101,13 +104,13 @@
   background: transparent;
   border-radius: 999px;
   font-size: 0.88rem;
-  color: var(--text);
+  color: var(--surface-text);
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .date-input-cell:not(.empty):hover {
-  background: var(--primary-soft);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .date-input-cell.selected {
@@ -117,7 +120,7 @@
 }
 
 .date-input-cell:disabled {
-  color: var(--border);
+  color: rgba(179, 172, 162, 0.4);
   cursor: not-allowed;
 }
 

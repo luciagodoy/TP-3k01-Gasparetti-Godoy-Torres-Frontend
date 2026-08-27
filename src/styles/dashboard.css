@@ -106,6 +106,24 @@
   border-color: #fff;
 }
 
+.categorias-showcase {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.categorias-showcase-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.categorias-showcase-header h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+  font-weight: 400;
+  color: var(--text);
+}
+
 .menu-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -143,12 +161,12 @@
 .menu-card h3 {
   font-size: 1.35rem;
   margin: 0.25rem 0;
-  color: var(--text);
+  color: var(--surface-text);
   font-weight: 600;
 }
 
 .menu-card p {
-  color: var(--muted);
+  color: var(--surface-muted);
   font-size: 0.92rem;
   margin: 0;
 }

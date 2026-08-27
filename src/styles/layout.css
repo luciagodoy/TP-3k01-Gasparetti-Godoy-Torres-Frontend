@@ -83,12 +83,15 @@
   text-align: center;
   padding: 0.75rem 1rem;
   border-radius: 999px;
+  border: none;
   background: var(--primary-soft);
+  cursor: pointer;
+  font-family: inherit;
   transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .nav-link:hover {
-  background-color: rgba(20, 38, 31, 0.14);
+  background-color: rgba(163, 137, 79, 0.16);
   transform: translateY(-1px);
   box-shadow: 0 10px 20px rgba(20, 20, 18, 0.08);
 }
@@ -96,7 +99,7 @@
 .nav-link.active {
   background: var(--primary);
   color: #fefdf9;
-  box-shadow: inset 0 0 0 1px rgba(20, 38, 31, 0.24);
+  box-shadow: inset 0 0 0 1px rgba(163, 137, 79, 0.3);
 }
 
 /* Botón sólido negro (p. ej. "Buscar Habitaciones" / "Iniciar sesión"): sin
@@ -115,6 +118,65 @@
 .nav-link-solid.active {
   background: #000;
   box-shadow: none;
+}
+
+.nav-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.nav-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.nav-dropdown-caret {
+  font-size: 0.7em;
+  transition: transform 0.2s ease;
+}
+
+.nav-dropdown.open .nav-dropdown-caret {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+  display: none;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.nav-dropdown.open .nav-dropdown-menu {
+  display: flex;
+}
+
+.nav-dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: background-color 0.25s ease;
+}
+
+.nav-dropdown-item:hover {
+  background-color: rgba(163, 137, 79, 0.16);
+}
+
+.nav-dropdown-item.active {
+  background: #000;
+  color: #fefdf9;
 }
 
 .footer {
@@ -151,6 +213,33 @@
   .nav-link {
     width: auto;
     padding: 0.8rem 1.1rem;
+  }
+
+  .nav-dropdown {
+    width: auto;
+  }
+
+  .nav-dropdown-trigger {
+    width: auto;
+  }
+
+  .nav-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0;
+    background: rgba(255, 253, 249, 0.98);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(44, 36, 26, 0.16);
+    padding: 0.5rem;
+    min-width: 190px;
+    z-index: 110;
+    backdrop-filter: blur(14px);
+  }
+
+  .nav-dropdown-item {
+    text-align: left;
   }
 }
 

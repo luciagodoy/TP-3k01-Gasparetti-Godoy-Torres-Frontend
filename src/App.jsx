@@ -31,6 +31,7 @@ function App() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="buscar" element={<BuscarHabitaciones />} />
+          <Route path="categorias" element={<Categorias />} />
           <Route path="login" element={<Login />} />
           <Route path="registro" element={<Registro />} />
           <Route element={<ProtectedRoute roles={['admin']} />}>
@@ -38,7 +39,6 @@ function App() {
             <Route path="habitaciones" element={<Habitaciones />} />
             <Route path="huespedes" element={<Huespedes />} />
             <Route path="checkin" element={<CheckIn />} />
-            <Route path="categorias" element={<Categorias />} />
             <Route path="servicios" element={<Servicios />} />
             <Route path="empleados" element={<Empleados />} />
             <Route path="provincias" element={<Provincias />} />

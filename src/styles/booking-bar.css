@@ -1,0 +1,102 @@
+/* Barra de reserva rápida: se solapa con el borde inferior del carrusel del
+   hero (como en los templates de hotel de referencia), en vez de vivir
+   pegada al contenido del hero como el botón anterior. Vive como hermana de
+   .dashboard-header (no adentro), para no quedar recortada por su
+   overflow: hidden. */
+.booking-bar {
+  position: relative;
+  z-index: 2;
+  /* .dashboard-page ya pone gap: 2rem entre el hero y esta barra; hay que
+     cancelar ese gap (y un poco más en desktop) para que quede pegada/
+     solapada al borde inferior del carrusel. */
+  margin-top: -2rem;
+  margin-bottom: 2rem;
+  background: var(--primary-dark);
+  border-radius: 20px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+}
+
+.booking-bar-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.booking-bar-field label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.booking-bar-field select,
+.booking-bar-field input[type='number'] {
+  width: 100%;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fffdf9;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.booking-bar-field select:focus-visible,
+.booking-bar-field input[type='number']:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.booking-bar-field select option {
+  color: #17181a;
+  background: #fffdf9;
+}
+
+.booking-bar .date-input-trigger {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #fffdf9;
+}
+
+.booking-bar .date-input-placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.booking-bar-submit {
+  border: none;
+  border-radius: 3px;
+  background: #fff;
+  color: #000;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.booking-bar-submit:hover {
+  background: #e9e4da;
+}
+
+@media (min-width: 1024px) {
+  .booking-bar {
+    flex-direction: row;
+    align-items: flex-end;
+    padding: 1.5rem 2rem;
+    margin-top: -4.25rem;
+  }
+
+  .booking-bar-field {
+    flex: 1;
+  }
+
+  .booking-bar-submit {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}

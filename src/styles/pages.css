@@ -53,7 +53,7 @@
   border-radius: 999px;
   font-family: inherit;
   font-size: 0.95rem;
-  color: var(--text);
+  color: var(--surface-text);
   background: var(--surface);
 }
 
@@ -96,7 +96,7 @@
 
 .form-group label {
   font-weight: 700;
-  color: #3c2f26;
+  color: var(--surface-text);
   margin-bottom: 0.65rem;
   font-size: 0.95rem;
 }
@@ -110,7 +110,7 @@
   font-family: inherit;
   font-size: 1rem;
   color: #2c241b;
-  background: #fbf5ed;
+  background: #f5efe3;
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -191,7 +191,7 @@
 }
 
 .table tbody tr {
-  background: rgba(255, 253, 249, 0.96);
+  background: rgba(255, 253, 249, 0.9);
 }
 
 .table tbody tr:hover {

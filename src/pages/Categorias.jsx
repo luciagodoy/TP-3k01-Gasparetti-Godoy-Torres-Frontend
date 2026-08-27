@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
+import { useAuth } from '../context/useAuth';
 import '../styles/pages.css';
 
 const emptyForm = { denominacion: '', descripcion: '', capacidadPersonas: 1, imagenesUrl: '', precioNoche: '' };
 
 export default function Categorias() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [categorias, setCategorias] = useState([]);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -116,74 +119,76 @@ export default function Categorias() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h2>Gestión de Categorías</h2>
+        <h2>Categorías</h2>
       </div>
 
       {message && <div className="alert alert-success">{message}</div>}
       {error && <div className="alert alert-error">{error}</div>}
 
-      <div className="form-container">
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Denominación</label>
-            <input
-              type="text"
-              name="denominacion"
-              value={formData.denominacion}
-              onChange={handleChange}
-              placeholder="Ej: Estándar"
-            />
-          </div>
-          <div className="form-group">
-            <label>Descripción</label>
-            <textarea
-              name="descripcion"
-              value={formData.descripcion}
-              onChange={handleChange}
-              placeholder="Descripción breve de la categoría"
-            ></textarea>
-          </div>
-          <div className="form-group">
-            <label>Capacidad de personas</label>
-            <input
-              type="number"
-              name="capacidadPersonas"
-              min="1"
-              value={formData.capacidadPersonas}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label>URLs de imágenes (una por línea)</label>
-            <textarea
-              name="imagenesUrl"
-              value={formData.imagenesUrl}
-              onChange={handleChange}
-              placeholder={'https://...\nhttps://...'}
-              rows={4}
-            ></textarea>
-          </div>
-          <div className="form-group">
-            <label>Precio por noche</label>
-            <input
-              type="number"
-              step="0.01"
-              name="precioNoche"
-              value={formData.precioNoche}
-              onChange={handleChange}
-              placeholder="0.00"
-            />
-          </div>
-          <button type="submit" className="btn btn-success" disabled={loading}>
-            {loading ? 'Guardando...' : editingId ? 'Actualizar categoría' : 'Guardar categoría'}
-          </button>
-          {editingId && (
-            <button type="button" className="btn btn-small" onClick={resetForm}>
-              Cancelar edición
+      {isAdmin && (
+        <div className="form-container">
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Denominación</label>
+              <input
+                type="text"
+                name="denominacion"
+                value={formData.denominacion}
+                onChange={handleChange}
+                placeholder="Ej: Estándar"
+              />
+            </div>
+            <div className="form-group">
+              <label>Descripción</label>
+              <textarea
+                name="descripcion"
+                value={formData.descripcion}
+                onChange={handleChange}
+                placeholder="Descripción breve de la categoría"
+              ></textarea>
+            </div>
+            <div className="form-group">
+              <label>Capacidad de personas</label>
+              <input
+                type="number"
+                name="capacidadPersonas"
+                min="1"
+                value={formData.capacidadPersonas}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="form-group">
+              <label>URLs de imágenes (una por línea)</label>
+              <textarea
+                name="imagenesUrl"
+                value={formData.imagenesUrl}
+                onChange={handleChange}
+                placeholder={'https://...\nhttps://...'}
+                rows={4}
+              ></textarea>
+            </div>
+            <div className="form-group">
+              <label>Precio por noche</label>
+              <input
+                type="number"
+                step="0.01"
+                name="precioNoche"
+                value={formData.precioNoche}
+                onChange={handleChange}
+                placeholder="0.00"
+              />
+            </div>
+            <button type="submit" className="btn btn-success" disabled={loading}>
+              {loading ? 'Guardando...' : editingId ? 'Actualizar categoría' : 'Guardar categoría'}
             </button>
-          )}
-        </form>
-      </div>
+            {editingId && (
+              <button type="button" className="btn btn-small" onClick={resetForm}>
+                Cancelar edición
+              </button>
+            )}
+          </form>
+        </div>
+      )}
 
       <div className="list-container">
         <h3>Categorías</h3>
@@ -196,7 +201,7 @@ export default function Categorias() {
               <th>Capacidad</th>
               <th>Precio/Noche</th>
               <th>Imágenes</th>
-              <th>Acciones</th>
+              {isAdmin && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -219,14 +224,16 @@ export default function Categorias() {
                     </div>
                   ) : '-'}
                 </td>
-                <td>
-                  <button className="btn btn-small" onClick={() => handleEdit(categoria)}>
-                    Editar
-                  </button>
-                  <button className="btn btn-small btn-danger" onClick={() => handleDelete(categoria.id)} disabled={loading}>
-                    Eliminar
-                  </button>
-                </td>
+                {isAdmin && (
+                  <td>
+                    <button className="btn btn-small" onClick={() => handleEdit(categoria)}>
+                      Editar
+                    </button>
+                    <button className="btn btn-small btn-danger" onClick={() => handleDelete(categoria.id)} disabled={loading}>
+                      Eliminar
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

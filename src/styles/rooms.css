@@ -125,18 +125,18 @@
   font-size: 1.3rem;
   font-weight: 600;
   margin: 0;
-  color: var(--text);
+  color: var(--surface-text);
 }
 
 .room-card-meta {
-  color: var(--muted);
+  color: var(--surface-muted);
   font-size: 0.9rem;
 }
 
 .room-card-price {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--accent);
   margin-top: 0.4rem;
 }
 

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import HeroCarousel from '../components/HeroCarousel';
+import BookingBar from '../components/BookingBar';
+import CategoriasShowcase from '../components/CategoriasShowcase';
 import heroSuite from '../assets/hero/hero-suite.jpg';
 import heroResort from '../assets/hero/hero-resort.jpg';
 import heroPool from '../assets/hero/hero-pool.jpg';
@@ -10,13 +12,14 @@ const heroImages = [heroSuite, heroResort, heroPool];
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
 
   const menuItems = [
     { title: 'Buscar Habitaciones', path: '/buscar', description: 'Explorar y reservar' },
     ...(user
       ? [{ title: 'Mis Reservas', path: '/mis-reservas', description: 'Ver y gestionar tus reservas' }]
       : []),
-    ...(user?.role === 'admin'
+    ...(isAdmin
       ? [
           { title: 'Reservas', path: '/reservas', description: 'Gestionar reservas' },
           { title: 'Habitaciones', path: '/habitaciones', description: 'Administrar habitaciones' },
@@ -43,11 +46,14 @@ export default function Dashboard() {
           <span className="eyebrow">Bienvenido</span>
           <h2>Una estadía a tu manera</h2>
           <div className="hero-actions">
-            <Link to="/buscar" className="btn btn-hero-primary">Buscar Habitaciones</Link>
             <Link to="/mis-reservas" className="btn btn-hero-secondary">Mis Reservas</Link>
           </div>
         </div>
       </div>
+
+      <BookingBar />
+
+      {!isAdmin && <CategoriasShowcase />}
 
       <div className="menu-grid">
         {menuItems.map((item) => (

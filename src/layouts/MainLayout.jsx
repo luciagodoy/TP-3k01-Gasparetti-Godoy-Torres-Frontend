@@ -1,25 +1,39 @@
-import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import crestLogo from '../assets/crest-logo-simple.png';
 import '../styles/layout.css';
 
+const GESTION_LINKS = [
+  { to: '/reservas', label: 'Reservas' },
+  { to: '/habitaciones', label: 'Habitaciones' },
+  { to: '/huespedes', label: 'Huéspedes' },
+  { to: '/categorias', label: 'Categorías' },
+  { to: '/checkin', label: 'Check-in/out' },
+];
+
 export default function MainLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAdmin = user?.role === 'admin';
 
-  const navItems = [
-    { to: '/buscar', label: 'Buscar Habitaciones' },
-    ...(user?.role === 'admin'
-      ? [
-          { to: '/reservas', label: 'Reservas' },
-          { to: '/habitaciones', label: 'Habitaciones' },
-          { to: '/huespedes', label: 'Huéspedes' },
-          { to: '/categorias', label: 'Categorías' },
-          { to: '/checkin', label: 'Check-in/out' },
-        ]
-      : []),
-    ...(user ? [{ to: '/mis-reservas', label: 'Mis Reservas' }] : []),
-  ];
+  const [gestionOpen, setGestionOpen] = useState(false);
+  const gestionRef = useRef(null);
+
+  useEffect(() => {
+    setGestionOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (gestionRef.current && !gestionRef.current.contains(e.target)) {
+        setGestionOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -35,23 +49,54 @@ export default function MainLayout() {
             <h1>Gestión Hotelera</h1>
           </Link>
           <nav className="navbar-menu">
-            {navItems.map((item) => (
+            {!isAdmin && (
               <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `nav-link${item.to === '/buscar' ? ' nav-link-solid' : ''}${isActive ? ' active' : ''}`
-                }
+                to="/buscar"
+                className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
               >
-                {item.label}
+                Buscar Habitaciones
               </NavLink>
-            ))}
+            )}
+
+            {!isAdmin && user && (
+              <NavLink
+                to="/mis-reservas"
+                className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
+              >
+                Mis Reservas
+              </NavLink>
+            )}
+
+            {isAdmin && (
+              <div className={`nav-dropdown${gestionOpen ? ' open' : ''}`} ref={gestionRef}>
+                <button
+                  type="button"
+                  className="nav-link nav-link-solid nav-dropdown-trigger"
+                  onClick={() => setGestionOpen((prev) => !prev)}
+                  aria-expanded={gestionOpen}
+                  aria-haspopup="true"
+                >
+                  Gestión <span className="nav-dropdown-caret">▾</span>
+                </button>
+                <div className="nav-dropdown-menu">
+                  {GESTION_LINKS.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      className={({ isActive }) => `nav-dropdown-item${isActive ? ' active' : ''}`}
+                    >
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            )}
           </nav>
           <div className="navbar-auth">
             {user ? (
               <>
                 <span>Hola, {user.username}</span>
-                <button className="btn btn-small" onClick={handleLogout}>Cerrar sesión</button>
+                <button className="nav-link nav-link-solid" onClick={handleLogout}>Cerrar sesión</button>
               </>
             ) : (
               <NavLink

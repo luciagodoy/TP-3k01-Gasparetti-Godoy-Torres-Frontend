@@ -5,7 +5,9 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'playwright-report', 'test-results']),
+  // .claude guarda scripts vendorizados/minificados de skills instaladas: no es
+  // código de la app y ensucia el lint con cientos de errores ajenos.
+  globalIgnores(['dist', 'playwright-report', 'test-results', '.claude']),
   {
     files: ['playwright.config.js', 'vite.config.js'],
     languageOptions: { globals: globals.node },

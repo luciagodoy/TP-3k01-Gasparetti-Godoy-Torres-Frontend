@@ -15,7 +15,6 @@ export default function Dashboard() {
   const isAdmin = user?.role === 'admin';
 
   const menuItems = [
-    { title: 'Buscar Habitaciones', path: '/buscar', description: 'Explorar y reservar' },
     ...(user
       ? [{ title: 'Mis Reservas', path: '/mis-reservas', description: 'Ver y gestionar tus reservas' }]
       : []),
@@ -30,8 +29,6 @@ export default function Dashboard() {
           { title: 'Cupos', path: '/cupos', description: 'Disponibilidad de los servicios' },
           { title: 'Precios de Servicios', path: '/precios-servicio', description: 'Vigencia y precio de cada servicio' },
           { title: 'Consumos de Servicio', path: '/reserva-servicios', description: 'Servicios agregados a una reserva' },
-          { title: 'Provincias', path: '/provincias', description: 'Provincias registradas' },
-          { title: 'Ciudades', path: '/ciudades', description: 'Ciudades registradas' },
           { title: 'Empleados', path: '/empleados', description: 'Personal del hotel' },
           { title: 'Usuarios', path: '/usuarios', description: 'Cuentas y roles de acceso' },
         ]

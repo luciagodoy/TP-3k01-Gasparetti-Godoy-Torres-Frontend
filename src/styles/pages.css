@@ -1,6 +1,6 @@
 .page-container {
   background: rgba(255, 253, 249, 0.98);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   padding: 1.25rem;
   box-shadow: var(--shadow);
   border: 1px solid rgba(163, 137, 79, 0.14);
@@ -50,7 +50,7 @@
   width: 100%;
   padding: 0.7rem 1rem;
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   font-family: inherit;
   font-size: 0.95rem;
   color: var(--surface-text);
@@ -78,14 +78,13 @@
   background-color: var(--primary-soft) !important;
 }
 
-/* Form Styles */
 .form-container {
   background: var(--surface);
-  border-radius: 28px;
+  border-radius: var(--radius-lg);
   padding: 1.75rem;
   margin-bottom: 2rem;
   border: 1px solid rgba(163, 137, 79, 0.14);
-  box-shadow: 0 18px 40px rgba(44, 36, 26, 0.06);
+  box-shadow: var(--shadow);
 }
 
 .form-group {
@@ -106,7 +105,7 @@
 .form-group textarea {
   padding: 1rem 1.1rem;
   border: 1px solid rgba(163, 137, 79, 0.18);
-  border-radius: 18px;
+  border-radius: var(--radius-sm);
   font-family: inherit;
   font-size: 1rem;
   color: #2c241b;
@@ -127,9 +126,8 @@
   min-height: 120px;
 }
 
-/* Alerts */
 .alert {
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
   font-weight: 600;
@@ -145,7 +143,6 @@
   color: #8a3324;
 }
 
-/* List Container */
 .list-container {
   margin-top: 2rem;
   overflow-x: auto;
@@ -159,12 +156,11 @@
   line-height: 1.1;
 }
 
-/* Table Styles */
 .table {
   width: 100%;
   border-collapse: collapse;
   background: transparent;
-  border-radius: 22px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: inset 0 0 0 1px rgba(163, 137, 79, 0.14);
 }
@@ -202,11 +198,10 @@
   border-bottom: none;
 }
 
-/* Buttons */
 .btn {
   padding: 0.95rem 1.6rem;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-action);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
@@ -219,7 +214,7 @@
 
 .btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 18px 36px rgba(44, 36, 26, 0.12);
+  box-shadow: var(--shadow-lifted);
 }
 
 .btn-primary {
@@ -264,13 +259,12 @@
   margin-bottom: 0.6rem;
 }
 
-/* Cards */
 .details-card {
   background: rgba(255, 253, 249, 0.98);
   border: 1px solid rgba(163, 137, 79, 0.14);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
-  box-shadow: 0 16px 45px rgba(44, 36, 26, 0.08);
+  box-shadow: var(--shadow);
   margin-top: 1.5rem;
 }
 
@@ -289,11 +283,10 @@
   padding-left: 1.2rem;
 }
 
-/* Badge Styles */
 .badge {
   display: inline-block;
   padding: 0.4rem 0.85rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 0.82rem;
   font-weight: 700;
 }
@@ -352,7 +345,6 @@
   }
 }
 
-/* LG: desktop */
 @media (min-width: 1024px) {
   .page-container {
     padding: 2rem;

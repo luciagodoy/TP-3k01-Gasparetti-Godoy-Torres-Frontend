@@ -115,7 +115,41 @@ export default function MainLayout() {
       </main>
 
       <footer className="footer">
-        <p>&copy; 2026 TP DSW - Hotel Management System</p>
+        <div className="footer-brand">
+          <img src={crestLogo} alt="" className="footer-crest" />
+          <span className="footer-wordmark">Gestión Hotelera</span>
+        </div>
+
+        <div className="footer-columns">
+          <div className="footer-column">
+            <h3>Explorar</h3>
+            <Link to="/">Inicio</Link>
+            <Link to="/buscar">Buscar Habitaciones</Link>
+            <Link to="/categorias">Categorías</Link>
+          </div>
+
+          <div className="footer-column">
+            <h3>Cuenta</h3>
+            {user ? (
+              <Link to="/mis-reservas">Mis Reservas</Link>
+            ) : (
+              <>
+                <Link to="/login">Iniciar Sesión</Link>
+                <Link to="/registro">Crear Cuenta</Link>
+              </>
+            )}
+          </div>
+
+          <div className="footer-column">
+            <h3>Contacto</h3>
+            <a href="mailto:gestionhotelera2026@gmail.com">gestionhotelera2026@gmail.com</a>
+            <span className="footer-address">Zeballos 1341, Rosario, Argentina</span>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <p>&copy; 2026 TP DSW - Hotel Management System</p>
+        </div>
       </footer>
     </div>
   );

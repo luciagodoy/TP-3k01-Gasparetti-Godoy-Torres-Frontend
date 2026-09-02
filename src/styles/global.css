@@ -1,7 +1,6 @@
-/* Global Styles */
 :root {
   color-scheme: light;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Archivo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 18px;
   line-height: 1.7;
   background-color: #f5f0e5;
@@ -13,17 +12,18 @@
   --text: #17140f;
   --muted: #6b6558;
   --border: #0c0c0c;
-  --shadow: 0 24px 60px rgba(20, 20, 18, 0.10);
-  /* --surface es un panel oscuro deliberado (tarjetas, popups) que contrasta
-     con el resto del sitio, claro/color hueso; el texto que vive encima usa
-     este par en vez de --text/--muted, que asumen fondo claro. */
+  --shadow: 0 2px 8px rgba(23, 20, 15, 0.08);
+  --shadow-lifted: 0 8px 20px rgba(23, 20, 15, 0.12);
+  --shadow-overlay: 0 16px 32px rgba(0, 0, 0, 0.24);
   --surface-text: #ffffff;
   --surface-muted: #a8a7a6;
 
-  /* Four Seasons: negro/casi-negro como color de marca, oro/latón como
-     único acento cálido, blanco cálido de fondo. El verde queda sólo como
-     color funcional de "éxito" (badges, botón Reservar), no como acento
-     principal de marca. */
+  --radius-action: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
   --primary: #141414;
   --primary-dark: #000000;
   --primary-soft: rgba(20, 20, 20, 0.06);
@@ -47,7 +47,7 @@ body {
   min-height: 100vh;
   background: radial-gradient(circle at top, rgba(163, 137, 79, 0.07), transparent 32%), linear-gradient(180deg, #faf7f0 0%, #f5f0e5 100%);
   color: var(--text);
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Archivo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -59,7 +59,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Libre Franklin', 'Inter', system-ui, sans-serif;
+  font-family: 'Bodoni Moda', 'Libre Franklin', Georgia, serif;
   color: var(--text);
   letter-spacing: -0.01em;
   line-height: 1.1;
@@ -72,7 +72,7 @@ button,
 input,
 select,
 textarea {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Archivo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .eyebrow {
@@ -104,7 +104,6 @@ button {
   cursor: pointer;
 }
 
-/* Animations */
 @keyframes slideIn {
   from {
     opacity: 0;

@@ -29,3 +29,6 @@ test-results
 *.sw?
 *.claude
 .mcp.json
+
+# Local dev-notes file for code comments (see COMMENTS.md convention)
+COMMENTS.md

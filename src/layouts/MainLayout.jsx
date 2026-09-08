@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import ErrorBoundary from '../components/ErrorBoundary';
 import crestLogo from '../assets/crest-logo-simple.png';
 import '../styles/layout.css';
 
@@ -111,7 +112,11 @@ export default function MainLayout() {
       </header>
 
       <main className="main-content">
-        <Outlet />
+        {/* La key por ruta remonta el boundary al navegar: si no, una vez que
+            una página falla el fallback queda pegado aunque cambies de sección. */}
+        <ErrorBoundary key={location.pathname}>
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       <footer className="footer">

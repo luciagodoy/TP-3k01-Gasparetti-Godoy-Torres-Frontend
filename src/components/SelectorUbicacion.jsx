@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import api from '../services/api';
 
 // Selector en cascada: primero provincia, después ciudad (con autocompletar por texto).
@@ -12,25 +12,33 @@ export default function SelectorUbicacion({ ciudadId, onChange }) {
 
   useEffect(() => {
     api.get('/provincias').then((data) => setProvincias(data || [])).catch(() => {});
-    api.get('/ciudades').then((data) => setCiudades(data || [])).catch(() => {});
   }, []);
 
-  // Si el padre ya trae un ciudadId (ej: editando un huésped existente), una vez
-  // que cargan las ciudades preseleccionamos su provincia y el texto de búsqueda.
+  // Editando un huésped existente sólo llega el id de la ciudad: la pedimos
+  // puntualmente para saber a qué provincia pertenece y precargar el texto, en
+  // vez de bajar el país entero para buscarla.
   useEffect(() => {
-    if (!ciudadId || ciudades.length === 0) return;
-    const ciudadActual = ciudades.find((c) => c.id === Number(ciudadId));
-    if (ciudadActual) {
-      setProvinciaId(String(ciudadActual.provinciaId));
-      setBusquedaCiudad(ciudadActual.nombre);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ciudadId, ciudades.length]);
+    if (!ciudadId || provinciaId) return;
+    api.get(`/ciudades/${ciudadId}`)
+      .then((ciudad) => {
+        if (!ciudad?.provinciaId) return;
+        setProvinciaId(String(ciudad.provinciaId));
+        setBusquedaCiudad(ciudad.nombre);
+      })
+      .catch(() => {});
+  }, [ciudadId, provinciaId]);
 
-  const ciudadesDeProvincia = useMemo(
-    () => ciudades.filter((c) => String(c.provinciaId) === provinciaId),
-    [ciudades, provinciaId]
-  );
+  // Las ciudades se piden filtradas por provincia: el listado completo del país
+  // son ~3900 filas (~1 MB) y esta pantalla es pública.
+  useEffect(() => {
+    if (!provinciaId) {
+      setCiudades([]);
+      return;
+    }
+    api.get(`/ciudades?provinciaId=${provinciaId}`)
+      .then((data) => setCiudades(data || []))
+      .catch(() => {});
+  }, [provinciaId]);
 
   const handleProvinciaChange = (e) => {
     setProvinciaId(e.target.value);
@@ -41,7 +49,7 @@ export default function SelectorUbicacion({ ciudadId, onChange }) {
   const handleCiudadInput = (e) => {
     const texto = e.target.value;
     setBusquedaCiudad(texto);
-    const encontrada = ciudadesDeProvincia.find((c) => c.nombre === texto);
+    const encontrada = ciudades.find((c) => c.nombre === texto);
     onChange(encontrada ? encontrada.id : '');
   };
 
@@ -69,7 +77,7 @@ export default function SelectorUbicacion({ ciudadId, onChange }) {
           disabled={!provinciaId}
         />
         <datalist id={datalistId}>
-          {ciudadesDeProvincia.map((ciudad) => (
+          {ciudades.map((ciudad) => (
             <option key={ciudad.id} value={ciudad.nombre} />
           ))}
         </datalist>

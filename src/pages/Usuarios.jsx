@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import { useAuth } from '../context/useAuth';
 import '../styles/pages.css';
 
@@ -7,7 +8,6 @@ const emptyForm = { username: '', email: '', password: '', role: 'huesped' };
 
 export default function Usuarios() {
   const { user: currentUser } = useAuth();
-  const [usuarios, setUsuarios] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -17,19 +17,11 @@ export default function Usuarios() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const fetchUsuarios = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/usuarios');
-      setUsuarios(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsuarios();
-  }, []);
+  const { data: usuarios, refetch: fetchUsuarios } = useQuery(
+    '/usuarios',
+    () => api.get('/usuarios'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
   const filteredUsuarios = usuarios.filter((usuario) => {
     const value = `${usuario.username} ${usuario.email} ${usuario.role}`.toLowerCase();

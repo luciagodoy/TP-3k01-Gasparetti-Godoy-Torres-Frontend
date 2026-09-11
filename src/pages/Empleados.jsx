@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import '../styles/pages.css';
 
 const emptyForm = { nombre: '', apellido: '', email: '', telefono: '', puesto: '', estado: 'activo' };
 
 export default function Empleados() {
-  const [empleados, setEmpleados] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -15,19 +15,11 @@ export default function Empleados() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const fetchEmpleados = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/empleados');
-      setEmpleados(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchEmpleados();
-  }, []);
+  const { data: empleados, refetch: fetchEmpleados } = useQuery(
+    '/empleados',
+    () => api.get('/empleados'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
   const filteredEmpleados = empleados.filter((empleado) => {
     const value = `${empleado.nombre} ${empleado.apellido} ${empleado.email} ${empleado.puesto}`.toLowerCase();

@@ -1,18 +1,17 @@
 import { useEffect, useId, useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 
 // Selector en cascada: primero provincia, después ciudad (con autocompletar por texto).
 // Avisa al padre el ciudadId elegido mediante onChange; '' si todavía no hay una ciudad válida.
 export default function SelectorUbicacion({ ciudadId, onChange }) {
   const datalistId = useId();
-  const [provincias, setProvincias] = useState([]);
-  const [ciudades, setCiudades] = useState([]);
   const [provinciaId, setProvinciaId] = useState('');
   const [busquedaCiudad, setBusquedaCiudad] = useState('');
 
-  useEffect(() => {
-    api.get('/provincias').then((data) => setProvincias(data || [])).catch(() => {});
-  }, []);
+  const { data: provincias } = useQuery('/provincias', () => api.get('/provincias'), {
+    initialData: [],
+  });
 
   // Editando un huésped existente sólo llega el id de la ciudad: la pedimos
   // puntualmente para saber a qué provincia pertenece y precargar el texto, en
@@ -30,15 +29,15 @@ export default function SelectorUbicacion({ ciudadId, onChange }) {
 
   // Las ciudades se piden filtradas por provincia: el listado completo del país
   // son ~3900 filas (~1 MB) y esta pantalla es pública.
-  useEffect(() => {
-    if (!provinciaId) {
-      setCiudades([]);
-      return;
-    }
-    api.get(`/ciudades?provinciaId=${provinciaId}`)
-      .then((data) => setCiudades(data || []))
-      .catch(() => {});
-  }, [provinciaId]);
+  const { data: ciudadesDeProvincia } = useQuery(
+    `/ciudades?provinciaId=${provinciaId}`,
+    () => api.get(`/ciudades?provinciaId=${provinciaId}`),
+    { initialData: [], enabled: Boolean(provinciaId) }
+  );
+
+  // Derivado en vez de limpiado dentro de un efecto: sin provincia elegida no
+  // hay ciudades que ofrecer, y la lista que quedó cacheada no debe reaparecer.
+  const ciudades = provinciaId ? ciudadesDeProvincia : [];
 
   const handleProvinciaChange = (e) => {
     setProvinciaId(e.target.value);

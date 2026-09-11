@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import '../styles/pages.css';
 
 const emptyForm = { reservaId: '', cupoId: '', cantidad: 1, precioUnitario: '' };
 
 export default function ReservaServicios() {
-  const [lineas, setLineas] = useState([]);
-  const [reservas, setReservas] = useState([]);
-  const [cupos, setCupos] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -17,39 +15,25 @@ export default function ReservaServicios() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const fetchLineas = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/reserva-servicios');
-      setLineas(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: lineas, refetch: fetchLineas } = useQuery(
+    '/reserva-servicios',
+    () => api.get('/reserva-servicios'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  const fetchReservas = async () => {
-    try {
-      const data = await api.get('/reservas');
-      setReservas(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: reservas } = useQuery(
+    '/reservas',
+    () => api.get('/reservas'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  const fetchCupos = async () => {
-    try {
-      const data = await api.get('/cupos');
-      setCupos(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: cupos } = useQuery(
+    '/cupos',
+    () => api.get('/cupos'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  useEffect(() => {
-    fetchLineas();
-    fetchReservas();
-    fetchCupos();
-  }, []);
+
 
   const filteredLineas = lineas.filter((linea) => {
     const value = `${linea.reservaId} ${linea.cupo?.servicio?.nombre || ''}`.toLowerCase();

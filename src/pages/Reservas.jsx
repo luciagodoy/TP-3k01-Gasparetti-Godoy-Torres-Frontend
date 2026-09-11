@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import DateInput from '../components/DateInput';
 import '../styles/pages.css';
 
@@ -12,53 +13,34 @@ const emptyForm = {
 };
 
 export default function Reservas() {
-  const [reservas, setReservas] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [huespedes, setHuespedes] = useState([]);
-  const [habitaciones, setHabitaciones] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [estadoFiltro, setEstadoFiltro] = useState('');
   const [selectedReserva, setSelectedReserva] = useState(null);
 
-  const fetchReservas = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/reservas');
-      setReservas(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: reservas, refetch: fetchReservas } = useQuery(
+    '/reservas',
+    () => api.get('/reservas'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  const fetchHuespedes = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/huespedes');
-      setHuespedes(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: huespedes } = useQuery(
+    '/huespedes',
+    () => api.get('/huespedes'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  const fetchHabitaciones = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/habitaciones');
-      setHabitaciones(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: habitaciones } = useQuery(
+    '/habitaciones',
+    () => api.get('/habitaciones'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  useEffect(() => {
-    fetchReservas();
-    fetchHuespedes();
-    fetchHabitaciones();
-  }, []);
+
 
   const filteredReservas = reservas.filter((r) => {
     const searchValue = `${r.id} ${r.huesped?.usuario?.username || r.huespedId || ''} ${r.habitacion?.numero || r.habitacionId || ''} ${r.estado || ''}`.toLowerCase();

@@ -1,15 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import { useAuth } from '../context/useAuth';
 import DateInput from '../components/DateInput';
 import GaleriaImagenes from '../components/GaleriaImagenes';
 import '../styles/pages.css';
 import '../styles/rooms.css';
 
+const construirConsulta = (filtros) => {
+  const params = new URLSearchParams();
+  if (filtros.fechaInicio) params.append('fechaInicio', filtros.fechaInicio);
+  if (filtros.fechaFin) params.append('fechaFin', filtros.fechaFin);
+  if (filtros.categoriaId) params.append('categoriaId', filtros.categoriaId);
+  if (filtros.personas) params.append('personas', filtros.personas);
+  const query = params.toString();
+  return query ? `?${query}` : '';
+};
+
 export default function BuscarHabitaciones() {
-  const [habitaciones, setHabitaciones] = useState([]);
-  const [categorias, setCategorias] = useState([]);
   const location = useLocation();
   // Si venimos del buscador de la landing (BookingBar), llega con los filtros
   // ya elegidos en location.state; si no, arranca vacío.
@@ -21,43 +30,39 @@ export default function BuscarHabitaciones() {
     ...(location.state || {}),
   }));
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
   const { user, huesped } = useAuth();
   const navigate = useNavigate();
 
-  const fetchCategorias = async () => {
-    try {
-      const data = await api.get('/categorias');
-      setCategorias(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  // La búsqueda vive en la key de useQuery: la carga inicial y el botón
+  // "Buscar" recorren el mismo camino, así que no hace falta un efecto de
+  // montaje aparte. El id se incrementa en cada click para que volver a buscar
+  // con los mismos filtros igual vuelva a pedir los datos.
+  const [consulta, setConsulta] = useState(() => ({
+    qs: construirConsulta({
+      fechaInicio: '',
+      fechaFin: '',
+      categoriaId: '',
+      personas: '',
+      ...(location.state || {}),
+    }),
+    id: 0,
+  }));
 
-  const buscar = async () => {
+  const { data: categorias } = useQuery('/categorias', () => api.get('/categorias'), {
+    initialData: [],
+    onError: (err) => setError(err.message),
+  });
+
+  const { data: habitaciones, loading } = useQuery(
+    `habitaciones:${consulta.id}:${consulta.qs}`,
+    () => api.get(`/habitaciones${consulta.qs}`),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
+
+  const buscar = () => {
     setError(null);
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (filtros.fechaInicio) params.append('fechaInicio', filtros.fechaInicio);
-      if (filtros.fechaFin) params.append('fechaFin', filtros.fechaFin);
-      if (filtros.categoriaId) params.append('categoriaId', filtros.categoriaId);
-      if (filtros.personas) params.append('personas', filtros.personas);
-      const query = params.toString();
-      const data = await api.get(`/habitaciones${query ? `?${query}` : ''}`);
-      setHabitaciones(data || []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    setConsulta((prev) => ({ qs: construirConsulta(filtros), id: prev.id + 1 }));
   };
-
-  useEffect(() => {
-    fetchCategorias();
-    buscar();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const handleFiltroChange = (e) => {
     const { name, value } = e.target;

@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import DateInput from '../components/DateInput';
 import '../styles/pages.css';
 
 const emptyForm = { servicioId: '', precio: '', fechaVigenciaDesde: '', fechaVigenciaHasta: '' };
 
 export default function PrecioServicios() {
-  const [precios, setPrecios] = useState([]);
-  const [servicios, setServicios] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -17,29 +16,18 @@ export default function PrecioServicios() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const fetchPrecios = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/precios-servicio');
-      setPrecios(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: precios, refetch: fetchPrecios } = useQuery(
+    '/precios-servicio',
+    () => api.get('/precios-servicio'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  const fetchServicios = async () => {
-    try {
-      const data = await api.get('/servicios');
-      setServicios(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: servicios } = useQuery(
+    '/servicios',
+    () => api.get('/servicios'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  useEffect(() => {
-    fetchPrecios();
-    fetchServicios();
-  }, []);
 
   const filteredPrecios = precios.filter((precio) =>
     searchTerm ? (precio.servicio?.nombre || '').toLowerCase().includes(searchTerm.toLowerCase()) : true

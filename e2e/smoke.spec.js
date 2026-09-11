@@ -4,7 +4,10 @@ test('el dashboard carga y permite navegar al login', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Gestión Hotelera' })).toBeVisible();
 
-  await page.getByRole('link', { name: 'Iniciar sesión' }).click();
+  // Scoped al header: el footer tiene otro link a /login ("Iniciar Sesión") y
+  // getByRole matchea el nombre sin distinguir mayúsculas, así que sin el scope
+  // el locator resuelve a 2 elementos y Playwright falla por strict mode.
+  await page.getByRole('banner').getByRole('link', { name: 'Iniciar sesión' }).click();
   await expect(page.getByRole('heading', { name: 'Iniciar Sesión' })).toBeVisible();
 });
 

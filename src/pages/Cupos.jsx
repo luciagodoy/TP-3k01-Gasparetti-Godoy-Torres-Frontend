@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import '../styles/pages.css';
 
 const emptyForm = { cantidad: 1, servicioId: '' };
 
 export default function Cupos() {
-  const [cupos, setCupos] = useState([]);
-  const [servicios, setServicios] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -16,29 +15,18 @@ export default function Cupos() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const fetchCupos = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/cupos');
-      setCupos(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: cupos, refetch: fetchCupos } = useQuery(
+    '/cupos',
+    () => api.get('/cupos'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  const fetchServicios = async () => {
-    try {
-      const data = await api.get('/servicios');
-      setServicios(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: servicios } = useQuery(
+    '/servicios',
+    () => api.get('/servicios'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  useEffect(() => {
-    fetchCupos();
-    fetchServicios();
-  }, []);
 
   const filteredCupos = cupos.filter((cupo) =>
     searchTerm ? (cupo.servicio?.nombre || '').toLowerCase().includes(searchTerm.toLowerCase()) : true

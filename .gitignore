@@ -17,7 +17,7 @@ dist-ssr
 playwright-report
 test-results
 
-# Editor directories and files
+
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -29,6 +29,7 @@ test-results
 *.sw?
 *.claude
 .mcp.json
+agents/
 
-# Local dev-notes file for code comments (see COMMENTS.md convention)
 COMMENTS.md
+CLAUDE.md

@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import '../styles/pages.css';
 
 const emptyForm = { nombre: '' };
 
 export default function Provincias() {
-  const [provincias, setProvincias] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -15,19 +15,11 @@ export default function Provincias() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const fetchProvincias = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/provincias');
-      setProvincias(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchProvincias();
-  }, []);
+  const { data: provincias, refetch: fetchProvincias } = useQuery(
+    '/provincias',
+    () => api.get('/provincias'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
   const filteredProvincias = provincias.filter((provincia) =>
     searchTerm ? provincia.nombre.toLowerCase().includes(searchTerm.toLowerCase()) : true

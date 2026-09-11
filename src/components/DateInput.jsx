@@ -39,13 +39,16 @@ export default function DateInput({ name, value, onChange, min, max, placeholder
   const [viewMonth, setViewMonth] = useState(selected?.m ?? today.getMonth() + 1);
   const containerRef = useRef(null);
 
-  useEffect(() => {
+  // Ajuste de estado durante el render. Hacerlo en un efecto pintaba primero un render
+  // con el calendario en el mes viejo y recién después lo corregía.
+  const [valorPrevio, setValorPrevio] = useState(value);
+  if (value !== valorPrevio) {
+    setValorPrevio(value);
     if (selected) {
       setViewYear(selected.y);
       setViewMonth(selected.m);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  }
 
   useEffect(() => {
     if (!open) return undefined;

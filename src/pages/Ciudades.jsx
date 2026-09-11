@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import '../styles/pages.css';
 
 const emptyForm = { nombre: '', provinciaId: '' };
 
 export default function Ciudades() {
-  const [ciudades, setCiudades] = useState([]);
-  const [provincias, setProvincias] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -16,29 +15,18 @@ export default function Ciudades() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const fetchCiudades = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/ciudades');
-      setCiudades(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: ciudades, refetch: fetchCiudades } = useQuery(
+    '/ciudades',
+    () => api.get('/ciudades'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  const fetchProvincias = async () => {
-    try {
-      const data = await api.get('/provincias');
-      setProvincias(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: provincias } = useQuery(
+    '/provincias',
+    () => api.get('/provincias'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  useEffect(() => {
-    fetchCiudades();
-    fetchProvincias();
-  }, []);
 
   const filteredCiudades = ciudades.filter((ciudad) => {
     const value = `${ciudad.nombre} ${ciudad.provincia?.nombre || ''}`.toLowerCase();

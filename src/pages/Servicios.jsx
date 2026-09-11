@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import '../styles/pages.css';
 
 const emptyForm = { nombre: '', descripcion: '' };
 
 export default function Servicios() {
-  const [servicios, setServicios] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -15,19 +15,11 @@ export default function Servicios() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const fetchServicios = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/servicios');
-      setServicios(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchServicios();
-  }, []);
+  const { data: servicios, refetch: fetchServicios } = useQuery(
+    '/servicios',
+    () => api.get('/servicios'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
   const filteredServicios = servicios.filter((servicio) => {
     const value = `${servicio.nombre} ${servicio.descripcion || ''}`.toLowerCase();

@@ -21,10 +21,7 @@ export default function MainLayout() {
 
   const [gestionOpen, setGestionOpen] = useState(false);
   const gestionRef = useRef(null);
-
-  useEffect(() => {
-    setGestionOpen(false);
-  }, [location.pathname]);
+  const triggerRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -35,6 +32,45 @@ export default function MainLayout() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Cerrar al navegar se hace en el onClick de cada item y no en un efecto sobre
+  // location.pathname: el efecto corría en cada cambio de ruta viniera de donde
+  // viniera, y dejaba el cierre a merced del orden de renders.
+  const cerrarGestion = ({ devolverFoco = false } = {}) => {
+    setGestionOpen(false);
+    if (devolverFoco) triggerRef.current?.focus();
+  };
+
+  // Sin esto el menú es sólo para mouse: no había forma de cerrarlo ni de
+  // recorrerlo con el teclado.
+  const handleGestionKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      cerrarGestion({ devolverFoco: true });
+      return;
+    }
+
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    e.preventDefault();
+
+    // El menú está display:none mientras está cerrado, así que no se puede
+    // enfocar un item todavía: la primera flecha lo abre y la siguiente navega.
+    if (!gestionOpen) {
+      setGestionOpen(true);
+      return;
+    }
+
+    const items = Array.from(gestionRef.current?.querySelectorAll('.nav-dropdown-item') || []);
+    if (items.length === 0) return;
+
+    const actual = items.indexOf(document.activeElement);
+    const siguiente =
+      actual === -1
+        ? (e.key === 'ArrowDown' ? 0 : items.length - 1)
+        : (actual + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+
+    items[siguiente].focus();
+  };
 
   const handleLogout = () => {
     logout();
@@ -69,21 +105,28 @@ export default function MainLayout() {
             )}
 
             {isAdmin && (
-              <div className={`nav-dropdown${gestionOpen ? ' open' : ''}`} ref={gestionRef}>
+              <div
+                className={`nav-dropdown${gestionOpen ? ' open' : ''}`}
+                ref={gestionRef}
+                onKeyDown={handleGestionKeyDown}
+              >
                 <button
                   type="button"
+                  ref={triggerRef}
                   className="nav-link nav-link-solid nav-dropdown-trigger"
                   onClick={() => setGestionOpen((prev) => !prev)}
                   aria-expanded={gestionOpen}
-                  aria-haspopup="true"
+                  aria-haspopup="menu"
                 >
                   Gestión <span className="nav-dropdown-caret">▾</span>
                 </button>
-                <div className="nav-dropdown-menu">
+                <div className="nav-dropdown-menu" role="menu">
                   {GESTION_LINKS.map((item) => (
                     <NavLink
                       key={item.to}
                       to={item.to}
+                      role="menuitem"
+                      onClick={() => cerrarGestion()}
                       className={({ isActive }) => `nav-dropdown-item${isActive ? ' active' : ''}`}
                     >
                       {item.label}

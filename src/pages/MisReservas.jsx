@@ -1,27 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import '../styles/pages.css';
 
 export default function MisReservas() {
-  const [reservas, setReservas] = useState([]);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchMisReservas = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/reservas/mias');
-      setReservas(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchMisReservas();
-  }, []);
+  const { data: reservas, refetch: fetchMisReservas } = useQuery(
+    '/reservas/mias',
+    () => api.get('/reservas/mias'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
   const handleCancelar = async (id) => {
     setError(null);

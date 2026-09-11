@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import '../styles/pages.css';
 
 const emptyForm = { numero: '', piso: '', categoriaId: '', estadoDisponibilidad: 'disponible' };
 
 export default function Habitaciones() {
-  const [habitaciones, setHabitaciones] = useState([]);
-  const [categorias, setCategorias] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState(emptyForm);
@@ -17,30 +16,18 @@ export default function Habitaciones() {
   const [estadoFiltro, setEstadoFiltro] = useState('');
   const [selectedHabitacion, setSelectedHabitacion] = useState(null);
 
-  const fetchHabitaciones = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/habitaciones');
-      setHabitaciones(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: habitaciones, refetch: fetchHabitaciones } = useQuery(
+    '/habitaciones',
+    () => api.get('/habitaciones'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  const fetchCategorias = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/categorias');
-      setCategorias(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const { data: categorias } = useQuery(
+    '/categorias',
+    () => api.get('/categorias'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
-  useEffect(() => {
-    fetchHabitaciones();
-    fetchCategorias();
-  }, []);
 
   const filteredHabitaciones = habitaciones.filter((hab) => {
     const searchValue = `${hab.numero} ${hab.piso} ${hab.estadoDisponibilidad} ${hab.categoria?.denominacion || ''}`.toLowerCase();

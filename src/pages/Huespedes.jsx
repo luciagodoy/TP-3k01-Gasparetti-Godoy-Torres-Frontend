@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useQuery from '../hooks/useQuery';
 import SelectorUbicacion from '../components/SelectorUbicacion';
 import '../styles/pages.css';
 
@@ -14,7 +15,6 @@ const emptyForm = {
 };
 
 export default function Huespedes() {
-  const [huespedes, setHuespedes] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [message, setMessage] = useState(null);
@@ -24,19 +24,11 @@ export default function Huespedes() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedHuesped, setSelectedHuesped] = useState(null);
 
-  const fetchHuespedes = async () => {
-    setError(null);
-    try {
-      const data = await api.get('/huespedes');
-      setHuespedes(data || []);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchHuespedes();
-  }, []);
+  const { data: huespedes, refetch: fetchHuespedes } = useQuery(
+    '/huespedes',
+    () => api.get('/huespedes'),
+    { initialData: [], onError: (err) => setError(err.message) }
+  );
 
   const filteredHuespedes = huespedes.filter((huesped) => {
     const searchValue = `${huesped.usuario?.username || ''} ${huesped.usuario?.email || ''} ${huesped.documentoIdentidad || ''} ${huesped.ciudad?.nombre || ''}`.toLowerCase();

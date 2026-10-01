@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, tests y build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  audit:
+    name: Auditoría de dependencias
+    runs-on: ubuntu-latest
+    # Job aparte y en paralelo: los avisos de seguridad se publican aunque el
+    # código no cambie, así que una vulnerabilidad nueva aparece como su propio
+    # check en rojo, sin tapar si los tests pasaron o no.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # Umbral "high" a propósito: el aviso moderado de uuid (vía sequelize 6)
+      # no tiene arreglo real; el único "fix" es bajar a sequelize 3, que rompe
+      # todo. Con "moderate" el pipeline quedaría en rojo para siempre.
+      - run: npm audit --audit-level=high
+
+  e2e:
+    name: Tests end-to-end (Playwright)
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # Los e2e levantan su propio servidor de Vite y no dependen del backend
+      # (cubren validación de formularios, ruteo y redirecciones protegidas).
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

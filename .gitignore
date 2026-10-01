@@ -27,9 +27,7 @@ test-results
 *.njsproj
 *.sln
 *.sw?
-*.claude
 .mcp.json
 agents/
-
 COMMENTS.md
-CLAUDE.md
+

@@ -8,16 +8,12 @@ import GaleriaImagenes from '../components/GaleriaImagenes';
 import '../styles/pages.scss';
 import '../styles/rooms.scss';
 
-// Sólo estos cuatro filtros viajan a la API (location.state puede traer otras
-// claves). Los vacíos los descarta el servicio al armar el query string.
 const filtrosDeBusqueda = ({ fechaInicio, fechaFin, categoriaId, personas }) => ({
   fechaInicio, fechaFin, categoriaId, personas,
 });
 
 export default function BuscarHabitaciones() {
   const location = useLocation();
-  // Si venimos del buscador de la landing (BookingBar), llega con los filtros
-  // ya elegidos en location.state; si no, arranca vacío.
   const [filtros, setFiltros] = useState(() => ({
     fechaInicio: '',
     fechaFin: '',
@@ -30,8 +26,7 @@ export default function BuscarHabitaciones() {
   const navigate = useNavigate();
 
   // La búsqueda vive en la key de useQuery: la carga inicial y el botón
-  // "Buscar" recorren el mismo camino, así que no hace falta un efecto de
-  // montaje aparte. El id se incrementa en cada click para que volver a buscar
+  // "Buscar" recorren el mismo camino. El id se incrementa en cada click para que volver a buscar
   // con los mismos filtros igual vuelva a pedir los datos.
   const [consulta, setConsulta] = useState(() => ({
     filtros: filtrosDeBusqueda(location.state || {}),
@@ -79,8 +74,7 @@ export default function BuscarHabitaciones() {
     navigate('/reservar', { state: seleccion });
   };
 
-  // Agrupamos las habitaciones encontradas por categoría: a los huéspedes les interesa
-  // el tipo de habitación y cuántas hay disponibles, no el número de habitación puntual.
+  // Agrupa las habitaciones encontradas por categoría
   const gruposPorCategoria = habitaciones.reduce((grupos, hab) => {
     const categoriaId = hab.categoria?.id;
     if (!categoriaId) return grupos;

@@ -53,9 +53,6 @@
   text-transform: capitalize;
 }
 
-/* --primary-soft es un tinte oscuro pensado para fondos claros: sobre el
-   fondo oscuro de --surface queda casi invisible, así que estos controles
-   usan un tinte claro propio en vez de la variable compartida. */
 .date-input-header button {
   border: none;
   background: rgba(255, 255, 255, 0.08);

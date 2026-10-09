@@ -25,8 +25,6 @@ export default class Reserva extends Modelo {
   }
 
   /**
-   * Noches entre dos fechas 'YYYY-MM-DD'. Replica calcularNoches del backend:
-   * se fija la hora en UTC para que la zona horaria local no corra un día.
    * @param {import('./tipos').FechaISO} fechaInicio
    * @param {import('./tipos').FechaISO} fechaFin
    */
@@ -43,13 +41,10 @@ export default class Reserva extends Modelo {
     return this.serviciosConsumidos.reduce((suma, linea) => suma + (linea.montoTotal ?? 0), 0);
   }
 
-  /** Alojamiento + servicios consumidos. */
   get total() {
     return (this.montoTotal ?? 0) + this.totalServicios;
   }
 
-  // Las transiciones válidas son las mismas que valida el backend
-  // (cancelarReservaPropia, realizarCheckIn, realizarCheckOut).
   get puedeCancelarse() {
     return this.estado === ESTADOS_RESERVA.PENDIENTE;
   }

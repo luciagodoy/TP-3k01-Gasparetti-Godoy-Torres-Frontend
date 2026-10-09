@@ -17,12 +17,6 @@
   }
 }
 
-/* A sangre completa (edge-to-edge) dentro de .main-content: en vez del truco
-   de 100vw (que se descuadra y recorta contenido cuando hay scrollbar
-   vertical, porque 100vw incluye su ancho), cancelamos exactamente el padding
-   de .main-content con márgenes negativos del mismo valor. Así el hero llena
-   el ancho real disponible sin depender del viewport crudo, y el padding
-   interno vuelve a dejar el texto alineado con el logo del navbar. */
 .dashboard-header {
   position: relative;
   display: flex;
@@ -36,9 +30,6 @@
   overflow: hidden;
 }
 
-/* Carrusel de fotos detrás del contenido del hero: capas apiladas con
-   crossfade por opacidad, más un degradado fijo encima para que el texto
-   siga siendo legible sobre cualquiera de las fotos. */
 .hero-carousel {
   position: absolute;
   inset: 0;
@@ -172,8 +163,7 @@
   margin: 0;
 }
 
-/* Mismo punto de quiebre que .navbar-container/.main-content (ver layout.css)
-   para que el padding izquierdo del hero siga alineado con el logo. */
+
 @include desde(lg) {
   .dashboard-header {
     margin-left: -1.5rem;

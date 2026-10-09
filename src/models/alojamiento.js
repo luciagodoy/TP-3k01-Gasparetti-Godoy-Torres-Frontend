@@ -11,7 +11,6 @@ export class CategoriaHabitacion extends Modelo {
     /** @type {number} */ this.precioNoche = aNumero(precioNoche);
   }
 
-  /** Precio del alojamiento por una cantidad de noches (sin servicios). */
   precioPorNoches(noches) {
     return noches > 0 ? noches * (this.precioNoche ?? 0) : 0;
   }

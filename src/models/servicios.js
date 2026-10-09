@@ -1,7 +1,5 @@
 import Modelo, { aNumero } from './Modelo';
 
-// "Servicio" acá es un servicio del hotel (spa, desayuno, cochera), no un
-// servicio de la capa de acceso a la API (esos viven en src/services).
 export class Servicio extends Modelo {
   constructor({ id, nombre, descripcion }) {
     super();
@@ -38,10 +36,6 @@ export class PrecioServicio extends Modelo {
   }
 
   /**
-   * Mismo criterio que buscarPrecioVigente del backend: rige desde
-   * fechaVigenciaDesde y, si no tiene fecha de fin, sigue vigente.
-   * Las fechas son 'YYYY-MM-DD', así que se comparan como texto sin pasar por
-   * Date (que las corre un día según la zona horaria).
    * @param {import('./tipos').FechaISO} [fecha] por defecto, hoy
    */
   estaVigente(fecha = new Date().toISOString().slice(0, 10)) {

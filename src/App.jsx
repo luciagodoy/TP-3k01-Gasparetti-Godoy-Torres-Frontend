@@ -12,9 +12,6 @@ import { ROLES_ADMIN, ROLES_STAFF } from './models';
 import './styles/global.scss';
 import './App.scss';
 
-// Las páginas detrás de sesión se cargan bajo demanda: quien entra sin loguearse
-// (o como huésped) no puede llegar a ellas, así que no tiene sentido que pague
-// su descarga en la primera visita junto con la landing.
 const Reservas = lazy(() => import('./pages/Reservas'));
 const Habitaciones = lazy(() => import('./pages/Habitaciones'));
 const Huespedes = lazy(() => import('./pages/Huespedes'));

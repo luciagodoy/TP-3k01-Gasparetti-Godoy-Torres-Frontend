@@ -15,7 +15,6 @@ export class User extends Modelo {
     return this.role === ROLES.ADMIN;
   }
 
-  /** Empleado o admin: puede operar el hotel (reservas, check-in, habitaciones...). */
   get esStaff() {
     return ROLES_STAFF.includes(this.role);
   }

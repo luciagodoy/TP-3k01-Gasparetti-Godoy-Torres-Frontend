@@ -4,9 +4,6 @@
 // tal cual a las páginas.
 export default class Modelo {
   /**
-   * Construye una instancia desde el JSON de la API. `this` es la subclase sobre
-   * la que se llama (Reserva.fromJSON crea una Reserva), así que no hace falta
-   * repetir este método en cada modelo.
    * @template T
    * @this {new (json: object) => T}
    * @param {object | null | undefined} json

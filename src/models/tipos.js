@@ -1,6 +1,5 @@
 // Tipos de dominio compartidos entre los modelos, los servicios y las páginas.
-// Los valores salen del backend (los ENUM de los modelos de Sequelize): si allá
-// se agrega un estado o un rol, hay que sumarlo acá también.
+// Los valores salen del backend (los ENUM de los modelos de Sequelize)
 
 /** @typedef {'huesped' | 'empleado' | 'admin'} Rol */
 
@@ -10,7 +9,7 @@
 
 /** @typedef {'activo' | 'inactivo'} EstadoEmpleado */
 
-/** Fecha sin hora tal como la maneja la API (DATEONLY): 'YYYY-MM-DD'. @typedef {string} FechaISO */
+/** Fecha sin hora (DATEONLY): 'YYYY-MM-DD'. @typedef {string} FechaISO */
 
 export const ROLES = Object.freeze({
   HUESPED: 'huesped',
@@ -18,8 +17,6 @@ export const ROLES = Object.freeze({
   ADMIN: 'admin',
 });
 
-// Mismo criterio que auth.staff del backend: la operación diaria del hotel la
-// hacen empleados y admins; sólo la gestión de cuentas y personal es de admin.
 export const ROLES_STAFF = Object.freeze([ROLES.EMPLEADO, ROLES.ADMIN]);
 export const ROLES_ADMIN = Object.freeze([ROLES.ADMIN]);
 

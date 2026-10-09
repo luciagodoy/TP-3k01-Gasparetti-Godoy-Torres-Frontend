@@ -19,9 +19,6 @@
   backdrop-filter: blur(14px);
 }
 
-/* Sin max-width propio: el mismo padding horizontal que .main-content (ver
-   abajo), para que el logo del navbar quede siempre alineado con el
-   contenido de la página, incluido el hero a sangre completa del dashboard. */
 .navbar-container {
   padding: 0 1rem;
   display: flex;
@@ -104,8 +101,6 @@
   box-shadow: inset 0 0 0 1px rgba(163, 137, 79, 0.3);
 }
 
-/* Botón sólido negro (p. ej. "Buscar Habitaciones" / "Iniciar sesión"): sin
-   la forma de píldora del resto de los nav-link, esquinas casi rectas. */
 .nav-link-solid {
   border-radius: var(--radius-action);
   background: #000;
@@ -271,8 +266,6 @@
   padding: 0 1rem;
 }
 
-/* Nav vuelve a ser una sola fila, con el logo fijo a la izquierda y todo
-   lo demás (menú + auth) agrupado a la derecha. */
 @include desde(md) {
   .navbar-container {
     flex-direction: row;

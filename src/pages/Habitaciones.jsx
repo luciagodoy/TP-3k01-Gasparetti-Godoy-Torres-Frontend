@@ -98,6 +98,7 @@ export default function Habitaciones() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Eliminar esta habitación? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);

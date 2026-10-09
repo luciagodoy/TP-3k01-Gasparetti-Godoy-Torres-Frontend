@@ -73,6 +73,7 @@ export default function Provincias() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Eliminar esta provincia? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);

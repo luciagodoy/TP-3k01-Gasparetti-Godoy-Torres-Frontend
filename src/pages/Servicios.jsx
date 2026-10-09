@@ -75,6 +75,7 @@ export default function Servicios() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Eliminar este servicio? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);

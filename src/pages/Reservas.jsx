@@ -85,6 +85,7 @@ export default function Reservas() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Eliminar esta reserva? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);

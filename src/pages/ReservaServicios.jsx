@@ -115,6 +115,7 @@ export default function ReservaServicios() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Eliminar este consumo de servicio? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);

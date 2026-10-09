@@ -102,6 +102,7 @@ export default function Huespedes() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Eliminar este huésped? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);

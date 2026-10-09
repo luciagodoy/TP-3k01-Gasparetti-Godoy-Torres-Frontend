@@ -82,6 +82,7 @@ export default function Ciudades() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Eliminar esta ciudad? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);

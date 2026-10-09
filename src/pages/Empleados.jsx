@@ -89,6 +89,7 @@ export default function Empleados() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Eliminar este empleado? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);

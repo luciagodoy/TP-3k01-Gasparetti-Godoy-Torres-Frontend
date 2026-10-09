@@ -16,6 +16,7 @@ export default function MisReservas() {
   );
 
   const handleCancelar = async (id) => {
+    if (!window.confirm('¿Cancelar esta reserva? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);

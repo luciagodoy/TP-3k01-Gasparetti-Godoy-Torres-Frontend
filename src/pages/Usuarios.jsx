@@ -100,6 +100,7 @@ export default function Usuarios() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Eliminar este usuario? Esta acción no se puede deshacer.')) return;
     if (id === currentUser?.id) {
       setError('No podés eliminar tu propia cuenta.');
       return;

@@ -7,8 +7,6 @@ const emptyForm = { denominacion: '', descripcion: '', capacidadPersonas: 1, ima
 
 export default function Categorias() {
   const { user } = useAuth();
-  // Igual que el backend (POST/PUT/DELETE /categorias son auth.staff): un
-  // empleado también puede editar categorías, no sólo el admin.
   const puedeEditar = Boolean(user?.esStaff);
   const [categorias, setCategorias] = useState([]);
   const [formData, setFormData] = useState(emptyForm);
@@ -104,6 +102,7 @@ export default function Categorias() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Eliminar esta categoría? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);

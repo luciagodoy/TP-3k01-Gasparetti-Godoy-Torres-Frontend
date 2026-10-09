@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import api from '../services/api';
-import '../styles/pages.css';
+import {
+  cupoService, habitacionService, precioServicioService, reservaService,
+  reservaServicioService, servicioService,
+} from '../services/recursos';
+import { Reserva } from '../models';
+import '../styles/pages.scss';
 
 export default function Reservar() {
   const location = useLocation();
@@ -28,7 +32,7 @@ export default function Reservar() {
     }
     const fetchHabitacion = async () => {
       try {
-        const data = await api.get(`/habitaciones/${habitacionId}`);
+        const data = await habitacionService.obtener(habitacionId);
         setHabitacion(data);
       } catch (err) {
         setError(err.message);
@@ -38,18 +42,15 @@ export default function Reservar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const noches = habitacionId && fechaInicio && fechaFin
-    ? Math.round((new Date(`${fechaFin}T00:00:00Z`) - new Date(`${fechaInicio}T00:00:00Z`)) / (24 * 60 * 60 * 1000))
-    : 0;
-  const totalEstimado = habitacion ? noches * (habitacion.categoria?.precioNoche ?? 0) : 0;
+  const noches = Reserva.calcularNoches(fechaInicio, fechaFin);
+  const totalEstimado = habitacion?.categoria ? habitacion.categoria.precioPorNoches(noches) : 0;
 
   const handleConfirmar = async () => {
     setError(null);
     setLoading(true);
     try {
-      const data = await api.post('/reservas/mias', { habitacionId, fechaInicio, fechaFin });
-      setReserva(data.reserva);
-      const listaServicios = await api.get('/servicios');
+      setReserva(await reservaService.crearPropia({ habitacionId, fechaInicio, fechaFin }));
+      const listaServicios = await servicioService.listar();
       setServicios(listaServicios || []);
       setStep('services');
     } catch (err) {
@@ -66,10 +67,10 @@ export default function Reservar() {
     setCantidad(1);
     try {
       const [cuposData, precioData] = await Promise.all([
-        api.get(`/cupos?servicioId=${servicio.id}`),
-        api.get(`/precios-servicio?servicioId=${servicio.id}&vigente=true`),
+        cupoService.listar({ servicioId: servicio.id }),
+        precioServicioService.listar({ servicioId: servicio.id, vigente: true }),
       ]);
-      setCupos((cuposData || []).filter((c) => c.disponibles > 0));
+      setCupos(cuposData.filter((cupo) => cupo.tieneDisponibilidad));
       setPrecioVigente(precioData?.[0] || null);
     } catch (err) {
       setError(err.message);
@@ -84,7 +85,7 @@ export default function Reservar() {
     setError(null);
     setLoading(true);
     try {
-      const linea = await api.post('/reserva-servicios/mias', {
+      const linea = await reservaServicioService.crearPropio({
         reservaId: reserva.id,
         cupoId: Number(cupoId),
         cantidad: Number(cantidad),

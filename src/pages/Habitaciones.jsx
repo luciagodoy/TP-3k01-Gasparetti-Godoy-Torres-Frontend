@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import api from '../services/api';
+import { categoriaService, habitacionService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = { numero: '', piso: '', categoriaId: '', estadoDisponibilidad: 'disponible' };
 
@@ -18,13 +18,13 @@ export default function Habitaciones() {
 
   const { data: habitaciones, refetch: fetchHabitaciones } = useQuery(
     '/habitaciones',
-    () => api.get('/habitaciones'),
+    () => habitacionService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
   const { data: categorias } = useQuery(
     '/categorias',
-    () => api.get('/categorias'),
+    () => categoriaService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -69,10 +69,10 @@ export default function Habitaciones() {
         estadoDisponibilidad: formData.estadoDisponibilidad,
       };
       if (editingId) {
-        await api.put(`/habitaciones/${editingId}`, payload);
+        await habitacionService.actualizar(editingId, payload);
         setMessage('Habitación actualizada correctamente.');
       } else {
-        await api.post('/habitaciones', payload);
+        await habitacionService.crear(payload);
         setMessage('Habitación creada correctamente.');
       }
       resetForm();
@@ -102,7 +102,7 @@ export default function Habitaciones() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/habitaciones/${id}`);
+      await habitacionService.eliminar(id);
       setMessage('Habitación eliminada correctamente.');
       fetchHabitaciones();
     } catch (err) {

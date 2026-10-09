@@ -1,3 +1,5 @@
+@use 'mixins' as *;
+
 /* Barra de reserva rápida: se solapa con el borde inferior del carrusel del
    hero (como en los templates de hotel de referencia), en vez de vivir
    pegada al contenido del hero como el botón anterior. Vive como hermana de
@@ -83,7 +85,7 @@
   background: #e9e4da;
 }
 
-@media (min-width: 1024px) {
+@include desde(lg) {
   .booking-bar {
     flex-direction: row;
     align-items: flex-end;

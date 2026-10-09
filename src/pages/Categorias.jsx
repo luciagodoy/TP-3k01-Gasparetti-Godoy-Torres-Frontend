@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
-import api from '../services/api';
+import { categoriaService } from '../services/recursos';
 import { useAuth } from '../context/useAuth';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = { denominacion: '', descripcion: '', capacidadPersonas: 1, imagenesUrl: '', precioNoche: '' };
 
 export default function Categorias() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  // Igual que el backend (POST/PUT/DELETE /categorias son auth.staff): un
+  // empleado también puede editar categorías, no sólo el admin.
+  const puedeEditar = Boolean(user?.esStaff);
   const [categorias, setCategorias] = useState([]);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -18,7 +20,7 @@ export default function Categorias() {
   const fetchCategorias = async () => {
     setError(null);
     try {
-      const data = await api.get('/categorias');
+      const data = await categoriaService.listar();
       setCategorias(data || []);
     } catch (err) {
       setError(err.message);
@@ -29,7 +31,7 @@ export default function Categorias() {
     const loadCategorias = async () => {
       setError(null);
       try {
-        const data = await api.get('/categorias');
+        const data = await categoriaService.listar();
         setCategorias(data || []);
       } catch (err) {
         setError(err.message);
@@ -75,10 +77,10 @@ export default function Categorias() {
         precioNoche: parseFloat(formData.precioNoche) || 0,
       };
       if (editingId) {
-        await api.put(`/categorias/${editingId}`, payload);
+        await categoriaService.actualizar(editingId, payload);
         setMessage('Categoría actualizada correctamente.');
       } else {
-        await api.post('/categorias', payload);
+        await categoriaService.crear(payload);
         setMessage('Categoría creada correctamente.');
       }
       resetForm();
@@ -106,7 +108,7 @@ export default function Categorias() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/categorias/${id}`);
+      await categoriaService.eliminar(id);
       setMessage('Categoría eliminada correctamente.');
       fetchCategorias();
     } catch (err) {
@@ -125,7 +127,7 @@ export default function Categorias() {
       {message && <div className="alert alert-success">{message}</div>}
       {error && <div className="alert alert-error">{error}</div>}
 
-      {isAdmin && (
+      {puedeEditar &&(
         <div className="form-container">
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -201,7 +203,7 @@ export default function Categorias() {
               <th>Capacidad</th>
               <th>Precio/Noche</th>
               <th>Imágenes</th>
-              {isAdmin && <th>Acciones</th>}
+              {puedeEditar &&<th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -224,7 +226,7 @@ export default function Categorias() {
                     </div>
                   ) : '-'}
                 </td>
-                {isAdmin && (
+                {puedeEditar &&(
                   <td>
                     <button className="btn btn-small" onClick={() => handleEdit(categoria)}>
                       Editar

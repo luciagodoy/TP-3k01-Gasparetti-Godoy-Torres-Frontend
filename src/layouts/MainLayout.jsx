@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-do
 import { useAuth } from '../context/useAuth';
 import ErrorBoundary from '../components/ErrorBoundary';
 import crestLogo from '../assets/crest-logo-simple.png';
-import '../styles/layout.css';
+import '../styles/layout.scss';
 
 const GESTION_LINKS = [
   { to: '/reservas', label: 'Reservas' },
@@ -17,7 +17,10 @@ export default function MainLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const isAdmin = user?.role === 'admin';
+  // Empleados y admins operan el hotel: ven el menú de gestión en lugar de las
+  // opciones de huésped (antes sólo el admin lo veía y un empleado quedaba sin
+  // acceso a nada de lo que su rol le permite en el backend).
+  const esStaff = Boolean(user?.esStaff);
 
   const [gestionOpen, setGestionOpen] = useState(false);
   const gestionRef = useRef(null);
@@ -86,7 +89,7 @@ export default function MainLayout() {
             <h1>Gestión Hotelera</h1>
           </Link>
           <nav className="navbar-menu">
-            {!isAdmin && (
+            {!esStaff && (
               <NavLink
                 to="/buscar"
                 className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
@@ -95,7 +98,7 @@ export default function MainLayout() {
               </NavLink>
             )}
 
-            {!isAdmin && user && (
+            {!esStaff && user && (
               <NavLink
                 to="/mis-reservas"
                 className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
@@ -104,7 +107,7 @@ export default function MainLayout() {
               </NavLink>
             )}
 
-            {isAdmin && (
+            {esStaff && (
               <div
                 className={`nav-dropdown${gestionOpen ? ' open' : ''}`}
                 ref={gestionRef}

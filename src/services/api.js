@@ -16,7 +16,9 @@ class ApiService {
     };
   }
 
-  async _request(endpoint, options) {
+  // leerCuerpo decide cómo se lee una respuesta exitosa: JSON por defecto, o
+  // Blob para los endpoints que devuelven un archivo (el comprobante en PDF).
+  async _request(endpoint, options, leerCuerpo) {
     let response;
     try {
       response = await fetch(`${this.baseURL}${endpoint}`, {
@@ -29,7 +31,7 @@ class ApiService {
       error.cause = causa;
       throw error;
     }
-    return this._handleResponse(response);
+    return this._handleResponse(response, leerCuerpo);
   }
 
   async get(endpoint) {
@@ -48,7 +50,17 @@ class ApiService {
     return this._request(endpoint, { method: 'DELETE' });
   }
 
-  async _handleResponse(response) {
+  async getArchivo(endpoint) {
+    return this._request(endpoint, { method: 'GET' }, (r) => r.blob());
+  }
+
+  async postArchivo(endpoint, data) {
+    return this._request(endpoint, { method: 'POST', body: JSON.stringify(data) }, (r) => r.blob());
+  }
+
+  // Los errores siguen llegando como JSON aunque se pida un archivo: el backend
+  // sólo manda el PDF cuando la operación salió bien.
+  async _handleResponse(response, leerCuerpo = (r) => r.json()) {
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
       if (response.status === 401 && this._onUnauthorized) {
@@ -59,7 +71,7 @@ class ApiService {
       throw err;
     }
     if (response.status === 204) return null;
-    return await response.json();
+    return await leerCuerpo(response);
   }
 
   onUnauthorized(callback) {

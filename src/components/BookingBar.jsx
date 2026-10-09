@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import { categoriaService } from '../services/recursos';
 import DateInput from './DateInput';
-import '../styles/booking-bar.css';
+import '../styles/booking-bar.scss';
 
 const emptyFiltros = { fechaInicio: '', fechaFin: '', categoriaId: '', personas: '' };
 
@@ -12,7 +12,7 @@ export default function BookingBar() {
   const [filtros, setFiltros] = useState(emptyFiltros);
 
   useEffect(() => {
-    api.get('/categorias').then((data) => setCategorias(data || [])).catch(() => {});
+    categoriaService.listar().then((data) => setCategorias(data || [])).catch(() => {});
   }, []);
 
   const handleChange = (e) => {

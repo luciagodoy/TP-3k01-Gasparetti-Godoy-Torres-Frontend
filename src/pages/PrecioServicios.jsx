@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import api from '../services/api';
+import { precioServicioService, servicioService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
 import DateInput from '../components/DateInput';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = { servicioId: '', precio: '', fechaVigenciaDesde: '', fechaVigenciaHasta: '' };
 
@@ -18,13 +18,13 @@ export default function PrecioServicios() {
 
   const { data: precios, refetch: fetchPrecios } = useQuery(
     '/precios-servicio',
-    () => api.get('/precios-servicio'),
+    () => precioServicioService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
   const { data: servicios } = useQuery(
     '/servicios',
-    () => api.get('/servicios'),
+    () => servicioService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -63,10 +63,10 @@ export default function PrecioServicios() {
         fechaVigenciaHasta: formData.fechaVigenciaHasta || null,
       };
       if (editingId) {
-        await api.put(`/precios-servicio/${editingId}`, payload);
+        await precioServicioService.actualizar(editingId, payload);
         setMessage('Precio actualizado correctamente.');
       } else {
-        await api.post('/precios-servicio', payload);
+        await precioServicioService.crear(payload);
         setMessage('Precio creado correctamente.');
       }
       resetForm();
@@ -96,7 +96,7 @@ export default function PrecioServicios() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/precios-servicio/${id}`);
+      await precioServicioService.eliminar(id);
       setMessage('Precio eliminado correctamente.');
       if (selected?.id === id) setSelected(null);
       fetchPrecios();

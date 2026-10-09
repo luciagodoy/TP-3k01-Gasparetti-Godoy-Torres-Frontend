@@ -1,3 +1,5 @@
+@use 'mixins' as *;
+
 
 .room-filters {
   display: flex;
@@ -12,7 +14,7 @@
   min-width: 100%;
 }
 
-@media (min-width: 480px) {
+@include desde(xs) {
   .room-filters .form-group {
     min-width: 160px;
   }

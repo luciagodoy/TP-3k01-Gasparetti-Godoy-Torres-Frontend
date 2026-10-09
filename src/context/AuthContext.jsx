@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
+import { huespedService } from '../services/recursos';
+import { User } from '../models';
 import { AuthContext } from './authContextObject';
 
 const STORAGE_KEY = 'auth';
@@ -12,8 +14,7 @@ export function AuthProvider({ children }) {
 
   const fetchHuesped = async () => {
     try {
-      const data = await api.get('/huespedes/me');
-      setHuesped(data);
+      setHuesped(await huespedService.miPerfil());
     } catch {
       // Cuentas admin/empleado no tienen perfil de huésped: no es un error.
       setHuesped(null);
@@ -38,7 +39,9 @@ export function AuthProvider({ children }) {
           const { token: storedToken, user: storedUser } = JSON.parse(stored);
           api.setAuthToken(storedToken);
           setToken(storedToken);
-          setUser(storedUser);
+          // localStorage guarda JSON plano (los getters como esStaff no se
+          // serializan): se vuelve a armar la instancia al restaurar la sesión.
+          setUser(User.fromJSON(storedUser));
           await fetchHuesped();
         } catch {
           localStorage.removeItem(STORAGE_KEY);
@@ -53,7 +56,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ token: newToken, user: newUser }));
     api.setAuthToken(newToken);
     setToken(newToken);
-    setUser(newUser);
+    setUser(newUser instanceof User ? newUser : User.fromJSON(newUser));
     await fetchHuesped();
   };
 

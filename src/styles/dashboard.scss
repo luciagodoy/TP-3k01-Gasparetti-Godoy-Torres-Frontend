@@ -1,3 +1,5 @@
+@use 'mixins' as *;
+
 .dashboard-page {
   display: grid;
   gap: 2rem;
@@ -172,7 +174,7 @@
 
 /* Mismo punto de quiebre que .navbar-container/.main-content (ver layout.css)
    para que el padding izquierdo del hero siga alineado con el logo. */
-@media (min-width: 1024px) {
+@include desde(lg) {
   .dashboard-header {
     margin-left: -1.5rem;
     margin-right: -1.5rem;

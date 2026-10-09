@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import { huespedService } from '../services/recursos';
 import crestLogo from '../assets/crest-logo.png';
 import SelectorUbicacion from '../components/SelectorUbicacion';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = {
   username: '',
@@ -39,7 +39,7 @@ export default function Registro() {
 
     setLoading(true);
     try {
-      await api.post('/huespedes/registro', {
+      await huespedService.registrar({
         username: formData.username,
         email: formData.email,
         password: formData.password,

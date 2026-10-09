@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from 'react';
-import api from '../services/api';
+import { ciudadService, provinciaService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
 
 // Selector en cascada: primero provincia, después ciudad (con autocompletar por texto).
@@ -9,7 +9,7 @@ export default function SelectorUbicacion({ ciudadId, onChange }) {
   const [provinciaId, setProvinciaId] = useState('');
   const [busquedaCiudad, setBusquedaCiudad] = useState('');
 
-  const { data: provincias } = useQuery('/provincias', () => api.get('/provincias'), {
+  const { data: provincias } = useQuery('/provincias', () => provinciaService.listar(), {
     initialData: [],
   });
 
@@ -18,7 +18,7 @@ export default function SelectorUbicacion({ ciudadId, onChange }) {
   // vez de bajar el país entero para buscarla.
   useEffect(() => {
     if (!ciudadId || provinciaId) return;
-    api.get(`/ciudades/${ciudadId}`)
+    ciudadService.obtener(ciudadId)
       .then((ciudad) => {
         if (!ciudad?.provinciaId) return;
         setProvinciaId(String(ciudad.provinciaId));
@@ -31,7 +31,7 @@ export default function SelectorUbicacion({ ciudadId, onChange }) {
   // son ~3900 filas (~1 MB) y esta pantalla es pública.
   const { data: ciudadesDeProvincia } = useQuery(
     `/ciudades?provinciaId=${provinciaId}`,
-    () => api.get(`/ciudades?provinciaId=${provinciaId}`),
+    () => ciudadService.listar({ provinciaId }),
     { initialData: [], enabled: Boolean(provinciaId) }
   );
 

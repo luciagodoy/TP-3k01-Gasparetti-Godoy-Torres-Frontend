@@ -8,8 +8,9 @@ import Login from './pages/Login';
 import Registro from './pages/Registro';
 import BuscarHabitaciones from './pages/BuscarHabitaciones';
 import NotFound from './pages/NotFound';
-import './styles/global.css';
-import './App.css';
+import { ROLES_ADMIN, ROLES_STAFF } from './models';
+import './styles/global.scss';
+import './App.scss';
 
 // Las páginas detrás de sesión se cargan bajo demanda: quien entra sin loguearse
 // (o como huésped) no puede llegar a ellas, así que no tiene sentido que pague
@@ -44,18 +45,22 @@ function App() {
             <Route path="categorias" element={<Categorias />} />
             <Route path="login" element={<Login />} />
             <Route path="registro" element={<Registro />} />
-            <Route element={<ProtectedRoute roles={['admin']} />}>
+            {/* Mismos niveles que el backend: auth.staff (empleado o admin) para
+                la operación del hotel y auth.admin sólo para cuentas y personal. */}
+            <Route element={<ProtectedRoute roles={ROLES_STAFF} />}>
               <Route path="reservas" element={<Reservas />} />
               <Route path="habitaciones" element={<Habitaciones />} />
               <Route path="huespedes" element={<Huespedes />} />
               <Route path="checkin" element={<CheckIn />} />
               <Route path="servicios" element={<Servicios />} />
-              <Route path="empleados" element={<Empleados />} />
               <Route path="provincias" element={<Provincias />} />
               <Route path="ciudades" element={<Ciudades />} />
               <Route path="cupos" element={<Cupos />} />
               <Route path="precios-servicio" element={<PrecioServicios />} />
               <Route path="reserva-servicios" element={<ReservaServicios />} />
+            </Route>
+            <Route element={<ProtectedRoute roles={ROLES_ADMIN} />}>
+              <Route path="empleados" element={<Empleados />} />
               <Route path="usuarios" element={<Usuarios />} />
             </Route>
             <Route element={<ProtectedRoute />}>

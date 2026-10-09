@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import { categoriaService } from '../services/recursos';
 import GaleriaImagenes from './GaleriaImagenes';
-import '../styles/rooms.css';
+import '../styles/rooms.scss';
 
 export default function CategoriasShowcase() {
   const navigate = useNavigate();
   const [categorias, setCategorias] = useState([]);
 
   useEffect(() => {
-    api.get('/categorias').then((data) => setCategorias(data || [])).catch(() => {});
+    categoriaService.listar().then((data) => setCategorias(data || [])).catch(() => {});
   }, []);
 
   if (categorias.length === 0) return null;

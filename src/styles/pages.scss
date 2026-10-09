@@ -1,3 +1,5 @@
+@use 'mixins' as *;
+
 .page-container {
   background: rgba(255, 253, 249, 0.98);
   border-radius: var(--radius-lg);
@@ -57,7 +59,7 @@
   background: var(--surface);
 }
 
-@media (min-width: 480px) {
+@include desde(xs) {
   .filter-row {
     width: auto;
   }
@@ -326,7 +328,16 @@
   color: var(--muted);
 }
 
-@media (min-width: 768px) {
+// Aclaración chica debajo de un campo o de un bloque de datos (antes era un
+// style inline repetido).
+.field-hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: -0.6rem;
+  margin-bottom: 1rem;
+}
+
+@include desde(md) {
   .page-container {
     padding: 1.5rem;
   }
@@ -351,7 +362,7 @@
   }
 }
 
-@media (min-width: 1024px) {
+@include desde(lg) {
   .page-container {
     padding: 2rem;
   }

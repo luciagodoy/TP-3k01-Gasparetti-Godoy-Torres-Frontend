@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import api from '../services/api';
+import { authService } from '../services/recursos';
 import { useAuth } from '../context/useAuth';
 import crestLogo from '../assets/crest-logo.png';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 export default function Login() {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -29,8 +29,8 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const data = await api.post('/auth/login', formData);
-      await login(data.token, data.usuario);
+      const { token, usuario } = await authService.login(formData);
+      await login(token, usuario);
       const from = location.state?.from ?? '/';
       navigate(from, { replace: true });
     } catch (err) {

@@ -1,22 +1,18 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import api from '../services/api';
+import { categoriaService, habitacionService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
 import { useAuth } from '../context/useAuth';
 import DateInput from '../components/DateInput';
 import GaleriaImagenes from '../components/GaleriaImagenes';
-import '../styles/pages.css';
-import '../styles/rooms.css';
+import '../styles/pages.scss';
+import '../styles/rooms.scss';
 
-const construirConsulta = (filtros) => {
-  const params = new URLSearchParams();
-  if (filtros.fechaInicio) params.append('fechaInicio', filtros.fechaInicio);
-  if (filtros.fechaFin) params.append('fechaFin', filtros.fechaFin);
-  if (filtros.categoriaId) params.append('categoriaId', filtros.categoriaId);
-  if (filtros.personas) params.append('personas', filtros.personas);
-  const query = params.toString();
-  return query ? `?${query}` : '';
-};
+// Sólo estos cuatro filtros viajan a la API (location.state puede traer otras
+// claves). Los vacíos los descarta el servicio al armar el query string.
+const filtrosDeBusqueda = ({ fechaInicio, fechaFin, categoriaId, personas }) => ({
+  fechaInicio, fechaFin, categoriaId, personas,
+});
 
 export default function BuscarHabitaciones() {
   const location = useLocation();
@@ -38,30 +34,24 @@ export default function BuscarHabitaciones() {
   // montaje aparte. El id se incrementa en cada click para que volver a buscar
   // con los mismos filtros igual vuelva a pedir los datos.
   const [consulta, setConsulta] = useState(() => ({
-    qs: construirConsulta({
-      fechaInicio: '',
-      fechaFin: '',
-      categoriaId: '',
-      personas: '',
-      ...(location.state || {}),
-    }),
+    filtros: filtrosDeBusqueda(location.state || {}),
     id: 0,
   }));
 
-  const { data: categorias } = useQuery('/categorias', () => api.get('/categorias'), {
+  const { data: categorias } = useQuery('/categorias', () => categoriaService.listar(), {
     initialData: [],
     onError: (err) => setError(err.message),
   });
 
   const { data: habitaciones, loading } = useQuery(
-    `habitaciones:${consulta.id}:${consulta.qs}`,
-    () => api.get(`/habitaciones${consulta.qs}`),
+    `habitaciones:${consulta.id}:${JSON.stringify(consulta.filtros)}`,
+    () => habitacionService.listar(consulta.filtros),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
   const buscar = () => {
     setError(null);
-    setConsulta((prev) => ({ qs: construirConsulta(filtros), id: prev.id + 1 }));
+    setConsulta((prev) => ({ filtros: filtrosDeBusqueda(filtros), id: prev.id + 1 }));
   };
 
   const handleFiltroChange = (e) => {

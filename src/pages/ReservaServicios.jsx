@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import api from '../services/api';
+import { cupoService, reservaService, reservaServicioService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = { reservaId: '', cupoId: '', cantidad: 1, precioUnitario: '' };
 
@@ -17,19 +17,19 @@ export default function ReservaServicios() {
 
   const { data: lineas, refetch: fetchLineas } = useQuery(
     '/reserva-servicios',
-    () => api.get('/reserva-servicios'),
+    () => reservaServicioService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
   const { data: reservas } = useQuery(
     '/reservas',
-    () => api.get('/reservas'),
+    () => reservaService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
   const { data: cupos } = useQuery(
     '/cupos',
-    () => api.get('/cupos'),
+    () => cupoService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -63,7 +63,7 @@ export default function ReservaServicios() {
       }
       setLoading(true);
       try {
-        await api.put(`/reserva-servicios/${editingId}`, {
+        await reservaServicioService.actualizar(editingId, {
           cantidad: formData.cantidad,
           precioUnitario: parseFloat(formData.precioUnitario),
         });
@@ -85,7 +85,7 @@ export default function ReservaServicios() {
 
     setLoading(true);
     try {
-      await api.post('/reserva-servicios', {
+      await reservaServicioService.crear({
         reservaId: Number(formData.reservaId),
         cupoId: Number(formData.cupoId),
         cantidad: formData.cantidad,
@@ -119,7 +119,7 @@ export default function ReservaServicios() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/reserva-servicios/${id}`);
+      await reservaServicioService.eliminar(id);
       setMessage('Consumo eliminado correctamente (cupo liberado).');
       if (selected?.id === id) setSelected(null);
       fetchLineas();

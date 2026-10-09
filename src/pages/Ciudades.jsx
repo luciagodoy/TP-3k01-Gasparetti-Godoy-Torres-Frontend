@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import api from '../services/api';
+import { ciudadService, provinciaService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = { nombre: '', provinciaId: '' };
 
@@ -17,13 +17,13 @@ export default function Ciudades() {
 
   const { data: ciudades, refetch: fetchCiudades } = useQuery(
     '/ciudades',
-    () => api.get('/ciudades'),
+    () => ciudadService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
   const { data: provincias } = useQuery(
     '/provincias',
-    () => api.get('/provincias'),
+    () => provinciaService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -58,10 +58,10 @@ export default function Ciudades() {
     try {
       const payload = { nombre: formData.nombre.trim(), provinciaId: Number(formData.provinciaId) };
       if (editingId) {
-        await api.put(`/ciudades/${editingId}`, payload);
+        await ciudadService.actualizar(editingId, payload);
         setMessage('Ciudad actualizada correctamente.');
       } else {
-        await api.post('/ciudades', payload);
+        await ciudadService.crear(payload);
         setMessage('Ciudad creada correctamente.');
       }
       resetForm();
@@ -86,7 +86,7 @@ export default function Ciudades() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/ciudades/${id}`);
+      await ciudadService.eliminar(id);
       setMessage('Ciudad eliminada correctamente.');
       if (selected?.id === id) setSelected(null);
       fetchCiudades();

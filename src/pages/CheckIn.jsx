@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import api from '../services/api';
-import '../styles/pages.css';
+import { huespedService, reservaService } from '../services/recursos';
+import descargarArchivo from '../utils/descargarArchivo';
+import '../styles/pages.scss';
 
 export default function CheckIn() {
   const [checkInId, setCheckInId] = useState('');
@@ -23,7 +24,7 @@ export default function CheckIn() {
 
     setLoading(true);
     try {
-      await api.put(`/reservas/${checkInId}`, { estado: 'check-in' });
+      await reservaService.checkIn(checkInId);
       setMessage('Check-in procesado correctamente.');
       setCheckInId('');
     } catch (err) {
@@ -47,11 +48,11 @@ export default function CheckIn() {
 
     setLoading(true);
     try {
-      const reserva = await api.get(`/reservas/${checkOutId}`);
+      const reserva = await reservaService.obtener(checkOutId);
       setReservaInfo(reserva);
       if (reserva?.huespedId) {
         try {
-          const huesped = await api.get(`/huespedes/${reserva.huespedId}`);
+          const huesped = await huespedService.obtener(reserva.huespedId);
           setHuespedInfo(huesped);
         } catch {
           setHuespedInfo(null);
@@ -75,8 +76,9 @@ export default function CheckIn() {
 
     setLoading(true);
     try {
-      await api.put(`/reservas/${checkOutId}`, { estado: 'check-out' });
-      setMessage('Check-out procesado correctamente.');
+      const comprobante = await reservaService.checkOut(checkOutId);
+      descargarArchivo(comprobante, `comprobante-reserva-${checkOutId}.pdf`);
+      setMessage('Check-out procesado correctamente. Se descargó el comprobante.');
       setReservaInfo(null);
       setHuespedInfo(null);
       setCheckOutId('');
@@ -137,11 +139,20 @@ export default function CheckIn() {
             <p><strong>ID:</strong> {reservaInfo.id}</p>
             <p><strong>Huésped:</strong> {huespedInfo ? huespedInfo.usuario?.username : reservaInfo.huespedId}</p>
             <p><strong>Habitación:</strong> {reservaInfo.habitacion ? reservaInfo.habitacion.numero : reservaInfo.habitacionId}</p>
-            <p><strong>Inicio:</strong> {new Date(reservaInfo.fechaInicio).toLocaleDateString()}</p>
-            <p><strong>Fin:</strong> {new Date(reservaInfo.fechaFin).toLocaleDateString()}</p>
+            {/* Las fechas se muestran tal cual ('YYYY-MM-DD'): new Date('2026-11-01')
+                las toma como medianoche UTC y en Argentina (UTC-3) mostraba el día anterior. */}
+            <p><strong>Inicio:</strong> {reservaInfo.fechaInicio}</p>
+            <p><strong>Fin:</strong> {reservaInfo.fechaFin} ({reservaInfo.noches} {reservaInfo.noches === 1 ? 'noche' : 'noches'})</p>
             <p><strong>Estado:</strong> {reservaInfo.estado}</p>
-            <p><strong>Monto total:</strong> ${reservaInfo.montoTotal}</p>
-            <button className="btn btn-primary" onClick={handleCheckOutSubmit} disabled={loading}>
+            <p><strong>Monto alojamiento:</strong> ${reservaInfo.montoTotal.toFixed(2)}</p>
+            {!reservaInfo.puedeHacerCheckOut && (
+              <p className="field-hint">Sólo se puede hacer check-out de una reserva con check-in registrado.</p>
+            )}
+            <button
+              className="btn btn-primary"
+              onClick={handleCheckOutSubmit}
+              disabled={loading || !reservaInfo.puedeHacerCheckOut}
+            >
               {loading ? 'Procesando...' : 'Confirmar Check-out'}
             </button>
           </div>

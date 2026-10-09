@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import api from '../services/api';
+import { huespedService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
 import SelectorUbicacion from '../components/SelectorUbicacion';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = {
   username: '',
@@ -26,7 +26,7 @@ export default function Huespedes() {
 
   const { data: huespedes, refetch: fetchHuespedes } = useQuery(
     '/huespedes',
-    () => api.get('/huespedes'),
+    () => huespedService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -58,7 +58,7 @@ export default function Huespedes() {
       }
       setLoading(true);
       try {
-        await api.put(`/huespedes/${editingId}`, {
+        await huespedService.actualizar(editingId, {
           telefono: formData.telefono || null,
           documentoIdentidad: formData.documentoIdentidad,
           ciudadId: Number(formData.ciudadId),
@@ -82,7 +82,7 @@ export default function Huespedes() {
 
     setLoading(true);
     try {
-      await api.post('/huespedes/registro', {
+      await huespedService.registrar({
         username: formData.username,
         email: formData.email,
         password: formData.password,
@@ -106,7 +106,7 @@ export default function Huespedes() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/huespedes/${id}`);
+      await huespedService.eliminar(id);
       setMessage('Huésped eliminado correctamente.');
       fetchHuespedes();
     } catch (err) {

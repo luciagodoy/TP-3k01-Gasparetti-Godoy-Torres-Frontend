@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import api from '../services/api';
+import { usuarioService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
 import { useAuth } from '../context/useAuth';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = { username: '', email: '', password: '', role: 'huesped' };
 
@@ -19,7 +19,7 @@ export default function Usuarios() {
 
   const { data: usuarios, refetch: fetchUsuarios } = useQuery(
     '/usuarios',
-    () => api.get('/usuarios'),
+    () => usuarioService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -51,7 +51,7 @@ export default function Usuarios() {
       }
       setLoading(true);
       try {
-        await api.put(`/usuarios/${editingId}`, {
+        await usuarioService.actualizar(editingId, {
           username: formData.username.trim(),
           email: formData.email.trim(),
           role: formData.role,
@@ -75,7 +75,7 @@ export default function Usuarios() {
 
     setLoading(true);
     try {
-      await api.post('/usuarios', {
+      await usuarioService.crear({
         username: formData.username.trim(),
         email: formData.email.trim(),
         password: formData.password,
@@ -108,7 +108,7 @@ export default function Usuarios() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/usuarios/${id}`);
+      await usuarioService.eliminar(id);
       setMessage('Usuario eliminado correctamente.');
       if (selected?.id === id) setSelected(null);
       fetchUsuarios();

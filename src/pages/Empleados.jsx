@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import api from '../services/api';
+import { empleadoService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = { nombre: '', apellido: '', email: '', telefono: '', puesto: '', estado: 'activo' };
 
@@ -17,7 +17,7 @@ export default function Empleados() {
 
   const { data: empleados, refetch: fetchEmpleados } = useQuery(
     '/empleados',
-    () => api.get('/empleados'),
+    () => empleadoService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -58,10 +58,10 @@ export default function Empleados() {
         estado: formData.estado,
       };
       if (editingId) {
-        await api.put(`/empleados/${editingId}`, payload);
+        await empleadoService.actualizar(editingId, payload);
         setMessage('Empleado actualizado correctamente.');
       } else {
-        await api.post('/empleados', payload);
+        await empleadoService.crear(payload);
         setMessage('Empleado creado correctamente.');
       }
       resetForm();
@@ -93,7 +93,7 @@ export default function Empleados() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/empleados/${id}`);
+      await empleadoService.eliminar(id);
       setMessage('Empleado eliminado correctamente.');
       if (selected?.id === id) setSelected(null);
       fetchEmpleados();

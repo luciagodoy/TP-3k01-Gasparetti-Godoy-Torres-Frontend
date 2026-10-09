@@ -1,3 +1,5 @@
+@use 'mixins' as *;
+
 
 .main-layout {
   display: flex;
@@ -258,7 +260,7 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-@media (min-width: 640px) {
+@include desde(sm) {
   .footer-columns {
     grid-template-columns: repeat(3, 1fr);
     text-align: left;
@@ -271,7 +273,7 @@
 
 /* Nav vuelve a ser una sola fila, con el logo fijo a la izquierda y todo
    lo demás (menú + auth) agrupado a la derecha. */
-@media (min-width: 768px) {
+@include desde(md) {
   .navbar-container {
     flex-direction: row;
     justify-content: flex-start;
@@ -321,7 +323,7 @@
 }
 
 
-@media (min-width: 1024px) {
+@include desde(lg) {
   .navbar-container {
     padding: 0 1.5rem;
   }

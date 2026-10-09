@@ -1,0 +1,13 @@
+// Tokens de compilación (Sass). Los colores, radios y sombras siguen siendo
+// custom properties de CSS en global.scss porque se leen en tiempo de
+// ejecución (var(--muted) en estilos inline, por ejemplo); los breakpoints van
+// acá porque una media query no puede usar var().
+
+// Mobile-first: los estilos sin media query son los de celular y cada punto de
+// corte SUMA reglas desde ese ancho en adelante. Nunca se usa max-width.
+$breakpoints: (
+  xs: 480px,  // celulares grandes / apaisados
+  sm: 640px,  // SM
+  md: 768px,  // MD: tablets
+  lg: 1024px, // LG: notebooks y escritorio
+);

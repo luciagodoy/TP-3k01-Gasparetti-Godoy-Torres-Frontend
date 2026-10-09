@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import api from '../services/api';
+import { servicioService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = { nombre: '', descripcion: '' };
 
@@ -17,7 +17,7 @@ export default function Servicios() {
 
   const { data: servicios, refetch: fetchServicios } = useQuery(
     '/servicios',
-    () => api.get('/servicios'),
+    () => servicioService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -51,10 +51,10 @@ export default function Servicios() {
     try {
       const payload = { nombre: formData.nombre.trim(), descripcion: formData.descripcion.trim() || null };
       if (editingId) {
-        await api.put(`/servicios/${editingId}`, payload);
+        await servicioService.actualizar(editingId, payload);
         setMessage('Servicio actualizado correctamente.');
       } else {
-        await api.post('/servicios', payload);
+        await servicioService.crear(payload);
         setMessage('Servicio creado correctamente.');
       }
       resetForm();
@@ -79,7 +79,7 @@ export default function Servicios() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/servicios/${id}`);
+      await servicioService.eliminar(id);
       setMessage('Servicio eliminado correctamente.');
       if (selected?.id === id) setSelected(null);
       fetchServicios();

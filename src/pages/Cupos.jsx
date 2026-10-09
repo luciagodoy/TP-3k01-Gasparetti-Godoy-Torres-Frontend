@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import api from '../services/api';
+import { cupoService, servicioService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = { cantidad: 1, servicioId: '' };
 
@@ -17,13 +17,13 @@ export default function Cupos() {
 
   const { data: cupos, refetch: fetchCupos } = useQuery(
     '/cupos',
-    () => api.get('/cupos'),
+    () => cupoService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
   const { data: servicios } = useQuery(
     '/servicios',
-    () => api.get('/servicios'),
+    () => servicioService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -57,10 +57,10 @@ export default function Cupos() {
     try {
       const payload = { cantidad: formData.cantidad, servicioId: Number(formData.servicioId) };
       if (editingId) {
-        await api.put(`/cupos/${editingId}`, payload);
+        await cupoService.actualizar(editingId, payload);
         setMessage('Cupo actualizado correctamente.');
       } else {
-        await api.post('/cupos', payload);
+        await cupoService.crear(payload);
         setMessage('Cupo creado correctamente.');
       }
       resetForm();
@@ -85,7 +85,7 @@ export default function Cupos() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/cupos/${id}`);
+      await cupoService.eliminar(id);
       setMessage('Cupo eliminado correctamente.');
       if (selected?.id === id) setSelected(null);
       fetchCupos();
@@ -125,7 +125,7 @@ export default function Cupos() {
               <input type="number" name="cantidad" min="1" value={formData.cantidad} onChange={handleChange} />
             </div>
             {editingId && (
-              <p style={{ color: 'var(--muted)', fontSize: '0.9rem', marginTop: '-0.6rem', marginBottom: '1rem' }}>
+              <p className="field-hint">
                 Al cambiar la cantidad, la disponibilidad se ajusta proporcionalmente (no se puede bajar por debajo de lo ya consumido).
               </p>
             )}

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../services/api';
+import { reservaService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 export default function MisReservas() {
   const [error, setError] = useState(null);
@@ -11,7 +11,7 @@ export default function MisReservas() {
 
   const { data: reservas, refetch: fetchMisReservas } = useQuery(
     '/reservas/mias',
-    () => api.get('/reservas/mias'),
+    () => reservaService.mias(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -20,7 +20,7 @@ export default function MisReservas() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.post(`/reservas/${id}/cancelar`, {});
+      await reservaService.cancelar(id);
       setMessage('Reserva cancelada correctamente.');
       fetchMisReservas();
     } catch (err) {
@@ -44,9 +44,7 @@ export default function MisReservas() {
 
       <div className="room-grid">
         {reservas.map((reserva) => {
-          const servicios = reserva.serviciosConsumidos || [];
-          const totalServicios = servicios.reduce((sum, l) => sum + Number(l.montoTotal), 0);
-          const total = Number(reserva.montoTotal) + totalServicios;
+          const servicios = reserva.serviciosConsumidos;
 
           return (
             <div className="room-card" key={reserva.id}>
@@ -64,15 +62,15 @@ export default function MisReservas() {
                     <ul>
                       {servicios.map((linea) => (
                         <li key={linea.id}>
-                          {linea.cupo?.servicio?.nombre} × {linea.cantidad} — ${Number(linea.montoTotal).toFixed(2)}
+                          {linea.nombreServicio} × {linea.cantidad} — ${linea.montoTotal.toFixed(2)}
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
-                <p className="room-card-price">Total: ${total.toFixed(2)}</p>
+                <p className="room-card-price">Total: ${reserva.total.toFixed(2)}</p>
                 <div className="room-card-footer">
-                  {reserva.estado === 'pendiente' && (
+                  {reserva.puedeCancelarse && (
                     <button className="btn btn-small btn-danger" onClick={() => handleCancelar(reserva.id)} disabled={loading}>
                       Cancelar
                     </button>

@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import api from '../services/api';
+import { habitacionService, huespedService, reservaService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
 import DateInput from '../components/DateInput';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = {
   habitacionId: '',
@@ -24,19 +24,19 @@ export default function Reservas() {
 
   const { data: reservas, refetch: fetchReservas } = useQuery(
     '/reservas',
-    () => api.get('/reservas'),
+    () => reservaService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
   const { data: huespedes } = useQuery(
     '/huespedes',
-    () => api.get('/huespedes'),
+    () => huespedService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
   const { data: habitaciones } = useQuery(
     '/habitaciones',
-    () => api.get('/habitaciones'),
+    () => habitacionService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -66,7 +66,7 @@ export default function Reservas() {
 
     setLoading(true);
     try {
-      await api.post('/reservas', {
+      await reservaService.crear({
         habitacionId: Number(formData.habitacionId),
         huespedId: Number(formData.huespedId),
         fechaInicio: formData.fechaInicio,
@@ -89,7 +89,7 @@ export default function Reservas() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/reservas/${id}`);
+      await reservaService.eliminar(id);
       setMessage('Reserva eliminada correctamente.');
       fetchReservas();
     } catch (err) {

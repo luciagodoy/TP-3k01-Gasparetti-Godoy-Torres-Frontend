@@ -6,19 +6,20 @@ import CategoriasShowcase from '../components/CategoriasShowcase';
 import heroSuite from '../assets/hero/hero-suite.jpg';
 import heroResort from '../assets/hero/hero-resort.jpg';
 import heroPool from '../assets/hero/hero-pool.jpg';
-import '../styles/dashboard.css';
+import '../styles/dashboard.scss';
 
 const heroImages = [heroSuite, heroResort, heroPool];
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const esStaff = Boolean(user?.esStaff);
+  const esAdmin = Boolean(user?.esAdmin);
 
   const menuItems = [
     ...(user
       ? [{ title: 'Mis Reservas', path: '/mis-reservas', description: 'Ver y gestionar tus reservas' }]
       : []),
-    ...(isAdmin
+    ...(esStaff
       ? [
           { title: 'Reservas', path: '/reservas', description: 'Gestionar reservas' },
           { title: 'Habitaciones', path: '/habitaciones', description: 'Administrar habitaciones' },
@@ -29,6 +30,10 @@ export default function Dashboard() {
           { title: 'Cupos', path: '/cupos', description: 'Disponibilidad de los servicios' },
           { title: 'Precios de Servicios', path: '/precios-servicio', description: 'Vigencia y precio de cada servicio' },
           { title: 'Consumos de Servicio', path: '/reserva-servicios', description: 'Servicios agregados a una reserva' },
+        ]
+      : []),
+    ...(esAdmin
+      ? [
           { title: 'Empleados', path: '/empleados', description: 'Personal del hotel' },
           { title: 'Usuarios', path: '/usuarios', description: 'Cuentas y roles de acceso' },
         ]
@@ -50,7 +55,7 @@ export default function Dashboard() {
 
       <BookingBar />
 
-      {!isAdmin && <CategoriasShowcase />}
+      {!esStaff && <CategoriasShowcase />}
 
       <div className="menu-grid">
         {menuItems.map((item) => (

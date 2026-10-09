@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import api from '../services/api';
+import { provinciaService } from '../services/recursos';
 import useQuery from '../hooks/useQuery';
-import '../styles/pages.css';
+import '../styles/pages.scss';
 
 const emptyForm = { nombre: '' };
 
@@ -17,7 +17,7 @@ export default function Provincias() {
 
   const { data: provincias, refetch: fetchProvincias } = useQuery(
     '/provincias',
-    () => api.get('/provincias'),
+    () => provinciaService.listar(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -49,10 +49,10 @@ export default function Provincias() {
     try {
       const payload = { nombre: formData.nombre.trim() };
       if (editingId) {
-        await api.put(`/provincias/${editingId}`, payload);
+        await provinciaService.actualizar(editingId, payload);
         setMessage('Provincia actualizada correctamente.');
       } else {
-        await api.post('/provincias', payload);
+        await provinciaService.crear(payload);
         setMessage('Provincia creada correctamente.');
       }
       resetForm();
@@ -77,7 +77,7 @@ export default function Provincias() {
     setMessage(null);
     setLoading(true);
     try {
-      await api.delete(`/provincias/${id}`);
+      await provinciaService.eliminar(id);
       setMessage('Provincia eliminada correctamente.');
       if (selected?.id === id) setSelected(null);
       fetchProvincias();

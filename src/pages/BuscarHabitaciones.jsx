@@ -137,13 +137,15 @@ export default function BuscarHabitaciones() {
               {grupo.categoria.descripcion && <p className="room-card-meta">{grupo.categoria.descripcion}</p>}
               <p className="room-card-price">${grupo.categoria.precioNoche ?? 0} / noche</p>
               <div className="room-card-footer">
-                <button
-                  className="btn btn-success"
-                  onClick={() => handleReservar(grupo)}
-                  disabled={!hayFechas}
-                >
-                  Reservar
-                </button>
+                <span className="aviso-boton" title={hayFechas ? undefined : 'Elegí las fechas de entrada y salida para poder reservar.'}>
+                  <button
+                    className="btn btn-success"
+                    onClick={() => handleReservar(grupo)}
+                    disabled={!hayFechas}
+                  >
+                    Reservar
+                  </button>
+                </span>
               </div>
             </div>
           </div>

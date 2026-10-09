@@ -20,6 +20,15 @@ test('el login valida los campos requeridos antes de llamar a la API', async ({ 
   await expect(page).toHaveURL(/\/login$/);
 });
 
+// Regresión: .form-container tiene fondo oscuro pero no definía color, así que
+// el texto que no era <label> quedaba negro sobre negro ("Confirmar reserva", Login...).
+test('el texto de los formularios es claro sobre su fondo oscuro', async ({ page }) => {
+  await page.goto('/login');
+  const texto = page.locator('.form-container p').first();
+  await expect(texto).toBeVisible();
+  await expect(texto).toHaveCSS('color', 'rgb(255, 255, 255)');
+});
+
 test('una ruta protegida redirige a /login si no hay sesión iniciada', async ({ page }) => {
   await page.goto('/mis-reservas');
   await expect(page).toHaveURL(/\/login$/);

@@ -31,8 +31,11 @@ export default function Login() {
     try {
       const { token, usuario } = await authService.login(formData);
       await login(token, usuario);
-      const from = location.state?.from ?? '/';
-      navigate(from, { replace: true });
+      // navigate() toma del destino sólo pathname/search/hash: el state hay que
+      // pasarlo aparte. Sin esto se perdía, por ejemplo, la habitación y las
+      // fechas elegidas al tocar "Reservar" sin sesión, y /reservar devolvía a /buscar.
+      const from = location.state?.from;
+      navigate(from ?? '/', { replace: true, state: from?.state });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -63,9 +66,10 @@ export default function Login() {
             {loading ? 'Ingresando...' : 'Ingresar'}
           </button>
         </form>
-        <p style={{ marginTop: '1rem' }}>
-          ¿No tenés cuenta? <Link to="/registro">Registrate</Link>
-        </p>
+        <p style={{ marginTop: '1.5rem', marginBottom: '0.75rem' }}>¿No tenés cuenta?</p>
+        <Link to="/registro" className="btn btn-secondary">
+          Crear cuenta
+        </Link>
       </div>
     </div>
   );

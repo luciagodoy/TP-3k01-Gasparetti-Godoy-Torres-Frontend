@@ -146,3 +146,17 @@
   margin-top: auto;
   padding-top: 1rem;
 }
+
+// Un botón deshabilitado no dispara eventos de mouse en todos los navegadores,
+// así que el aviso (title) va en este contenedor y el botón deja pasar el puntero.
+.aviso-boton {
+  display: inline-block;
+
+  &:has(.btn:disabled) {
+    cursor: not-allowed;
+  }
+
+  .btn:disabled {
+    pointer-events: none;
+  }
+}

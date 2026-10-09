@@ -82,11 +82,26 @@
 
 .form-container {
   background: var(--surface);
+  color: var(--surface-text);
   border-radius: var(--radius-lg);
   padding: 1.75rem;
   margin-bottom: 2rem;
   border: 1px solid rgba(163, 137, 79, 0.14);
   box-shadow: var(--shadow);
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--surface-text);
+  }
+
+  a:not(.btn) {
+    color: var(--surface-text);
+    text-decoration: underline;
+  }
+
+  // --muted es para fondos claros: sobre --surface casi no se lee.
+  .field-hint {
+    color: var(--surface-muted);
+  }
 }
 
 .form-group {
@@ -220,12 +235,12 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  background: var(--primary);
   color: white;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--primary-dark) 0%, #8f7540 100%);
+  background: var(--primary-dark);
 }
 
 .btn-secondary {

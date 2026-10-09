@@ -146,12 +146,20 @@ export default function MainLayout() {
                 <button className="nav-link nav-link-solid" onClick={handleLogout}>Cerrar sesión</button>
               </>
             ) : (
-              <NavLink
-                to="/login"
-                className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
-              >
-                Iniciar sesión
-              </NavLink>
+              <>
+                <NavLink
+                  to="/registro"
+                  className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
+                >
+                  Registrarse
+                </NavLink>
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
+                >
+                  Iniciar sesión
+                </NavLink>
+              </>
             )}
           </div>
         </div>

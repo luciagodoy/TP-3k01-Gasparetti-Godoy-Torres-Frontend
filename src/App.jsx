@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ScrollToTop from './components/ScrollToTop';
 import Dashboard from './pages/Dashboard';
 import Categorias from './pages/Categorias';
 import Login from './pages/Login';
@@ -34,6 +35,7 @@ function CargandoPagina() {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Suspense fallback={<CargandoPagina />}>
         <Routes>
           <Route path="/" element={<MainLayout />}>

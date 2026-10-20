@@ -14,7 +14,7 @@
   min-width: 100%;
 }
 
-@include desde(xs) {
+@include breakpoint-up(xs) {
   .room-filters .form-group {
     min-width: 160px;
   }
@@ -147,9 +147,9 @@
   padding-top: 1rem;
 }
 
-// Un botón deshabilitado no dispara eventos de mouse en todos los navegadores,
-// así que el aviso (title) va en este contenedor y el botón deja pasar el puntero.
-.aviso-boton {
+// A disabled button does not fire mouse events in every browser, so the hint
+// (title) lives on this wrapper and the button lets the pointer through.
+.button-hint {
   display: inline-block;
 
   &:has(.btn:disabled) {

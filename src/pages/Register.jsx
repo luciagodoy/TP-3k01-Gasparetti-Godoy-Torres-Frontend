@@ -1,21 +1,21 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { huespedService } from '../services/recursos';
+import { guestService } from '../services/resources';
 import crestLogo from '../assets/crest-logo.png';
-import SelectorUbicacion from '../components/SelectorUbicacion';
+import LocationSelector from '../components/LocationSelector';
 import '../styles/pages.scss';
 
 const emptyForm = {
   username: '',
   email: '',
   password: '',
-  telefono: '',
-  documentoIdentidad: '',
-  ciudadId: '',
-  pais: 'Argentina',
+  phone: '',
+  documentNumber: '',
+  cityId: '',
+  country: 'Argentina',
 };
 
-export default function Registro() {
+export default function Register() {
   const [formData, setFormData] = useState(emptyForm);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
@@ -32,21 +32,21 @@ export default function Registro() {
     setError(null);
     setMessage(null);
 
-    if (!formData.username || !formData.email || !formData.password || !formData.documentoIdentidad || !formData.ciudadId) {
+    if (!formData.username || !formData.email || !formData.password || !formData.documentNumber || !formData.cityId) {
       setError('Completa todos los campos requeridos.');
       return;
     }
 
     setLoading(true);
     try {
-      await huespedService.registrar({
+      await guestService.register({
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        telefono: formData.telefono || null,
-        documentoIdentidad: formData.documentoIdentidad,
-        ciudadId: Number(formData.ciudadId),
-        pais: formData.pais,
+        phone: formData.phone || null,
+        documentNumber: formData.documentNumber,
+        cityId: Number(formData.cityId),
+        country: formData.country,
       });
       setMessage('Cuenta creada correctamente. Ya podés iniciar sesión.');
       setFormData(emptyForm);
@@ -71,32 +71,32 @@ export default function Registro() {
       <div className="form-container">
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Usuario</label>
-            <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Nombre de usuario" />
+            <label htmlFor="register-username">Usuario</label>
+            <input id="register-username" type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Nombre de usuario" />
           </div>
           <div className="form-group">
-            <label>Email</label>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="juan@example.com" />
+            <label htmlFor="register-email">Email</label>
+            <input id="register-email" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="juan@example.com" />
           </div>
           <div className="form-group">
-            <label>Contraseña</label>
-            <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Contraseña" />
+            <label htmlFor="register-password">Contraseña</label>
+            <input id="register-password" type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Contraseña" />
           </div>
           <div className="form-group">
-            <label>Teléfono</label>
-            <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="123456789" />
+            <label htmlFor="register-phone">Teléfono</label>
+            <input id="register-phone" type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="123456789" />
           </div>
           <div className="form-group">
-            <label>Documento de Identidad</label>
-            <input type="text" name="documentoIdentidad" value={formData.documentoIdentidad} onChange={handleChange} placeholder="12345678" />
+            <label htmlFor="register-document">Documento de Identidad</label>
+            <input id="register-document" type="text" name="documentNumber" value={formData.documentNumber} onChange={handleChange} placeholder="12345678" />
           </div>
-          <SelectorUbicacion
-            ciudadId={formData.ciudadId}
-            onChange={(ciudadId) => setFormData((prev) => ({ ...prev, ciudadId }))}
+          <LocationSelector
+            cityId={formData.cityId}
+            onChange={(cityId) => setFormData((prev) => ({ ...prev, cityId }))}
           />
           <div className="form-group">
-            <label>País</label>
-            <input type="text" name="pais" value={formData.pais} onChange={handleChange} placeholder="País" />
+            <label htmlFor="register-country">País</label>
+            <input id="register-country" type="text" name="country" value={formData.country} onChange={handleChange} placeholder="País" />
           </div>
           <button type="submit" className="btn btn-success" disabled={loading}>
             {loading ? 'Creando cuenta...' : 'Crear cuenta'}

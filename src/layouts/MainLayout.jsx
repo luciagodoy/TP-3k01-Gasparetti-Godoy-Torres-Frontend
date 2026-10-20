@@ -1,78 +1,80 @@
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import ErrorBoundary from '../components/ErrorBoundary';
 import crestLogo from '../assets/crest-logo-simple.png';
 import '../styles/layout.scss';
 
-const GESTION_LINKS = [
-  { to: '/reservas', label: 'Reservas' },
-  { to: '/habitaciones', label: 'Habitaciones' },
-  { to: '/huespedes', label: 'Huéspedes' },
-  { to: '/categorias', label: 'Categorías' },
-  { to: '/checkin', label: 'Check-in/out' },
+const MANAGEMENT_LINKS = [
+  { to: '/reservations', label: 'Reservas' },
+  { to: '/rooms', label: 'Habitaciones' },
+  { to: '/guests', label: 'Huéspedes' },
+  { to: '/room-categories', label: 'Categorías' },
+  { to: '/check-in', label: 'Check-in/out' },
 ];
+
+const navLinkClass = ({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`;
 
 export default function MainLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  // Empleados y admins operan el hotel: ven el menú de gestión en lugar de las
-  // opciones de huésped (antes sólo el admin lo veía y un empleado quedaba sin
-  // acceso a nada de lo que su rol le permite en el backend).
-  const esStaff = Boolean(user?.esStaff);
+  // Employees and admins run the hotel: they get the management menu instead of
+  // the guest options (it used to be admin-only, so an employee could reach
+  // none of what the backend allows their role).
+  const isStaff = Boolean(user?.isStaff);
 
-  const [gestionOpen, setGestionOpen] = useState(false);
-  const gestionRef = useRef(null);
+  const [managementOpen, setManagementOpen] = useState(false);
+  const managementRef = useRef(null);
   const triggerRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (gestionRef.current && !gestionRef.current.contains(e.target)) {
-        setGestionOpen(false);
+      if (managementRef.current && !managementRef.current.contains(e.target)) {
+        setManagementOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Cerrar al navegar se hace en el onClick de cada item y no en un efecto sobre
-  // location.pathname: el efecto corría en cada cambio de ruta viniera de donde
-  // viniera, y dejaba el cierre a merced del orden de renders.
-  const cerrarGestion = ({ devolverFoco = false } = {}) => {
-    setGestionOpen(false);
-    if (devolverFoco) triggerRef.current?.focus();
+  // Closing on navigation happens in each item's onClick, not in an effect on
+  // location.pathname: the effect ran on every route change wherever it came
+  // from, and left closing at the mercy of render order.
+  const closeManagement = ({ returnFocus = false } = {}) => {
+    setManagementOpen(false);
+    if (returnFocus) triggerRef.current?.focus();
   };
 
-  // Sin esto el menú es sólo para mouse: no había forma de cerrarlo ni de
-  // recorrerlo con el teclado.
-  const handleGestionKeyDown = (e) => {
+  // Without this the menu is mouse-only: there was no way to close it or move
+  // through it with the keyboard.
+  const handleManagementKeyDown = (e) => {
     if (e.key === 'Escape') {
       e.preventDefault();
-      cerrarGestion({ devolverFoco: true });
+      closeManagement({ returnFocus: true });
       return;
     }
 
     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
     e.preventDefault();
 
-    // El menú está display:none mientras está cerrado, así que no se puede
-    // enfocar un item todavía: la primera flecha lo abre y la siguiente navega.
-    if (!gestionOpen) {
-      setGestionOpen(true);
+    // The menu is display:none while closed, so no item can be focused yet:
+    // the first arrow opens it and the next one moves.
+    if (!managementOpen) {
+      setManagementOpen(true);
       return;
     }
 
-    const items = Array.from(gestionRef.current?.querySelectorAll('.nav-dropdown-item') || []);
+    const items = Array.from(managementRef.current?.querySelectorAll('.nav-dropdown-item') || []);
     if (items.length === 0) return;
 
-    const actual = items.indexOf(document.activeElement);
-    const siguiente =
-      actual === -1
+    const current = items.indexOf(document.activeElement);
+    const nextIndex =
+      current === -1
         ? (e.key === 'ArrowDown' ? 0 : items.length - 1)
-        : (actual + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+        : (current + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
 
-    items[siguiente].focus();
+    items[nextIndex].focus();
   };
 
   const handleLogout = () => {
@@ -89,47 +91,41 @@ export default function MainLayout() {
             <h1>Gestión Hotelera</h1>
           </Link>
           <nav className="navbar-menu">
-            {!esStaff && (
-              <NavLink
-                to="/buscar"
-                className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
-              >
+            {!isStaff && (
+              <NavLink to="/search" className={navLinkClass}>
                 Buscar Habitaciones
               </NavLink>
             )}
 
-            {!esStaff && user && (
-              <NavLink
-                to="/mis-reservas"
-                className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
-              >
+            {!isStaff && user && (
+              <NavLink to="/my-reservations" className={navLinkClass}>
                 Mis Reservas
               </NavLink>
             )}
 
-            {esStaff && (
+            {isStaff && (
               <div
-                className={`nav-dropdown${gestionOpen ? ' open' : ''}`}
-                ref={gestionRef}
-                onKeyDown={handleGestionKeyDown}
+                className={`nav-dropdown${managementOpen ? ' open' : ''}`}
+                ref={managementRef}
+                onKeyDown={handleManagementKeyDown}
               >
                 <button
                   type="button"
                   ref={triggerRef}
                   className="nav-link nav-link-solid nav-dropdown-trigger"
-                  onClick={() => setGestionOpen((prev) => !prev)}
-                  aria-expanded={gestionOpen}
+                  onClick={() => setManagementOpen((prev) => !prev)}
+                  aria-expanded={managementOpen}
                   aria-haspopup="menu"
                 >
                   Gestión <span className="nav-dropdown-caret">▾</span>
                 </button>
                 <div className="nav-dropdown-menu" role="menu">
-                  {GESTION_LINKS.map((item) => (
+                  {MANAGEMENT_LINKS.map((item) => (
                     <NavLink
                       key={item.to}
                       to={item.to}
                       role="menuitem"
-                      onClick={() => cerrarGestion()}
+                      onClick={() => closeManagement()}
                       className={({ isActive }) => `nav-dropdown-item${isActive ? ' active' : ''}`}
                     >
                       {item.label}
@@ -147,16 +143,10 @@ export default function MainLayout() {
               </>
             ) : (
               <>
-                <NavLink
-                  to="/registro"
-                  className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
-                >
+                <NavLink to="/register" className={navLinkClass}>
                   Registrarse
                 </NavLink>
-                <NavLink
-                  to="/login"
-                  className={({ isActive }) => `nav-link nav-link-solid${isActive ? ' active' : ''}`}
-                >
+                <NavLink to="/login" className={navLinkClass}>
                   Iniciar sesión
                 </NavLink>
               </>
@@ -166,10 +156,12 @@ export default function MainLayout() {
       </header>
 
       <main className="main-content">
-        {/* La key por ruta remonta el boundary al navegar: si no, una vez que
-            una página falla el fallback queda pegado aunque cambies de sección. */}
+        {/* Keying the boundary by route remounts it on navigation: otherwise, once
+            a page fails, the fallback sticks even after changing section. */}
         <ErrorBoundary key={location.pathname}>
-          <Outlet />
+          <Suspense fallback={<div className="page-container">Cargando...</div>}>
+            <Outlet />
+          </Suspense>
         </ErrorBoundary>
       </main>
 
@@ -183,18 +175,18 @@ export default function MainLayout() {
           <div className="footer-column">
             <h3>Explorar</h3>
             <Link to="/">Inicio</Link>
-            <Link to="/buscar">Buscar Habitaciones</Link>
-            <Link to="/categorias">Categorías</Link>
+            <Link to="/search">Buscar Habitaciones</Link>
+            <Link to="/room-categories">Categorías</Link>
           </div>
 
           <div className="footer-column">
             <h3>Cuenta</h3>
             {user ? (
-              <Link to="/mis-reservas">Mis Reservas</Link>
+              <Link to="/my-reservations">Mis Reservas</Link>
             ) : (
               <>
                 <Link to="/login">Iniciar Sesión</Link>
-                <Link to="/registro">Crear Cuenta</Link>
+                <Link to="/register">Crear Cuenta</Link>
               </>
             )}
           </div>

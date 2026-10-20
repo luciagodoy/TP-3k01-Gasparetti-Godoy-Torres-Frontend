@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-// Crossfade automático entre fotos, apiladas absolutamente detrás del
-// contenido del hero (ver .hero-carousel en dashboard.css).
+// Automatic crossfade between photos, stacked absolutely behind the hero
+// content (see .hero-carousel in dashboard.scss).
 export default function HeroCarousel({ images, intervalMs = 6000 }) {
   const [index, setIndex] = useState(0);
 

@@ -1,75 +1,71 @@
-import { lazy, Suspense } from 'react';
+import { lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import Dashboard from './pages/Dashboard';
-import Categorias from './pages/Categorias';
+import RoomCategories from './pages/RoomCategories';
 import Login from './pages/Login';
-import Registro from './pages/Registro';
-import BuscarHabitaciones from './pages/BuscarHabitaciones';
+import Register from './pages/Register';
+import SearchRooms from './pages/SearchRooms';
 import NotFound from './pages/NotFound';
-import { ROLES_ADMIN, ROLES_STAFF } from './models';
+import { ADMIN_ROLES, STAFF_ROLES } from './models';
 import './styles/global.scss';
 import './App.scss';
 
-const Reservas = lazy(() => import('./pages/Reservas'));
-const Habitaciones = lazy(() => import('./pages/Habitaciones'));
-const Huespedes = lazy(() => import('./pages/Huespedes'));
-const CheckIn = lazy(() => import('./pages/CheckIn'));
-const Servicios = lazy(() => import('./pages/Servicios'));
-const Empleados = lazy(() => import('./pages/Empleados'));
-const Provincias = lazy(() => import('./pages/Provincias'));
-const Ciudades = lazy(() => import('./pages/Ciudades'));
-const Cupos = lazy(() => import('./pages/Cupos'));
-const PrecioServicios = lazy(() => import('./pages/PrecioServicios'));
-const ReservaServicios = lazy(() => import('./pages/ReservaServicios'));
-const Usuarios = lazy(() => import('./pages/Usuarios'));
-const MisReservas = lazy(() => import('./pages/MisReservas'));
-const Reservar = lazy(() => import('./pages/Reservar'));
-
-function CargandoPagina() {
-  return <div className="page-container">Cargando...</div>;
-}
+const Reservations = lazy(() => import('./pages/Reservations'));
+const Rooms = lazy(() => import('./pages/Rooms'));
+const Guests = lazy(() => import('./pages/Guests'));
+const CheckInOut = lazy(() => import('./pages/CheckInOut'));
+const Amenities = lazy(() => import('./pages/Amenities'));
+const Employees = lazy(() => import('./pages/Employees'));
+const Provinces = lazy(() => import('./pages/Provinces'));
+const Cities = lazy(() => import('./pages/Cities'));
+const AmenityQuotas = lazy(() => import('./pages/AmenityQuotas'));
+const AmenityPrices = lazy(() => import('./pages/AmenityPrices'));
+const ReservationAmenities = lazy(() => import('./pages/ReservationAmenities'));
+const PricingRules = lazy(() => import('./pages/PricingRules'));
+const Users = lazy(() => import('./pages/Users'));
+const MyReservations = lazy(() => import('./pages/MyReservations'));
+const BookRoom = lazy(() => import('./pages/BookRoom'));
 
 function App() {
   return (
     <Router>
       <ScrollToTop />
-      <Suspense fallback={<CargandoPagina />}>
-        <Routes>
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="buscar" element={<BuscarHabitaciones />} />
-            <Route path="categorias" element={<Categorias />} />
-            <Route path="login" element={<Login />} />
-            <Route path="registro" element={<Registro />} />
-            {/* Mismos niveles que el backend: auth.staff (empleado o admin) para
-                la operación del hotel y auth.admin sólo para cuentas y personal. */}
-            <Route element={<ProtectedRoute roles={ROLES_STAFF} />}>
-              <Route path="reservas" element={<Reservas />} />
-              <Route path="habitaciones" element={<Habitaciones />} />
-              <Route path="huespedes" element={<Huespedes />} />
-              <Route path="checkin" element={<CheckIn />} />
-              <Route path="servicios" element={<Servicios />} />
-              <Route path="provincias" element={<Provincias />} />
-              <Route path="ciudades" element={<Ciudades />} />
-              <Route path="cupos" element={<Cupos />} />
-              <Route path="precios-servicio" element={<PrecioServicios />} />
-              <Route path="reserva-servicios" element={<ReservaServicios />} />
-            </Route>
-            <Route element={<ProtectedRoute roles={ROLES_ADMIN} />}>
-              <Route path="empleados" element={<Empleados />} />
-              <Route path="usuarios" element={<Usuarios />} />
-            </Route>
-            <Route element={<ProtectedRoute />}>
-              <Route path="mis-reservas" element={<MisReservas />} />
-              <Route path="reservar" element={<Reservar />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
+      <Routes>
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="search" element={<SearchRooms />} />
+          <Route path="room-categories" element={<RoomCategories />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          {/* Same levels as the backend: auth.staff (employee or admin) for the
+              hotel operation and auth.admin only for accounts and staff. */}
+          <Route element={<ProtectedRoute roles={STAFF_ROLES} />}>
+            <Route path="reservations" element={<Reservations />} />
+            <Route path="rooms" element={<Rooms />} />
+            <Route path="guests" element={<Guests />} />
+            <Route path="check-in" element={<CheckInOut />} />
+            <Route path="amenities" element={<Amenities />} />
+            <Route path="provinces" element={<Provinces />} />
+            <Route path="cities" element={<Cities />} />
+            <Route path="amenity-quotas" element={<AmenityQuotas />} />
+            <Route path="amenity-prices" element={<AmenityPrices />} />
+            <Route path="reservation-amenities" element={<ReservationAmenities />} />
+            <Route path="pricing-rules" element={<PricingRules />} />
           </Route>
-        </Routes>
-      </Suspense>
+          <Route element={<ProtectedRoute roles={ADMIN_ROLES} />}>
+            <Route path="employees" element={<Employees />} />
+            <Route path="users" element={<Users />} />
+          </Route>
+          <Route element={<ProtectedRoute />}>
+            <Route path="my-reservations" element={<MyReservations />} />
+            <Route path="book" element={<BookRoom />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
     </Router>
   );
 }

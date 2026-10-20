@@ -78,7 +78,7 @@
   background: #e9e4da;
 }
 
-@include desde(lg) {
+@include breakpoint-up(lg) {
   .booking-bar {
     flex-direction: row;
     align-items: flex-end;

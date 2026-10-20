@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { cupoService, servicioService } from '../services/recursos';
+import { amenityQuotaService, amenityService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
 import '../styles/pages.scss';
 
-const emptyForm = { cantidad: 1, servicioId: '' };
+const emptyForm = { quantity: 1, amenityId: '' };
 
-export default function Cupos() {
+export default function AmenityQuotas() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -15,26 +15,25 @@ export default function Cupos() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const { data: cupos, refetch: fetchCupos } = useQuery(
-    '/cupos',
-    () => cupoService.listar(),
+  const { data: quotas, refetch: fetchQuotas } = useQuery(
+    '/amenity-quotas',
+    () => amenityQuotaService.list(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-  const { data: servicios } = useQuery(
-    '/servicios',
-    () => servicioService.listar(),
+  const { data: amenities } = useQuery(
+    '/amenities',
+    () => amenityService.list(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-
-  const filteredCupos = cupos.filter((cupo) =>
-    searchTerm ? (cupo.servicio?.nombre || '').toLowerCase().includes(searchTerm.toLowerCase()) : true
+  const filteredQuotas = quotas.filter((quota) =>
+    searchTerm ? (quota.amenity?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) : true
   );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: name === 'cantidad' ? Number(value) : value }));
+    setFormData((prev) => ({ ...prev, [name]: name === 'quantity' ? Number(value) : value }));
   };
 
   const resetForm = () => {
@@ -48,23 +47,23 @@ export default function Cupos() {
     setError(null);
     setMessage(null);
 
-    if (!formData.cantidad || !formData.servicioId) {
+    if (!formData.quantity || !formData.amenityId) {
       setError('Cantidad y servicio son requeridos.');
       return;
     }
 
     setLoading(true);
     try {
-      const payload = { cantidad: formData.cantidad, servicioId: Number(formData.servicioId) };
+      const payload = { quantity: formData.quantity, amenityId: Number(formData.amenityId) };
       if (editingId) {
-        await cupoService.actualizar(editingId, payload);
+        await amenityQuotaService.update(editingId, payload);
         setMessage('Cupo actualizado correctamente.');
       } else {
-        await cupoService.crear(payload);
+        await amenityQuotaService.create(payload);
         setMessage('Cupo creado correctamente.');
       }
       resetForm();
-      fetchCupos();
+      fetchQuotas();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -72,9 +71,9 @@ export default function Cupos() {
     }
   };
 
-  const handleEdit = (cupo) => {
-    setFormData({ cantidad: cupo.cantidad, servicioId: cupo.servicioId ?? cupo.servicio?.id ?? '' });
-    setEditingId(cupo.id);
+  const handleEdit = (quota) => {
+    setFormData({ quantity: quota.quantity, amenityId: quota.amenityId ?? quota.amenity?.id ?? '' });
+    setEditingId(quota.id);
     setShowForm(true);
     setMessage(null);
     setError(null);
@@ -86,10 +85,10 @@ export default function Cupos() {
     setMessage(null);
     setLoading(true);
     try {
-      await cupoService.eliminar(id);
+      await amenityQuotaService.remove(id);
       setMessage('Cupo eliminado correctamente.');
       if (selected?.id === id) setSelected(null);
-      fetchCupos();
+      fetchQuotas();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -113,17 +112,17 @@ export default function Cupos() {
         <div className="form-container">
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Servicio</label>
-              <select name="servicioId" value={formData.servicioId} onChange={handleChange}>
+              <label htmlFor="quota-amenity">Servicio</label>
+              <select id="quota-amenity" name="amenityId" value={formData.amenityId} onChange={handleChange}>
                 <option value="">Seleccionar servicio</option>
-                {servicios.map((servicio) => (
-                  <option key={servicio.id} value={servicio.id}>{servicio.nombre}</option>
+                {amenities.map((amenity) => (
+                  <option key={amenity.id} value={amenity.id}>{amenity.name}</option>
                 ))}
               </select>
             </div>
             <div className="form-group">
-              <label>Cantidad total</label>
-              <input type="number" name="cantidad" min="1" value={formData.cantidad} onChange={handleChange} />
+              <label htmlFor="quota-quantity">Cantidad total</label>
+              <input id="quota-quantity" type="number" name="quantity" min="1" value={formData.quantity} onChange={handleChange} />
             </div>
             {editingId && (
               <p className="field-hint">
@@ -146,6 +145,7 @@ export default function Cupos() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por servicio"
+              aria-label="Buscar cupo por servicio"
             />
           </div>
         </div>
@@ -160,21 +160,21 @@ export default function Cupos() {
             </tr>
           </thead>
           <tbody>
-            {filteredCupos.map((cupo) => (
+            {filteredQuotas.map((quota) => (
               <tr
-                key={cupo.id}
-                className={selected?.id === cupo.id ? 'selected-row' : ''}
-                onClick={() => setSelected(cupo)}
+                key={quota.id}
+                className={selected?.id === quota.id ? 'selected-row' : ''}
+                onClick={() => setSelected(quota)}
               >
-                <td>{cupo.id}</td>
-                <td>{cupo.servicio?.nombre || '-'}</td>
-                <td>{cupo.cantidad}</td>
-                <td>{cupo.disponibles}</td>
+                <td>{quota.id}</td>
+                <td>{quota.amenity?.name || '-'}</td>
+                <td>{quota.quantity}</td>
+                <td>{quota.available}</td>
                 <td>
-                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(cupo); }}>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(quota); }}>
                     Editar
                   </button>
-                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(cupo.id); }} disabled={loading}>
+                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(quota.id); }} disabled={loading}>
                     Eliminar
                   </button>
                 </td>
@@ -187,9 +187,9 @@ export default function Cupos() {
           <div className="details-card">
             <h4>Detalle del cupo</h4>
             <p><strong>ID:</strong> {selected.id}</p>
-            <p><strong>Servicio:</strong> {selected.servicio?.nombre || '-'}</p>
-            <p><strong>Cantidad total:</strong> {selected.cantidad}</p>
-            <p><strong>Disponibles:</strong> {selected.disponibles}</p>
+            <p><strong>Servicio:</strong> {selected.amenity?.name || '-'}</p>
+            <p><strong>Cantidad total:</strong> {selected.quantity}</p>
+            <p><strong>Disponibles:</strong> {selected.available}</p>
             <button className="btn btn-secondary" onClick={() => setSelected(null)}>Cerrar detalle</button>
           </div>
         )}

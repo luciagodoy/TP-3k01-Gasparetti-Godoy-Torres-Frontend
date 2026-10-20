@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { ciudadService, provinciaService } from '../services/recursos';
+import { provinceService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
 import '../styles/pages.scss';
 
-const emptyForm = { nombre: '', provinciaId: '' };
+const emptyForm = { name: '' };
 
-export default function Ciudades() {
+export default function Provinces() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -15,27 +15,18 @@ export default function Ciudades() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const { data: ciudades, refetch: fetchCiudades } = useQuery(
-    '/ciudades',
-    () => ciudadService.listar(),
+  const { data: provinces, refetch: fetchProvinces } = useQuery(
+    '/provinces',
+    () => provinceService.list(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-  const { data: provincias } = useQuery(
-    '/provincias',
-    () => provinciaService.listar(),
-    { initialData: [], onError: (err) => setError(err.message) }
+  const filteredProvinces = provinces.filter((province) =>
+    searchTerm ? province.name.toLowerCase().includes(searchTerm.toLowerCase()) : true
   );
-
-
-  const filteredCiudades = ciudades.filter((ciudad) => {
-    const value = `${ciudad.nombre} ${ciudad.provincia?.nombre || ''}`.toLowerCase();
-    return searchTerm ? value.includes(searchTerm.toLowerCase()) : true;
-  });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData({ name: e.target.value });
   };
 
   const resetForm = () => {
@@ -49,23 +40,23 @@ export default function Ciudades() {
     setError(null);
     setMessage(null);
 
-    if (!formData.nombre.trim() || !formData.provinciaId) {
-      setError('Nombre y provincia son requeridos.');
+    if (!formData.name.trim()) {
+      setError('El nombre es requerido.');
       return;
     }
 
     setLoading(true);
     try {
-      const payload = { nombre: formData.nombre.trim(), provinciaId: Number(formData.provinciaId) };
+      const payload = { name: formData.name.trim() };
       if (editingId) {
-        await ciudadService.actualizar(editingId, payload);
-        setMessage('Ciudad actualizada correctamente.');
+        await provinceService.update(editingId, payload);
+        setMessage('Provincia actualizada correctamente.');
       } else {
-        await ciudadService.crear(payload);
-        setMessage('Ciudad creada correctamente.');
+        await provinceService.create(payload);
+        setMessage('Provincia creada correctamente.');
       }
       resetForm();
-      fetchCiudades();
+      fetchProvinces();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -73,24 +64,24 @@ export default function Ciudades() {
     }
   };
 
-  const handleEdit = (ciudad) => {
-    setFormData({ nombre: ciudad.nombre, provinciaId: ciudad.provinciaId ?? ciudad.provincia?.id ?? '' });
-    setEditingId(ciudad.id);
+  const handleEdit = (province) => {
+    setFormData({ name: province.name });
+    setEditingId(province.id);
     setShowForm(true);
     setMessage(null);
     setError(null);
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Eliminar esta ciudad? Esta acción no se puede deshacer.')) return;
+    if (!window.confirm('¿Eliminar esta provincia? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);
     try {
-      await ciudadService.eliminar(id);
-      setMessage('Ciudad eliminada correctamente.');
+      await provinceService.remove(id);
+      setMessage('Provincia eliminada correctamente.');
       if (selected?.id === id) setSelected(null);
-      fetchCiudades();
+      fetchProvinces();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -101,9 +92,9 @@ export default function Ciudades() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h2>Gestión de Ciudades</h2>
+        <h2>Gestión de Provincias</h2>
         <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(!showForm); }}>
-          {showForm ? 'Cancelar' : '+ Nueva Ciudad'}
+          {showForm ? 'Cancelar' : '+ Nueva Provincia'}
         </button>
       </div>
 
@@ -114,17 +105,8 @@ export default function Ciudades() {
         <div className="form-container">
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Nombre</label>
-              <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ej: Río Cuarto" />
-            </div>
-            <div className="form-group">
-              <label>Provincia</label>
-              <select name="provinciaId" value={formData.provinciaId} onChange={handleChange}>
-                <option value="">Seleccionar provincia</option>
-                {provincias.map((provincia) => (
-                  <option key={provincia.id} value={provincia.id}>{provincia.nombre}</option>
-                ))}
-              </select>
+              <label htmlFor="province-name">Nombre</label>
+              <input id="province-name" type="text" value={formData.name} onChange={handleChange} placeholder="Ej: Córdoba" />
             </div>
             <button type="submit" className="btn btn-success" disabled={loading}>
               {loading ? 'Guardando...' : editingId ? 'Actualizar' : 'Guardar'}
@@ -135,13 +117,14 @@ export default function Ciudades() {
 
       <div className="list-container">
         <div className="list-header">
-          <h3>Ciudades</h3>
+          <h3>Provincias</h3>
           <div className="filter-row">
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar por ciudad o provincia"
+              placeholder="Buscar por nombre"
+              aria-label="Buscar provincia por nombre"
             />
           </div>
         </div>
@@ -150,25 +133,23 @@ export default function Ciudades() {
             <tr>
               <th>ID</th>
               <th>Nombre</th>
-              <th>Provincia</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {filteredCiudades.map((ciudad) => (
+            {filteredProvinces.map((province) => (
               <tr
-                key={ciudad.id}
-                className={selected?.id === ciudad.id ? 'selected-row' : ''}
-                onClick={() => setSelected(ciudad)}
+                key={province.id}
+                className={selected?.id === province.id ? 'selected-row' : ''}
+                onClick={() => setSelected(province)}
               >
-                <td>{ciudad.id}</td>
-                <td>{ciudad.nombre}</td>
-                <td>{ciudad.provincia?.nombre || '-'}</td>
+                <td>{province.id}</td>
+                <td>{province.name}</td>
                 <td>
-                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(ciudad); }}>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(province); }}>
                     Editar
                   </button>
-                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(ciudad.id); }} disabled={loading}>
+                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(province.id); }} disabled={loading}>
                     Eliminar
                   </button>
                 </td>
@@ -179,10 +160,9 @@ export default function Ciudades() {
 
         {selected && (
           <div className="details-card">
-            <h4>Detalle de la ciudad</h4>
+            <h4>Detalle de la provincia</h4>
             <p><strong>ID:</strong> {selected.id}</p>
-            <p><strong>Nombre:</strong> {selected.nombre}</p>
-            <p><strong>Provincia:</strong> {selected.provincia?.nombre || '-'}</p>
+            <p><strong>Nombre:</strong> {selected.name}</p>
             <button className="btn btn-secondary" onClick={() => setSelected(null)}>Cerrar detalle</button>
           </div>
         )}

@@ -74,17 +74,17 @@ no requieren que el backend esté corriendo, porque cubren flujos que no depende
 ├── src/
 │   ├── assets/            # Logos e imágenes del hero
 │   ├── components/        # ProtectedRoute, ErrorBoundary, HeroCarousel, BookingBar,
-│   │                      # DateInput, SelectorUbicacion, GaleriaImagenes, CategoriasShowcase
+│   │                      # DateInput, LocationSelector, ImageGallery, CategoryShowcase
 │   ├── context/           # AuthContext + useAuth: sesión, usuario logueado y rol
 │   ├── hooks/
 │   │   └── useQuery.js    # Pedidos a la API con estado de carga/error y recarga
 │   ├── layouts/
 │   │   └── MainLayout.jsx # Layout principal con navegación (según sesión y rol)
-│   ├── models/            # Modelos de dominio (Reserva, Habitacion, Huesped...) y roles
+│   ├── models/            # Modelos de dominio (Reservation, Room, Guest...) y roles
 │   ├── pages/             # Una página por ruta (ver "Rutas de la Aplicación")
 │   ├── services/
 │   │   ├── api.js         # Cliente HTTP base (fetch, token de sesión, manejo de errores)
-│   │   └── recursos.js    # Un servicio por recurso de la API, devuelve modelos
+│   │   └── resources.js   # Un servicio por recurso de la API, devuelve modelos
 │   ├── styles/            # Estilos Sass (ver "Estilos")
 │   ├── test/              # Setup de tests unitarios
 │   ├── utils/             # Utilidades (descarga de archivos, p. ej. el PDF del check-out)
@@ -99,7 +99,8 @@ no requieren que el backend esté corriendo, porque cubren flujos que no depende
 
 ## 🔐 Autenticación y roles
 
-Hay tres roles, resueltos por el backend (definidos en `src/models/tipos.js`):
+Hay tres roles, resueltos por el backend (definidos en `src/models/types.js` como `ROLES.GUEST`,
+`ROLES.EMPLOYEE` y `ROLES.ADMIN`; el valor guardado sigue siendo `'huesped'`, `'empleado'`, `'admin'`):
 
 - **Huésped** (cualquier usuario logueado): puede buscar y reservar habitaciones, agregar
   servicios a su reserva y ver/cancelar sus propias reservas en "Mis Reservas".
@@ -107,8 +108,8 @@ Hay tres roles, resueltos por el backend (definidos en `src/models/tipos.js`):
   check-in/out, servicios, cupos, precios, provincias y ciudades) y puede editar categorías.
 - **Admin**: todo lo anterior, más la gestión de empleados y usuarios.
 
-Las rutas se protegen en `App.jsx` con `<ProtectedRoute roles={ROLES_STAFF} />` (empleado o
-admin) y `<ProtectedRoute roles={ROLES_ADMIN} />` (sólo admin).
+Las rutas se protegen en `App.jsx` con `<ProtectedRoute roles={STAFF_ROLES} />` (empleado o
+admin) y `<ProtectedRoute roles={ADMIN_ROLES} />` (sólo admin).
 
 El primer usuario admin lo crea el backend automáticamente al arrancar (ver el README del
 backend, sección "Cuenta admin inicial").
@@ -135,27 +136,28 @@ VITE_API_URL=http://localhost:3000/api
 
 ## 🔗 Rutas de la Aplicación
 
-| Ruta                 | Página             | Acceso  | Descripción                                   |
-| -------------------- | ------------------ | ------- | --------------------------------------------- |
-| `/`                  | Dashboard          | Público | Página principal                              |
-| `/buscar`            | BuscarHabitaciones | Público | Búsqueda de habitaciones                      |
-| `/categorias`        | Categorías         | Público | Categorías de habitación (staff puede editar) |
-| `/login`             | Login              | Público | Iniciar sesión                                |
-| `/registro`          | Registro           | Público | Alta de cuenta de huésped                     |
-| `/reservar`          | Reservar           | Huésped | Reservar + agregar servicios                  |
-| `/mis-reservas`      | MisReservas        | Huésped | Ver/cancelar reservas propias                 |
-| `/reservas`          | Reservas           | Staff   | Gestión de todas las reservas                 |
-| `/habitaciones`      | Habitaciones       | Staff   | Gestión de habitaciones                       |
-| `/huespedes`         | Huéspedes          | Staff   | Gestión de huéspedes                          |
-| `/checkin`           | Check-in/out       | Staff   | Procesar entrada y salida                     |
-| `/servicios`         | Servicios          | Staff   | Gestión de servicios adicionales              |
-| `/cupos`             | Cupos              | Staff   | Cupos disponibles por servicio                |
-| `/precios-servicio`  | PrecioServicios    | Staff   | Precios de los servicios                      |
-| `/reserva-servicios` | ReservaServicios   | Staff   | Consumos de servicio por reserva              |
-| `/provincias`        | Provincias         | Staff   | Gestión de provincias                         |
-| `/ciudades`          | Ciudades           | Staff   | Gestión de ciudades                           |
-| `/empleados`         | Empleados          | Admin   | Gestión de empleados                          |
-| `/usuarios`          | Usuarios           | Admin   | Gestión de usuarios                           |
+| Ruta                     | Página               | Acceso  | Descripción                                   |
+| ------------------------ | -------------------- | ------- | --------------------------------------------- |
+| `/`                      | Dashboard            | Público | Página principal                              |
+| `/search`                | SearchRooms          | Público | Búsqueda de habitaciones                      |
+| `/room-categories`       | RoomCategories       | Público | Categorías de habitación (staff puede editar) |
+| `/login`                 | Login                | Público | Iniciar sesión                                |
+| `/register`              | Register             | Público | Alta de cuenta de huésped                     |
+| `/book`                  | BookRoom             | Huésped | Reservar + agregar servicios                  |
+| `/my-reservations`       | MyReservations       | Huésped | Ver/cancelar reservas propias                 |
+| `/reservations`          | Reservations         | Staff   | Gestión de todas las reservas                 |
+| `/rooms`                 | Rooms                | Staff   | Gestión de habitaciones                       |
+| `/guests`                | Guests               | Staff   | Gestión de huéspedes                          |
+| `/check-in`              | CheckInOut           | Staff   | Procesar entrada y salida                     |
+| `/amenities`             | Amenities            | Staff   | Gestión de servicios adicionales              |
+| `/amenity-quotas`        | AmenityQuotas        | Staff   | Cupos disponibles por servicio                |
+| `/amenity-prices`        | AmenityPrices        | Staff   | Precios de los servicios                      |
+| `/reservation-amenities` | ReservationAmenities | Staff   | Consumos de servicio por reserva              |
+| `/pricing-rules`         | PricingRules         | Staff   | Tarifas dinámicas (ocupación y antelación)    |
+| `/provinces`             | Provinces            | Staff   | Gestión de provincias                         |
+| `/cities`                | Cities               | Staff   | Gestión de ciudades                           |
+| `/employees`             | Employees            | Admin   | Gestión de empleados                          |
+| `/users`                 | Users                | Admin   | Gestión de usuarios                           |
 
 "Huésped" significa cualquier usuario logueado; "Staff" es empleado o admin.
 
@@ -168,7 +170,7 @@ página falla al renderizar, se muestra un mensaje de error en lugar de dejar la
 El proyecto usa Sass (`.scss`) con un enfoque mobile-first, y estilos por sección en `src/styles/`:
 
 - `_tokens.scss` - Breakpoints (los colores, radios y sombras son custom properties de CSS en `global.scss`)
-- `_mixins.scss` - Mixin `desde(md)` para media queries mobile-first
+- `_mixins.scss` - Mixin `breakpoint-up(md)` para media queries mobile-first
 - `global.scss` - Estilos globales y variables de CSS
 - `layout.scss` - Navegación y layout principal
 - `dashboard.scss` - Dashboard y hero
@@ -184,18 +186,18 @@ Las páginas no llaman a `fetch` directamente. Hay dos capas:
 - `src/services/api.js`: cliente HTTP base (`get`, `post`, `put`, `delete`) que agrega el token
   de sesión. Si el backend no responde, lanza un error de red visible en lugar de devolver
   datos falsos.
-- `src/services/recursos.js`: un servicio por recurso (`reservaService`, `habitacionService`,
-  `huespedService`, `categoriaService`...) con los métodos `listar`, `obtener`, `crear`,
-  `actualizar` y `eliminar`, que devuelven instancias de los modelos de `src/models/` en vez
-  de JSON crudo.
+- `src/services/resources.js`: un servicio por recurso (`reservationService`, `roomService`,
+  `guestService`, `roomCategoryService`...) armado con la factory `createResourceService`, con
+  los métodos `list`, `get`, `create`, `update` y `remove`, que devuelven instancias de los
+  modelos de `src/models/` en vez de JSON crudo.
 
 Ejemplo de uso:
 
 ```javascript
-import { habitacionService } from './services/recursos';
+import { roomService } from './services/resources';
 
-const habitaciones = await habitacionService.listar();
-const habitacion = await habitacionService.obtener(1);
+const rooms = await roomService.list();
+const room = await roomService.get(1);
 ```
 
 Para cargar datos dentro de un componente se usa el hook `useQuery`, que maneja el estado de
@@ -203,9 +205,9 @@ carga y error, y expone `refetch` para recargar después de un cambio:
 
 ```javascript
 import useQuery from './hooks/useQuery';
-import { habitacionService } from './services/recursos';
+import { roomService } from './services/resources';
 
-const { data, loading, error, refetch } = useQuery('/habitaciones', () => habitacionService.listar());
+const { data, loading, error, refetch } = useQuery('/rooms', () => roomService.list());
 ```
 
 ## ⚙️ Integración continua

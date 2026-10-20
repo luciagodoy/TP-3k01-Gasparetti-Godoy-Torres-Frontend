@@ -1,7 +1,8 @@
-export { default as Modelo } from './Modelo';
-export { Provincia, Ciudad } from './ubicacion';
-export { CategoriaHabitacion, Habitacion } from './alojamiento';
-export { User, Huesped, Empleado } from './personas';
-export { Servicio, Cupo, PrecioServicio, ReservaServicio } from './servicios';
-export { default as Reserva } from './Reserva';
-export * from './tipos';
+export { default as BaseModel } from './BaseModel';
+export { Province, City } from './location';
+export { RoomCategory, Room } from './lodging';
+export { User, Guest, Employee } from './people';
+export { Amenity, AmenityQuota, AmenityPrice, ReservationAmenity } from './amenities';
+export { default as Reservation } from './Reservation';
+export { PricingRule, NightQuote, Quote } from './pricing';
+export * from './types';

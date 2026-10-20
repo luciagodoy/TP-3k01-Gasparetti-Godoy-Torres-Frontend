@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { cupoService, reservaService, reservaServicioService } from '../services/recursos';
+import { amenityQuotaService, reservationService, reservationAmenityService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
 import '../styles/pages.scss';
 
-const emptyForm = { reservaId: '', cupoId: '', cantidad: 1, precioUnitario: '' };
+const emptyForm = { reservationId: '', quotaId: '', quantity: 1, unitPrice: '' };
 
-export default function ReservaServicios() {
+export default function ReservationAmenities() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -15,34 +15,32 @@ export default function ReservaServicios() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const { data: lineas, refetch: fetchLineas } = useQuery(
-    '/reserva-servicios',
-    () => reservaServicioService.listar(),
+  const { data: consumptions, refetch: fetchConsumptions } = useQuery(
+    '/reservation-amenities',
+    () => reservationAmenityService.list(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-  const { data: reservas } = useQuery(
-    '/reservas',
-    () => reservaService.listar(),
+  const { data: reservations } = useQuery(
+    '/reservations',
+    () => reservationService.list(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-  const { data: cupos } = useQuery(
-    '/cupos',
-    () => cupoService.listar(),
+  const { data: quotas } = useQuery(
+    '/amenity-quotas',
+    () => amenityQuotaService.list(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-
-
-  const filteredLineas = lineas.filter((linea) => {
-    const value = `${linea.reservaId} ${linea.cupo?.servicio?.nombre || ''}`.toLowerCase();
+  const filteredConsumptions = consumptions.filter((consumption) => {
+    const value = `${consumption.reservationId} ${consumption.amenityName || ''}`.toLowerCase();
     return searchTerm ? value.includes(searchTerm.toLowerCase()) : true;
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: name === 'cantidad' ? Number(value) : value }));
+    setFormData((prev) => ({ ...prev, [name]: name === 'quantity' ? Number(value) : value }));
   };
 
   const resetForm = () => {
@@ -57,19 +55,19 @@ export default function ReservaServicios() {
     setMessage(null);
 
     if (editingId) {
-      if (!formData.cantidad || !formData.precioUnitario) {
+      if (!formData.quantity || !formData.unitPrice) {
         setError('Cantidad y precio unitario son requeridos.');
         return;
       }
       setLoading(true);
       try {
-        await reservaServicioService.actualizar(editingId, {
-          cantidad: formData.cantidad,
-          precioUnitario: parseFloat(formData.precioUnitario),
+        await reservationAmenityService.update(editingId, {
+          quantity: formData.quantity,
+          unitPrice: parseFloat(formData.unitPrice),
         });
         setMessage('Consumo actualizado correctamente.');
         resetForm();
-        fetchLineas();
+        fetchConsumptions();
       } catch (err) {
         setError(err.message);
       } finally {
@@ -78,22 +76,22 @@ export default function ReservaServicios() {
       return;
     }
 
-    if (!formData.reservaId || !formData.cupoId || !formData.cantidad || !formData.precioUnitario) {
+    if (!formData.reservationId || !formData.quotaId || !formData.quantity || !formData.unitPrice) {
       setError('Reserva, cupo, cantidad y precio unitario son requeridos.');
       return;
     }
 
     setLoading(true);
     try {
-      await reservaServicioService.crear({
-        reservaId: Number(formData.reservaId),
-        cupoId: Number(formData.cupoId),
-        cantidad: formData.cantidad,
-        precioUnitario: parseFloat(formData.precioUnitario),
+      await reservationAmenityService.create({
+        reservationId: Number(formData.reservationId),
+        quotaId: Number(formData.quotaId),
+        quantity: formData.quantity,
+        unitPrice: parseFloat(formData.unitPrice),
       });
       setMessage('Consumo registrado correctamente.');
       resetForm();
-      fetchLineas();
+      fetchConsumptions();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -101,14 +99,14 @@ export default function ReservaServicios() {
     }
   };
 
-  const handleEdit = (linea) => {
+  const handleEdit = (consumption) => {
     setFormData({
-      reservaId: linea.reservaId,
-      cupoId: linea.cupoId,
-      cantidad: linea.cantidad,
-      precioUnitario: linea.precioUnitario,
+      reservationId: consumption.reservationId,
+      quotaId: consumption.quotaId,
+      quantity: consumption.quantity,
+      unitPrice: consumption.unitPrice,
     });
-    setEditingId(linea.id);
+    setEditingId(consumption.id);
     setShowForm(true);
     setMessage(null);
     setError(null);
@@ -120,10 +118,10 @@ export default function ReservaServicios() {
     setMessage(null);
     setLoading(true);
     try {
-      await reservaServicioService.eliminar(id);
+      await reservationAmenityService.remove(id);
       setMessage('Consumo eliminado correctamente (cupo liberado).');
       if (selected?.id === id) setSelected(null);
-      fetchLineas();
+      fetchConsumptions();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -131,11 +129,11 @@ export default function ReservaServicios() {
     }
   };
 
-  const reservaLabel = (reserva) =>
-    `#${reserva.id} - Habitación ${reserva.habitacion?.numero ?? reserva.habitacionId} (${reserva.fechaInicio} a ${reserva.fechaFin})`;
+  const reservationLabel = (reservation) =>
+    `#${reservation.id} - Habitación ${reservation.room?.number ?? reservation.roomId} (${reservation.startDate} a ${reservation.endDate})`;
 
-  const cupoLabel = (cupo) =>
-    `${cupo.servicio?.nombre || `Servicio #${cupo.servicioId}`} - ${cupo.disponibles}/${cupo.cantidad} disponibles`;
+  const quotaLabel = (quota) =>
+    `${quota.amenity?.name || `Servicio #${quota.amenityId}`} - ${quota.available}/${quota.quantity} disponibles`;
 
   return (
     <div className="page-container">
@@ -160,32 +158,32 @@ export default function ReservaServicios() {
             {!editingId && (
               <>
                 <div className="form-group">
-                  <label>Reserva</label>
-                  <select name="reservaId" value={formData.reservaId} onChange={handleChange}>
+                  <label htmlFor="consumption-reservation">Reserva</label>
+                  <select id="consumption-reservation" name="reservationId" value={formData.reservationId} onChange={handleChange}>
                     <option value="">Seleccionar reserva</option>
-                    {reservas.map((reserva) => (
-                      <option key={reserva.id} value={reserva.id}>{reservaLabel(reserva)}</option>
+                    {reservations.map((reservation) => (
+                      <option key={reservation.id} value={reservation.id}>{reservationLabel(reservation)}</option>
                     ))}
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Cupo</label>
-                  <select name="cupoId" value={formData.cupoId} onChange={handleChange}>
+                  <label htmlFor="consumption-quota">Cupo</label>
+                  <select id="consumption-quota" name="quotaId" value={formData.quotaId} onChange={handleChange}>
                     <option value="">Seleccionar cupo</option>
-                    {cupos.map((cupo) => (
-                      <option key={cupo.id} value={cupo.id}>{cupoLabel(cupo)}</option>
+                    {quotas.map((quota) => (
+                      <option key={quota.id} value={quota.id}>{quotaLabel(quota)}</option>
                     ))}
                   </select>
                 </div>
               </>
             )}
             <div className="form-group">
-              <label>Cantidad</label>
-              <input type="number" name="cantidad" min="1" value={formData.cantidad} onChange={handleChange} />
+              <label htmlFor="consumption-quantity">Cantidad</label>
+              <input id="consumption-quantity" type="number" name="quantity" min="1" value={formData.quantity} onChange={handleChange} />
             </div>
             <div className="form-group">
-              <label>Precio unitario</label>
-              <input type="number" step="0.01" name="precioUnitario" value={formData.precioUnitario} onChange={handleChange} placeholder="0.00" />
+              <label htmlFor="consumption-unit-price">Precio unitario</label>
+              <input id="consumption-unit-price" type="number" step="0.01" name="unitPrice" value={formData.unitPrice} onChange={handleChange} placeholder="0.00" />
             </div>
             <button type="submit" className="btn btn-success" disabled={loading}>
               {loading ? 'Guardando...' : editingId ? 'Actualizar' : 'Guardar'}
@@ -203,6 +201,7 @@ export default function ReservaServicios() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por reserva o servicio"
+              aria-label="Buscar consumo por reserva o servicio"
             />
           </div>
         </div>
@@ -218,22 +217,22 @@ export default function ReservaServicios() {
             </tr>
           </thead>
           <tbody>
-            {filteredLineas.map((linea) => (
+            {filteredConsumptions.map((consumption) => (
               <tr
-                key={linea.id}
-                className={selected?.id === linea.id ? 'selected-row' : ''}
-                onClick={() => setSelected(linea)}
+                key={consumption.id}
+                className={selected?.id === consumption.id ? 'selected-row' : ''}
+                onClick={() => setSelected(consumption)}
               >
-                <td>#{linea.reservaId}</td>
-                <td>{linea.cupo?.servicio?.nombre || '-'}</td>
-                <td>{linea.cantidad}</td>
-                <td>${Number(linea.precioUnitario).toFixed(2)}</td>
-                <td>${Number(linea.montoTotal).toFixed(2)}</td>
+                <td>#{consumption.reservationId}</td>
+                <td>{consumption.amenityName || '-'}</td>
+                <td>{consumption.quantity}</td>
+                <td>${consumption.unitPrice.toFixed(2)}</td>
+                <td>${consumption.totalAmount.toFixed(2)}</td>
                 <td>
-                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(linea); }}>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(consumption); }}>
                     Editar
                   </button>
-                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(linea.id); }} disabled={loading}>
+                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(consumption.id); }} disabled={loading}>
                     Eliminar
                   </button>
                 </td>
@@ -245,11 +244,11 @@ export default function ReservaServicios() {
         {selected && (
           <div className="details-card">
             <h4>Detalle del consumo</h4>
-            <p><strong>Reserva:</strong> #{selected.reservaId}</p>
-            <p><strong>Servicio:</strong> {selected.cupo?.servicio?.nombre || '-'}</p>
-            <p><strong>Cantidad:</strong> {selected.cantidad}</p>
-            <p><strong>Precio unitario:</strong> ${Number(selected.precioUnitario).toFixed(2)}</p>
-            <p><strong>Total:</strong> ${Number(selected.montoTotal).toFixed(2)}</p>
+            <p><strong>Reserva:</strong> #{selected.reservationId}</p>
+            <p><strong>Servicio:</strong> {selected.amenityName || '-'}</p>
+            <p><strong>Cantidad:</strong> {selected.quantity}</p>
+            <p><strong>Precio unitario:</strong> ${selected.unitPrice.toFixed(2)}</p>
+            <p><strong>Total:</strong> ${selected.totalAmount.toFixed(2)}</p>
             <button className="btn btn-secondary" onClick={() => setSelected(null)}>Cerrar detalle</button>
           </div>
         )}

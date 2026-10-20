@@ -1,9 +1,9 @@
 import { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-// Sin un error boundary, cualquier excepción al renderizar una página deja la
-// app entera en blanco (React desmonta todo el árbol). Tiene que ser un class
-// component: getDerivedStateFromError / componentDidCatch no existen en hooks.
+// Without an error boundary, any exception while rendering a page leaves the
+// whole app blank (React unmounts the entire tree). It has to be a class
+// component: getDerivedStateFromError / componentDidCatch have no hook version.
 export default class ErrorBoundary extends Component {
   state = { error: null };
 
@@ -12,7 +12,7 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    console.error('Error no controlado al renderizar:', error, info);
+    console.error('Unhandled render error:', error, info);
   }
 
   render() {

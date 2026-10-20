@@ -14,6 +14,12 @@
   min-width: 100%;
 }
 
+// Form labels are white for the dark surfaces of the forms; this bar sits on
+// the light page background, where they were invisible.
+.room-filters .form-group label {
+  color: var(--text);
+}
+
 @include breakpoint-up(xs) {
   .room-filters .form-group {
     min-width: 160px;
@@ -79,26 +85,36 @@
 
 .room-card-gallery-dots {
   position: absolute;
-  bottom: 8px;
+  bottom: 0;
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
-  gap: 6px;
 }
 
 .room-card-gallery-dot {
-  width: 7px;
-  height: 7px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
+  background: transparent;
   border: none;
   cursor: pointer;
   padding: 0;
-}
 
-.room-card-gallery-dot.active {
-  background: #fff;
+  &::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  &.active::before {
+    background: #fff;
+  }
 }
 
 .room-card-image-placeholder {

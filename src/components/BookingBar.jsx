@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { roomCategoryService } from '../services/resources';
+import CategorySelector from './CategorySelector';
 import DateInput from './DateInput';
+import GuestSelector from './GuestSelector';
+import { largestCapacity } from '../models';
 import '../styles/booking-bar.scss';
 
 const emptyFilters = { startDate: '', endDate: '', categoryId: '', people: '' };
@@ -44,25 +47,19 @@ export default function BookingBar() {
         />
       </div>
       <div className="booking-bar-field">
-        <label htmlFor="booking-category">Categoría</label>
-        <select id="booking-category" name="categoryId" value={filters.categoryId} onChange={handleChange}>
-          <option value="">Todas</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>{category.name}</option>
-          ))}
-        </select>
+        <label id="booking-category-label">Categoría</label>
+        <CategorySelector
+          id="booking-category"
+          labelId="booking-category-label"
+          name="categoryId"
+          value={filters.categoryId}
+          onChange={handleChange}
+          categories={categories}
+        />
       </div>
       <div className="booking-bar-field">
-        <label htmlFor="booking-people">Huéspedes</label>
-        <input
-          id="booking-people"
-          type="number"
-          name="people"
-          min="1"
-          placeholder="1"
-          value={filters.people}
-          onChange={handleChange}
-        />
+        <label htmlFor="booking-people">Número de huéspedes</label>
+        <GuestSelector id="booking-people" name="people" value={filters.people} onChange={handleChange} max={largestCapacity(categories)} />
       </div>
       <button type="submit" className="booking-bar-submit">Buscar Habitaciones</button>
     </form>

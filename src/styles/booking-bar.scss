@@ -29,7 +29,6 @@
   color: rgba(255, 255, 255, 0.65);
 }
 
-.booking-bar-field select,
 .booking-bar-field input[type='number'] {
   width: 100%;
   padding: 1rem 1.1rem;
@@ -41,15 +40,14 @@
   font-size: 1rem;
 }
 
-.booking-bar-field select:focus-visible,
-.booking-bar-field input[type='number']:focus-visible {
-  outline: none;
+.booking-bar-field input[type='number']:focus-visible,
+.booking-bar .date-input-trigger:focus-visible,
+.booking-bar .guest-selector-trigger:focus-visible,
+.booking-bar .category-selector-trigger:focus-visible {
+  outline: 2px solid #fffdf9;
+  outline-offset: 2px;
   border-color: rgba(255, 255, 255, 0.5);
-}
-
-.booking-bar-field select option {
-  color: #17181a;
-  background: #fffdf9;
+  box-shadow: none;
 }
 
 .booking-bar .date-input-trigger {

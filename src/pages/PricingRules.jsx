@@ -139,8 +139,8 @@ export default function PricingRules() {
         de la mitad del precio base. Las reservas ya hechas conservan su precio.
       </p>
 
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {message && <div role="status" className="alert alert-success">{message}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       {showForm && (
         <div className="form-container">
@@ -228,6 +228,9 @@ export default function PricingRules() {
                 <td>{rule.scopeLabel}</td>
                 <td>{rule.active ? 'Activa' : 'Inactiva'}</td>
                 <td>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); setSelected(rule); }}>
+                    Ver detalle
+                  </button>
                   <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(rule); }}>
                     Editar
                   </button>

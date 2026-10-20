@@ -65,8 +65,8 @@ export default function Register() {
         <h2>Crear Cuenta</h2>
       </div>
 
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {message && <div role="status" className="alert alert-success">{message}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       <div className="form-container">
         <form onSubmit={handleSubmit}>

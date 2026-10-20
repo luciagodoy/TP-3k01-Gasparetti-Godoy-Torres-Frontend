@@ -116,8 +116,8 @@ export default function AmenityPrices() {
         </button>
       </div>
 
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {message && <div role="status" className="alert alert-success">{message}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       {showForm && (
         <div className="form-container">
@@ -187,6 +187,9 @@ export default function AmenityPrices() {
                 <td>{price.validFrom}</td>
                 <td>{price.validTo || 'Sin límite'}</td>
                 <td>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); setSelected(price); }}>
+                    Ver detalle
+                  </button>
                   <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(price); }}>
                     Editar
                   </button>

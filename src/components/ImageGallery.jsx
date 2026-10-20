@@ -34,6 +34,7 @@ export default function ImageGallery({ images, alt }) {
                 className={`room-card-gallery-dot${i === index ? ' active' : ''}`}
                 onClick={(e) => { e.stopPropagation(); setIndex(i); }}
                 aria-label={`Ver foto ${i + 1}`}
+                aria-current={i === index ? 'true' : undefined}
               />
             ))}
           </div>

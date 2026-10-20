@@ -100,8 +100,8 @@ export default function Amenities() {
         </button>
       </div>
 
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {message && <div role="status" className="alert alert-success">{message}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       {showForm && (
         <div className="form-container">
@@ -154,6 +154,9 @@ export default function Amenities() {
                 <td>{amenity.name}</td>
                 <td>{amenity.description || '-'}</td>
                 <td>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); setSelected(amenity); }}>
+                    Ver detalle
+                  </button>
                   <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(amenity); }}>
                     Editar
                   </button>

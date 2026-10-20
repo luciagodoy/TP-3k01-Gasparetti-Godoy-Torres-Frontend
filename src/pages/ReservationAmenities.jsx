@@ -149,8 +149,8 @@ export default function ReservationAmenities() {
         que el personal registre o corrija consumos manualmente.
       </p>
 
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {message && <div role="status" className="alert alert-success">{message}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       {showForm && (
         <div className="form-container">
@@ -229,6 +229,9 @@ export default function ReservationAmenities() {
                 <td>${consumption.unitPrice.toFixed(2)}</td>
                 <td>${consumption.totalAmount.toFixed(2)}</td>
                 <td>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); setSelected(consumption); }}>
+                    Ver detalle
+                  </button>
                   <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(consumption); }}>
                     Editar
                   </button>

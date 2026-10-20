@@ -14,6 +14,11 @@ export class RoomCategory extends BaseModel {
   }
 }
 
+// The most guests any room of the hotel takes: the upper limit of the guest
+// selector. undefined while the categories are not loaded yet.
+export const largestCapacity = (categories) =>
+  categories.reduce((largest, category) => Math.max(largest, category.capacity || 0), 0) || undefined;
+
 export class Room extends BaseModel {
   constructor({ id, number, floor, status, categoryId, category }) {
     super();

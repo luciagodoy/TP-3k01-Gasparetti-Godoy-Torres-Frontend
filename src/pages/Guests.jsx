@@ -143,8 +143,8 @@ export default function Guests() {
         </button>
       </div>
 
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {message && <div role="status" className="alert alert-success">{message}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       {showForm && (
         <div className="form-container">
@@ -226,6 +226,9 @@ export default function Guests() {
                 <td>{guest.documentNumber}</td>
                 <td>{guest.city?.name} / {guest.city?.province?.name} / {guest.country}</td>
                 <td>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); setSelected(guest); }}>
+                    Ver detalle
+                  </button>
                   <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(guest); }}>
                     Editar
                   </button>

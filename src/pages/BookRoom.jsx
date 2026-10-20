@@ -125,7 +125,7 @@ export default function BookRoom() {
         <h2>Confirmar Reserva</h2>
       </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       {step === 'confirm' && (
         <div className="form-container">
@@ -169,7 +169,7 @@ export default function BookRoom() {
 
       {step === 'amenities' && (
         <>
-          <div className="alert alert-success">Reserva creada correctamente. ¿Querés agregar servicios adicionales?</div>
+          <div role="status" className="alert alert-success">Reserva creada correctamente. ¿Querés agregar servicios adicionales?</div>
 
           <div className="list-container">
             <h3>Servicios disponibles</h3>

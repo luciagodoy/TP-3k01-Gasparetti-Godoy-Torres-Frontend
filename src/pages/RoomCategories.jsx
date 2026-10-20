@@ -104,8 +104,8 @@ export default function RoomCategories() {
         <h2>Categorías</h2>
       </div>
 
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {message && <div role="status" className="alert alert-success">{message}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       {canEdit && (
         <div className="form-container">
@@ -166,7 +166,7 @@ export default function RoomCategories() {
               <th>Capacidad</th>
               <th>Precio/Noche</th>
               <th>Imágenes</th>
-              {canEdit && <th>Acciones</th>}
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -189,16 +189,21 @@ export default function RoomCategories() {
                     </div>
                   ) : '-'}
                 </td>
-                {canEdit && (
-                  <td>
-                    <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(category); }}>
-                      Editar
-                    </button>
-                    <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(category.id); }} disabled={loading}>
-                      Eliminar
-                    </button>
-                  </td>
-                )}
+                <td>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); setSelected(category); }}>
+                    Ver detalle
+                  </button>
+                  {canEdit && (
+                    <>
+                      <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(category); }}>
+                        Editar
+                      </button>
+                      <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(category.id); }} disabled={loading}>
+                        Eliminar
+                      </button>
+                    </>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

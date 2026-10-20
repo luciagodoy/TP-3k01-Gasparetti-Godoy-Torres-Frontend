@@ -117,8 +117,8 @@ export default function Employees() {
         </button>
       </div>
 
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {message && <div role="status" className="alert alert-success">{message}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       {showForm && (
         <div className="form-container">
@@ -194,6 +194,9 @@ export default function Employees() {
                 <td>{employee.position}</td>
                 <td><span className={`badge badge-${employee.status}`}>{employee.status}</span></td>
                 <td>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); setSelected(employee); }}>
+                    Ver detalle
+                  </button>
                   <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(employee); }}>
                     Editar
                   </button>

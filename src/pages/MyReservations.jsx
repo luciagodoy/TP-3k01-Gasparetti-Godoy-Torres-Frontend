@@ -38,8 +38,8 @@ export default function MyReservations() {
         <Link className="btn btn-primary" to="/search">+ Nueva Reserva</Link>
       </div>
 
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {message && <div role="status" className="alert alert-success">{message}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       {reservations.length === 0 && <p>Todavía no tenés reservas.</p>}
 

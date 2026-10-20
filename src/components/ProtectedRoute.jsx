@@ -13,7 +13,7 @@ export default function ProtectedRoute({ roles }) {
         <div className="page-header">
           <h2>Acceso restringido</h2>
         </div>
-        <div className="alert alert-error">
+        <div role="alert" className="alert alert-error">
           Tu cuenta ({user.role}) no tiene permiso para ver esta sección.
         </div>
       </div>

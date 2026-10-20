@@ -24,7 +24,7 @@ export default class ErrorBoundary extends Component {
           <h2>Algo salió mal</h2>
         </div>
 
-        <div className="alert alert-error">
+        <div role="alert" className="alert alert-error">
           No pudimos mostrar esta sección. Podés reintentar o volver al inicio.
         </div>
 

@@ -3,8 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { pricingService, roomCategoryService, roomService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
 import { useAuth } from '../context/useAuth';
+import CategorySelector from '../components/CategorySelector';
 import DateInput from '../components/DateInput';
+import GuestSelector from '../components/GuestSelector';
 import ImageGallery from '../components/ImageGallery';
+import { largestCapacity } from '../models';
 import '../styles/pages.scss';
 import '../styles/rooms.scss';
 
@@ -108,7 +111,7 @@ export default function SearchRooms() {
         <h2>Buscar Habitaciones</h2>
       </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       <div className="room-filters">
         <div className="form-group">
@@ -120,17 +123,19 @@ export default function SearchRooms() {
           <DateInput id="search-end" name="endDate" value={filters.endDate} onChange={handleFilterChange} min={filters.startDate || today()} />
         </div>
         <div className="form-group">
-          <label htmlFor="search-category">Categoría</label>
-          <select id="search-category" name="categoryId" value={filters.categoryId} onChange={handleFilterChange}>
-            <option value="">Todas</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>{category.name}</option>
-            ))}
-          </select>
+          <label id="search-category-label">Categoría</label>
+          <CategorySelector
+            id="search-category"
+            labelId="search-category-label"
+            name="categoryId"
+            value={filters.categoryId}
+            onChange={handleFilterChange}
+            categories={categories}
+          />
         </div>
         <div className="form-group">
-          <label htmlFor="search-people">Personas</label>
-          <input id="search-people" type="number" name="people" min="1" value={filters.people} onChange={handleFilterChange} />
+          <label htmlFor="search-people">Número de huéspedes</label>
+          <GuestSelector id="search-people" name="people" value={filters.people} onChange={handleFilterChange} max={largestCapacity(categories)} />
         </div>
         <button className="btn btn-primary" onClick={search} disabled={loading}>
           {loading ? 'Buscando...' : 'Buscar'}

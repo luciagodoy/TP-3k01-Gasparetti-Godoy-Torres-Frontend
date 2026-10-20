@@ -1,0 +1,142 @@
+// Guest count selector: a trigger shaped like the date inputs and a light panel
+// with one room and a stepper.
+
+.guest-selector {
+  position: relative;
+}
+
+.guest-selector-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(163, 137, 79, 0.18);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 1rem;
+  text-align: left;
+  color: #2c241b;
+  background: #fbf5ed;
+  cursor: pointer;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.guest-selector-trigger:hover,
+.guest-selector-trigger[aria-expanded='true'] {
+  border-color: var(--primary);
+}
+
+.guest-selector-trigger:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(163, 137, 79, 0.16);
+}
+
+.guest-selector-icon {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+// Long summaries get an ellipsis instead of widening the filter bar.
+.guest-selector-summary {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.guest-selector-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  z-index: 50;
+  width: min(320px, calc(100vw - 2rem));
+  padding: 1.5rem;
+  background: var(--surface-soft);
+  color: var(--text);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lifted);
+}
+
+.guest-selector-room {
+  margin: 0 0 1.25rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+.guest-selector-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.guest-selector-row-label {
+  font-weight: 700;
+}
+
+.guest-selector-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.guest-selector-step {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.guest-selector-step:hover:not(:disabled) {
+  background: var(--primary-soft);
+}
+
+.guest-selector-step:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.guest-selector-step:disabled {
+  border-color: transparent;
+  background: #e7e3dc;
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.guest-selector-count {
+  min-width: 1.5ch;
+  text-align: center;
+  font-size: 1.05rem;
+}
+
+// Inside the dark booking bar of the home page, like its date inputs.
+.booking-bar .guest-selector-trigger {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #fffdf9;
+}
+
+.booking-bar .guest-selector-trigger:hover,
+.booking-bar .guest-selector-trigger[aria-expanded='true'] {
+  border-color: rgba(255, 255, 255, 0.5);
+}

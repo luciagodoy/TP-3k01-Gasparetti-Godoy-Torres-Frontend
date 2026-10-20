@@ -94,8 +94,8 @@ export default function CheckInOut() {
         <h2>Check-in / Check-out</h2>
       </div>
 
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {message && <div role="status" className="alert alert-success">{message}</div>}
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
 
       <div className="form-container">
         <h3>Procesar Check-in</h3>

@@ -98,18 +98,18 @@
   border-color: #fff;
 }
 
-.categorias-showcase {
+.category-showcase {
   display: grid;
   gap: 1.5rem;
 }
 
-.categorias-showcase-header {
+.category-showcase-header {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
 }
 
-.categorias-showcase-header h2 {
+.category-showcase-header h2 {
   margin: 0;
   font-size: clamp(1.6rem, 2.4vw, 2.2rem);
   font-weight: 400;
@@ -164,7 +164,7 @@
 }
 
 
-@include desde(lg) {
+@include breakpoint-up(lg) {
   .dashboard-header {
     margin-left: -1.5rem;
     margin-right: -1.5rem;

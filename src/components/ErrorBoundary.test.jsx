@@ -3,16 +3,16 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ErrorBoundary from './ErrorBoundary';
 
-function ComponenteQueExplota() {
-  throw new Error('fallo de prueba');
+function ExplodingComponent() {
+  throw new Error('test failure');
 }
 
-const renderConRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
+const renderWithRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe('ErrorBoundary', () => {
   beforeEach(() => {
-    // React loguea el error capturado por consola; lo silenciamos para que la
-    // salida de los tests no parezca un fallo real.
+    // React logs the caught error to the console; silence it so the test
+    // output does not look like a real failure.
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -20,8 +20,8 @@ describe('ErrorBoundary', () => {
     vi.restoreAllMocks();
   });
 
-  it('renderiza los hijos cuando no hay error', () => {
-    renderConRouter(
+  it('renders the children when there is no error', () => {
+    renderWithRouter(
       <ErrorBoundary>
         <p>contenido normal</p>
       </ErrorBoundary>
@@ -30,10 +30,10 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('contenido normal')).toBeInTheDocument();
   });
 
-  it('muestra el fallback en vez de tumbar la app cuando un hijo lanza', () => {
-    renderConRouter(
+  it('shows the fallback instead of crashing the app when a child throws', () => {
+    renderWithRouter(
       <ErrorBoundary>
-        <ComponenteQueExplota />
+        <ExplodingComponent />
       </ErrorBoundary>
     );
 

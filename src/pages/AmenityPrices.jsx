@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { precioServicioService, servicioService } from '../services/recursos';
+import { amenityPriceService, amenityService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
 import DateInput from '../components/DateInput';
 import '../styles/pages.scss';
 
-const emptyForm = { servicioId: '', precio: '', fechaVigenciaDesde: '', fechaVigenciaHasta: '' };
+const emptyForm = { amenityId: '', price: '', validFrom: '', validTo: '' };
 
-export default function PrecioServicios() {
+export default function AmenityPrices() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -16,21 +16,20 @@ export default function PrecioServicios() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const { data: precios, refetch: fetchPrecios } = useQuery(
-    '/precios-servicio',
-    () => precioServicioService.listar(),
+  const { data: prices, refetch: fetchPrices } = useQuery(
+    '/amenity-prices',
+    () => amenityPriceService.list(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-  const { data: servicios } = useQuery(
-    '/servicios',
-    () => servicioService.listar(),
+  const { data: amenities } = useQuery(
+    '/amenities',
+    () => amenityService.list(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-
-  const filteredPrecios = precios.filter((precio) =>
-    searchTerm ? (precio.servicio?.nombre || '').toLowerCase().includes(searchTerm.toLowerCase()) : true
+  const filteredPrices = prices.filter((price) =>
+    searchTerm ? (price.amenity?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) : true
   );
 
   const handleChange = (e) => {
@@ -49,7 +48,7 @@ export default function PrecioServicios() {
     setError(null);
     setMessage(null);
 
-    if (!formData.servicioId || !formData.precio || !formData.fechaVigenciaDesde) {
+    if (!formData.amenityId || !formData.price || !formData.validFrom) {
       setError('Servicio, precio y fecha de inicio de vigencia son requeridos.');
       return;
     }
@@ -57,20 +56,20 @@ export default function PrecioServicios() {
     setLoading(true);
     try {
       const payload = {
-        servicioId: Number(formData.servicioId),
-        precio: parseFloat(formData.precio),
-        fechaVigenciaDesde: formData.fechaVigenciaDesde,
-        fechaVigenciaHasta: formData.fechaVigenciaHasta || null,
+        amenityId: Number(formData.amenityId),
+        price: parseFloat(formData.price),
+        validFrom: formData.validFrom,
+        validTo: formData.validTo || null,
       };
       if (editingId) {
-        await precioServicioService.actualizar(editingId, payload);
+        await amenityPriceService.update(editingId, payload);
         setMessage('Precio actualizado correctamente.');
       } else {
-        await precioServicioService.crear(payload);
+        await amenityPriceService.create(payload);
         setMessage('Precio creado correctamente.');
       }
       resetForm();
-      fetchPrecios();
+      fetchPrices();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -78,14 +77,14 @@ export default function PrecioServicios() {
     }
   };
 
-  const handleEdit = (precio) => {
+  const handleEdit = (price) => {
     setFormData({
-      servicioId: precio.servicioId ?? precio.servicio?.id ?? '',
-      precio: precio.precio,
-      fechaVigenciaDesde: precio.fechaVigenciaDesde,
-      fechaVigenciaHasta: precio.fechaVigenciaHasta || '',
+      amenityId: price.amenityId ?? price.amenity?.id ?? '',
+      price: price.price,
+      validFrom: price.validFrom,
+      validTo: price.validTo || '',
     });
-    setEditingId(precio.id);
+    setEditingId(price.id);
     setShowForm(true);
     setMessage(null);
     setError(null);
@@ -97,10 +96,10 @@ export default function PrecioServicios() {
     setMessage(null);
     setLoading(true);
     try {
-      await precioServicioService.eliminar(id);
+      await amenityPriceService.remove(id);
       setMessage('Precio eliminado correctamente.');
       if (selected?.id === id) setSelected(null);
-      fetchPrecios();
+      fetchPrices();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -124,25 +123,25 @@ export default function PrecioServicios() {
         <div className="form-container">
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Servicio</label>
-              <select name="servicioId" value={formData.servicioId} onChange={handleChange}>
+              <label htmlFor="price-amenity">Servicio</label>
+              <select id="price-amenity" name="amenityId" value={formData.amenityId} onChange={handleChange}>
                 <option value="">Seleccionar servicio</option>
-                {servicios.map((servicio) => (
-                  <option key={servicio.id} value={servicio.id}>{servicio.nombre}</option>
+                {amenities.map((amenity) => (
+                  <option key={amenity.id} value={amenity.id}>{amenity.name}</option>
                 ))}
               </select>
             </div>
             <div className="form-group">
-              <label>Precio</label>
-              <input type="number" step="0.01" name="precio" value={formData.precio} onChange={handleChange} placeholder="0.00" />
+              <label htmlFor="price-value">Precio</label>
+              <input id="price-value" type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} placeholder="0.00" />
             </div>
             <div className="form-group">
-              <label>Vigente desde</label>
-              <DateInput name="fechaVigenciaDesde" value={formData.fechaVigenciaDesde} onChange={handleChange} />
+              <label htmlFor="price-valid-from">Vigente desde</label>
+              <DateInput id="price-valid-from" name="validFrom" value={formData.validFrom} onChange={handleChange} />
             </div>
             <div className="form-group">
-              <label>Vigente hasta (opcional)</label>
-              <DateInput name="fechaVigenciaHasta" value={formData.fechaVigenciaHasta} onChange={handleChange} min={formData.fechaVigenciaDesde || undefined} />
+              <label htmlFor="price-valid-to">Vigente hasta (opcional)</label>
+              <DateInput id="price-valid-to" name="validTo" value={formData.validTo} onChange={handleChange} min={formData.validFrom || undefined} />
             </div>
             <button type="submit" className="btn btn-success" disabled={loading}>
               {loading ? 'Guardando...' : editingId ? 'Actualizar' : 'Guardar'}
@@ -160,6 +159,7 @@ export default function PrecioServicios() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por servicio"
+              aria-label="Buscar precio por servicio"
             />
           </div>
         </div>
@@ -175,22 +175,22 @@ export default function PrecioServicios() {
             </tr>
           </thead>
           <tbody>
-            {filteredPrecios.map((precio) => (
+            {filteredPrices.map((price) => (
               <tr
-                key={precio.id}
-                className={selected?.id === precio.id ? 'selected-row' : ''}
-                onClick={() => setSelected(precio)}
+                key={price.id}
+                className={selected?.id === price.id ? 'selected-row' : ''}
+                onClick={() => setSelected(price)}
               >
-                <td>{precio.id}</td>
-                <td>{precio.servicio?.nombre || '-'}</td>
-                <td>${Number(precio.precio).toFixed(2)}</td>
-                <td>{precio.fechaVigenciaDesde}</td>
-                <td>{precio.fechaVigenciaHasta || 'Sin límite'}</td>
+                <td>{price.id}</td>
+                <td>{price.amenity?.name || '-'}</td>
+                <td>${price.price.toFixed(2)}</td>
+                <td>{price.validFrom}</td>
+                <td>{price.validTo || 'Sin límite'}</td>
                 <td>
-                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(precio); }}>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(price); }}>
                     Editar
                   </button>
-                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(precio.id); }} disabled={loading}>
+                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(price.id); }} disabled={loading}>
                     Eliminar
                   </button>
                 </td>
@@ -203,10 +203,10 @@ export default function PrecioServicios() {
           <div className="details-card">
             <h4>Detalle del precio</h4>
             <p><strong>ID:</strong> {selected.id}</p>
-            <p><strong>Servicio:</strong> {selected.servicio?.nombre || '-'}</p>
-            <p><strong>Precio:</strong> ${Number(selected.precio).toFixed(2)}</p>
-            <p><strong>Vigente desde:</strong> {selected.fechaVigenciaDesde}</p>
-            <p><strong>Vigente hasta:</strong> {selected.fechaVigenciaHasta || 'Sin límite'}</p>
+            <p><strong>Servicio:</strong> {selected.amenity?.name || '-'}</p>
+            <p><strong>Precio:</strong> ${selected.price.toFixed(2)}</p>
+            <p><strong>Vigente desde:</strong> {selected.validFrom}</p>
+            <p><strong>Vigente hasta:</strong> {selected.validTo || 'Sin límite'}</p>
             <button className="btn btn-secondary" onClick={() => setSelected(null)}>Cerrar detalle</button>
           </div>
         )}

@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { usuarioService } from '../services/recursos';
+import { userService } from '../services/resources';
+import { ROLES } from '../models';
 import useQuery from '../hooks/useQuery';
 import { useAuth } from '../context/useAuth';
 import '../styles/pages.scss';
 
-const emptyForm = { username: '', email: '', password: '', role: 'huesped' };
+const emptyForm = { username: '', email: '', password: '', role: ROLES.GUEST };
 
-export default function Usuarios() {
+export default function Users() {
   const { user: currentUser } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
@@ -17,14 +18,14 @@ export default function Usuarios() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const { data: usuarios, refetch: fetchUsuarios } = useQuery(
-    '/usuarios',
-    () => usuarioService.listar(),
+  const { data: users, refetch: fetchUsers } = useQuery(
+    '/users',
+    () => userService.list(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-  const filteredUsuarios = usuarios.filter((usuario) => {
-    const value = `${usuario.username} ${usuario.email} ${usuario.role}`.toLowerCase();
+  const filteredUsers = users.filter((user) => {
+    const value = `${user.username} ${user.email} ${user.role}`.toLowerCase();
     return searchTerm ? value.includes(searchTerm.toLowerCase()) : true;
   });
 
@@ -51,15 +52,16 @@ export default function Usuarios() {
       }
       setLoading(true);
       try {
-        await usuarioService.actualizar(editingId, {
+        await userService.update(editingId, {
           username: formData.username.trim(),
           email: formData.email.trim(),
           role: formData.role,
+          // An empty password field means "keep the current one".
           ...(formData.password ? { password: formData.password } : {}),
         });
         setMessage('Usuario actualizado correctamente.');
         resetForm();
-        fetchUsuarios();
+        fetchUsers();
       } catch (err) {
         setError(err.message);
       } finally {
@@ -75,7 +77,7 @@ export default function Usuarios() {
 
     setLoading(true);
     try {
-      await usuarioService.crear({
+      await userService.create({
         username: formData.username.trim(),
         email: formData.email.trim(),
         password: formData.password,
@@ -83,7 +85,7 @@ export default function Usuarios() {
       });
       setMessage('Usuario creado correctamente.');
       resetForm();
-      fetchUsuarios();
+      fetchUsers();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -91,28 +93,28 @@ export default function Usuarios() {
     }
   };
 
-  const handleEdit = (usuario) => {
-    setFormData({ username: usuario.username, email: usuario.email, password: '', role: usuario.role });
-    setEditingId(usuario.id);
+  const handleEdit = (user) => {
+    setFormData({ username: user.username, email: user.email, password: '', role: user.role });
+    setEditingId(user.id);
     setShowForm(true);
     setMessage(null);
     setError(null);
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Eliminar este usuario? Esta acción no se puede deshacer.')) return;
     if (id === currentUser?.id) {
       setError('No podés eliminar tu propia cuenta.');
       return;
     }
+    if (!window.confirm('¿Eliminar este usuario? Esta acción no se puede deshacer.')) return;
     setError(null);
     setMessage(null);
     setLoading(true);
     try {
-      await usuarioService.eliminar(id);
+      await userService.remove(id);
       setMessage('Usuario eliminado correctamente.');
       if (selected?.id === id) setSelected(null);
-      fetchUsuarios();
+      fetchUsers();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -136,23 +138,23 @@ export default function Usuarios() {
         <div className="form-container">
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Usuario</label>
-              <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Nombre de usuario" />
+              <label htmlFor="user-username">Usuario</label>
+              <input id="user-username" type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Nombre de usuario" />
             </div>
             <div className="form-group">
-              <label>Email</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="usuario@example.com" />
+              <label htmlFor="user-email">Email</label>
+              <input id="user-email" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="usuario@example.com" />
             </div>
             <div className="form-group">
-              <label>{editingId ? 'Nueva contraseña (opcional)' : 'Contraseña'}</label>
-              <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder={editingId ? 'Dejar en blanco para no cambiarla' : 'Contraseña'} />
+              <label htmlFor="user-password">{editingId ? 'Nueva contraseña (opcional)' : 'Contraseña'}</label>
+              <input id="user-password" type="password" name="password" value={formData.password} onChange={handleChange} placeholder={editingId ? 'Dejar en blanco para no cambiarla' : 'Contraseña'} />
             </div>
             <div className="form-group">
-              <label>Rol</label>
-              <select name="role" value={formData.role} onChange={handleChange}>
-                <option value="huesped">Huésped</option>
-                <option value="empleado">Empleado</option>
-                <option value="admin">Admin</option>
+              <label htmlFor="user-role">Rol</label>
+              <select id="user-role" name="role" value={formData.role} onChange={handleChange}>
+                <option value={ROLES.GUEST}>Huésped</option>
+                <option value={ROLES.EMPLOYEE}>Empleado</option>
+                <option value={ROLES.ADMIN}>Admin</option>
               </select>
             </div>
             <button type="submit" className="btn btn-success" disabled={loading}>
@@ -171,6 +173,7 @@ export default function Usuarios() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por usuario, email o rol"
+              aria-label="Buscar usuario por nombre, email o rol"
             />
           </div>
         </div>
@@ -184,23 +187,23 @@ export default function Usuarios() {
             </tr>
           </thead>
           <tbody>
-            {filteredUsuarios.map((usuario) => (
+            {filteredUsers.map((user) => (
               <tr
-                key={usuario.id}
-                className={selected?.id === usuario.id ? 'selected-row' : ''}
-                onClick={() => setSelected(usuario)}
+                key={user.id}
+                className={selected?.id === user.id ? 'selected-row' : ''}
+                onClick={() => setSelected(user)}
               >
-                <td>{usuario.username}</td>
-                <td>{usuario.email}</td>
-                <td><span className="badge badge-check-in">{usuario.role}</span></td>
+                <td>{user.username}</td>
+                <td>{user.email}</td>
+                <td><span className="badge badge-check-in">{user.role}</span></td>
                 <td>
-                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(usuario); }}>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(user); }}>
                     Editar
                   </button>
                   <button
                     className="btn btn-small btn-danger"
-                    onClick={(e) => { e.stopPropagation(); handleDelete(usuario.id); }}
-                    disabled={loading || usuario.id === currentUser?.id}
+                    onClick={(e) => { e.stopPropagation(); handleDelete(user.id); }}
+                    disabled={loading || user.id === currentUser?.id}
                   >
                     Eliminar
                   </button>

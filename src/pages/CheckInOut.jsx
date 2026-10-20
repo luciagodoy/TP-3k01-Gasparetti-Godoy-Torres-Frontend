@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { huespedService, reservaService } from '../services/recursos';
-import descargarArchivo from '../utils/descargarArchivo';
+import { guestService, reservationService } from '../services/resources';
+import downloadFile from '../utils/downloadFile';
 import '../styles/pages.scss';
 
-export default function CheckIn() {
+export default function CheckInOut() {
   const [checkInId, setCheckInId] = useState('');
   const [checkOutId, setCheckOutId] = useState('');
-  const [reservaInfo, setReservaInfo] = useState(null);
-  const [huespedInfo, setHuespedInfo] = useState(null);
+  const [reservation, setReservation] = useState(null);
+  const [guest, setGuest] = useState(null);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -24,7 +24,7 @@ export default function CheckIn() {
 
     setLoading(true);
     try {
-      await reservaService.checkIn(checkInId);
+      await reservationService.checkIn(checkInId);
       setMessage('Check-in procesado correctamente.');
       setCheckInId('');
     } catch (err) {
@@ -34,12 +34,12 @@ export default function CheckIn() {
     }
   };
 
-  const handleBuscarReserva = async (e) => {
+  const handleFindReservation = async (e) => {
     e.preventDefault();
     setMessage(null);
     setError(null);
-    setReservaInfo(null);
-    setHuespedInfo(null);
+    setReservation(null);
+    setGuest(null);
 
     if (!checkOutId) {
       setError('Debes ingresar el ID de la reserva para buscarla.');
@@ -48,14 +48,13 @@ export default function CheckIn() {
 
     setLoading(true);
     try {
-      const reserva = await reservaService.obtener(checkOutId);
-      setReservaInfo(reserva);
-      if (reserva?.huespedId) {
+      const found = await reservationService.get(checkOutId);
+      setReservation(found);
+      if (found?.guestId) {
         try {
-          const huesped = await huespedService.obtener(reserva.huespedId);
-          setHuespedInfo(huesped);
+          setGuest(await guestService.get(found.guestId));
         } catch {
-          setHuespedInfo(null);
+          setGuest(null);
         }
       }
     } catch (err) {
@@ -76,11 +75,11 @@ export default function CheckIn() {
 
     setLoading(true);
     try {
-      const comprobante = await reservaService.checkOut(checkOutId);
-      descargarArchivo(comprobante, `comprobante-reserva-${checkOutId}.pdf`);
+      const receipt = await reservationService.checkOut(checkOutId);
+      downloadFile(receipt, `comprobante-reserva-${checkOutId}.pdf`);
       setMessage('Check-out procesado correctamente. Se descargó el comprobante.');
-      setReservaInfo(null);
-      setHuespedInfo(null);
+      setReservation(null);
+      setGuest(null);
       setCheckOutId('');
     } catch (err) {
       setError(err.message);
@@ -102,8 +101,9 @@ export default function CheckIn() {
         <h3>Procesar Check-in</h3>
         <form onSubmit={handleCheckInSubmit}>
           <div className="form-group">
-            <label>ID de Reserva</label>
+            <label htmlFor="check-in-id">ID de Reserva</label>
             <input
+              id="check-in-id"
               type="text"
               value={checkInId}
               onChange={(e) => setCheckInId(e.target.value)}
@@ -118,10 +118,11 @@ export default function CheckIn() {
 
       <div className="form-container">
         <h3>Procesar Check-out</h3>
-        <form onSubmit={handleBuscarReserva}>
+        <form onSubmit={handleFindReservation}>
           <div className="form-group">
-            <label>ID de Reserva</label>
+            <label htmlFor="check-out-id">ID de Reserva</label>
             <input
+              id="check-out-id"
               type="text"
               value={checkOutId}
               onChange={(e) => setCheckOutId(e.target.value)}
@@ -133,25 +134,25 @@ export default function CheckIn() {
           </button>
         </form>
 
-        {reservaInfo && (
+        {reservation && (
           <div className="details-card">
             <h4>Detalle de Reserva</h4>
-            <p><strong>ID:</strong> {reservaInfo.id}</p>
-            <p><strong>Huésped:</strong> {huespedInfo ? huespedInfo.usuario?.username : reservaInfo.huespedId}</p>
-            <p><strong>Habitación:</strong> {reservaInfo.habitacion ? reservaInfo.habitacion.numero : reservaInfo.habitacionId}</p>
-            {/* Las fechas se muestran tal cual ('YYYY-MM-DD'): new Date('2026-11-01')
-                las toma como medianoche UTC y en Argentina (UTC-3) mostraba el día anterior. */}
-            <p><strong>Inicio:</strong> {reservaInfo.fechaInicio}</p>
-            <p><strong>Fin:</strong> {reservaInfo.fechaFin} ({reservaInfo.noches} {reservaInfo.noches === 1 ? 'noche' : 'noches'})</p>
-            <p><strong>Estado:</strong> {reservaInfo.estado}</p>
-            <p><strong>Monto alojamiento:</strong> ${reservaInfo.montoTotal.toFixed(2)}</p>
-            {!reservaInfo.puedeHacerCheckOut && (
+            <p><strong>ID:</strong> {reservation.id}</p>
+            <p><strong>Huésped:</strong> {guest ? guest.user?.username : reservation.guestId}</p>
+            <p><strong>Habitación:</strong> {reservation.room ? reservation.room.number : reservation.roomId}</p>
+            {/* Dates are shown as they come ('YYYY-MM-DD'): new Date('2026-11-01')
+                reads them as UTC midnight and in Argentina (UTC-3) showed the previous day. */}
+            <p><strong>Inicio:</strong> {reservation.startDate}</p>
+            <p><strong>Fin:</strong> {reservation.endDate} ({reservation.nights} {reservation.nights === 1 ? 'noche' : 'noches'})</p>
+            <p><strong>Estado:</strong> {reservation.status}</p>
+            <p><strong>Monto alojamiento:</strong> ${reservation.totalAmount.toFixed(2)}</p>
+            {!reservation.canCheckOut && (
               <p className="field-hint">Sólo se puede hacer check-out de una reserva con check-in registrado.</p>
             )}
             <button
               className="btn btn-primary"
               onClick={handleCheckOutSubmit}
-              disabled={loading || !reservaInfo.puedeHacerCheckOut}
+              disabled={loading || !reservation.canCheckOut}
             >
               {loading ? 'Procesando...' : 'Confirmar Check-out'}
             </button>

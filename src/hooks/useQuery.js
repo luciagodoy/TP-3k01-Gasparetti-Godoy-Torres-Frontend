@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-
 export default function useQuery(key, fetcher, options) {
   const enabled = options?.enabled !== false;
 
@@ -8,12 +7,12 @@ export default function useQuery(key, fetcher, options) {
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
 
-  const [estado, setEstado] = useState({
+  const [state, setState] = useState({
     data: initialDataRef.current,
     error: null,
     loading: enabled,
   });
-  const [recarga, setRecarga] = useState(0);
+  const [reloadCount, setReloadCount] = useState(0);
 
   useEffect(() => {
     fetcherRef.current = fetcher;
@@ -23,28 +22,27 @@ export default function useQuery(key, fetcher, options) {
   useEffect(() => {
     if (!enabled) return undefined;
 
-    let cancelado = false;
+    let cancelled = false;
 
     (async () => {
       try {
-        const resultado = await fetcherRef.current();
-        if (cancelado) return;
-        setEstado({ data: resultado ?? initialDataRef.current, error: null, loading: false });
-        optionsRef.current?.onSuccess?.(resultado);
+        const result = await fetcherRef.current();
+        if (cancelled) return;
+        setState({ data: result ?? initialDataRef.current, error: null, loading: false });
+        optionsRef.current?.onSuccess?.(result);
       } catch (err) {
-        if (cancelado) return;
-        
-        setEstado((prev) => ({ data: prev.data, error: err, loading: false }));
+        if (cancelled) return;
+        setState((prev) => ({ data: prev.data, error: err, loading: false }));
         optionsRef.current?.onError?.(err);
       }
     })();
 
     return () => {
-      cancelado = true;
+      cancelled = true;
     };
-  }, [key, enabled, recarga]);
+  }, [key, enabled, reloadCount]);
 
-  const refetch = useCallback(() => setRecarga((n) => n + 1), []);
+  const refetch = useCallback(() => setReloadCount((n) => n + 1), []);
 
-  return { ...estado, refetch };
+  return { ...state, refetch };
 }

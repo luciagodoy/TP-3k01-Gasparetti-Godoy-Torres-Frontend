@@ -1,67 +1,66 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { categoriaService } from '../services/recursos';
+import { roomCategoryService } from '../services/resources';
 import DateInput from './DateInput';
 import '../styles/booking-bar.scss';
 
-const emptyFiltros = { fechaInicio: '', fechaFin: '', categoriaId: '', personas: '' };
+const emptyFilters = { startDate: '', endDate: '', categoryId: '', people: '' };
 
 export default function BookingBar() {
   const navigate = useNavigate();
-  const [categorias, setCategorias] = useState([]);
-  const [filtros, setFiltros] = useState(emptyFiltros);
+  const [categories, setCategories] = useState([]);
+  const [filters, setFilters] = useState(emptyFilters);
 
   useEffect(() => {
-    categoriaService.listar().then((data) => setCategorias(data || [])).catch(() => {});
+    roomCategoryService.list().then((data) => setCategories(data || [])).catch(() => {});
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFiltros((prev) => ({ ...prev, [name]: value }));
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate('/buscar', { state: filtros });
+    navigate('/search', { state: filters });
   };
+
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <form className="booking-bar" onSubmit={handleSubmit}>
       <div className="booking-bar-field">
-        <label>Check In</label>
+        <label htmlFor="booking-start-date">Check In</label>
+        <DateInput id="booking-start-date" name="startDate" value={filters.startDate} onChange={handleChange} min={today} />
+      </div>
+      <div className="booking-bar-field">
+        <label htmlFor="booking-end-date">Check Out</label>
         <DateInput
-          name="fechaInicio"
-          value={filtros.fechaInicio}
+          id="booking-end-date"
+          name="endDate"
+          value={filters.endDate}
           onChange={handleChange}
-          min={new Date().toISOString().slice(0, 10)}
+          min={filters.startDate || today}
         />
       </div>
       <div className="booking-bar-field">
-        <label>Check Out</label>
-        <DateInput
-          name="fechaFin"
-          value={filtros.fechaFin}
-          onChange={handleChange}
-          min={filtros.fechaInicio || new Date().toISOString().slice(0, 10)}
-        />
-      </div>
-      <div className="booking-bar-field">
-        <label>Categoría</label>
-        <select name="categoriaId" value={filtros.categoriaId} onChange={handleChange}>
+        <label htmlFor="booking-category">Categoría</label>
+        <select id="booking-category" name="categoryId" value={filters.categoryId} onChange={handleChange}>
           <option value="">Todas</option>
-          {categorias.map((categoria) => (
-            <option key={categoria.id} value={categoria.id}>{categoria.denominacion}</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>{category.name}</option>
           ))}
         </select>
       </div>
       <div className="booking-bar-field">
-        <label>Huéspedes</label>
+        <label htmlFor="booking-people">Huéspedes</label>
         <input
+          id="booking-people"
           type="number"
-          name="personas"
+          name="people"
           min="1"
           placeholder="1"
-          value={filtros.personas}
+          value={filters.people}
           onChange={handleChange}
         />
       </div>

@@ -13,6 +13,12 @@ dist-ssr
 *.local
 *.pid
 
+# Env files. VITE_ values end up in the bundle anyway, but .env.production and
+# friends should not be committed by accident; only the template is tracked.
+.env
+.env.*
+!.env.example
+
 # Test output
 playwright-report
 test-results

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import HeroCarousel from '../components/HeroCarousel';
 import BookingBar from '../components/BookingBar';
-import CategoriasShowcase from '../components/CategoriasShowcase';
+import CategoryShowcase from '../components/CategoryShowcase';
 import heroSuite from '../assets/hero/hero-suite.jpg';
 import heroResort from '../assets/hero/hero-resort.jpg';
 import heroPool from '../assets/hero/hero-pool.jpg';
@@ -12,30 +12,31 @@ const heroImages = [heroSuite, heroResort, heroPool];
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const esStaff = Boolean(user?.esStaff);
-  const esAdmin = Boolean(user?.esAdmin);
+  const isStaff = Boolean(user?.isStaff);
+  const isAdmin = Boolean(user?.isAdmin);
 
   const menuItems = [
     ...(user
-      ? [{ title: 'Mis Reservas', path: '/mis-reservas', description: 'Ver y gestionar tus reservas' }]
+      ? [{ title: 'Mis Reservas', path: '/my-reservations', description: 'Ver y gestionar tus reservas' }]
       : []),
-    ...(esStaff
+    ...(isStaff
       ? [
-          { title: 'Reservas', path: '/reservas', description: 'Gestionar reservas' },
-          { title: 'Habitaciones', path: '/habitaciones', description: 'Administrar habitaciones' },
-          { title: 'Huéspedes', path: '/huespedes', description: 'Gestionar huéspedes' },
-          { title: 'Categorías', path: '/categorias', description: 'Categorías de habitación' },
-          { title: 'Check-in/out', path: '/checkin', description: 'Entrada y salida' },
-          { title: 'Servicios', path: '/servicios', description: 'Servicios adicionales del hotel' },
-          { title: 'Cupos', path: '/cupos', description: 'Disponibilidad de los servicios' },
-          { title: 'Precios de Servicios', path: '/precios-servicio', description: 'Vigencia y precio de cada servicio' },
-          { title: 'Consumos de Servicio', path: '/reserva-servicios', description: 'Servicios agregados a una reserva' },
+          { title: 'Reservas', path: '/reservations', description: 'Gestionar reservas' },
+          { title: 'Habitaciones', path: '/rooms', description: 'Administrar habitaciones' },
+          { title: 'Huéspedes', path: '/guests', description: 'Gestionar huéspedes' },
+          { title: 'Categorías', path: '/room-categories', description: 'Categorías de habitación' },
+          { title: 'Check-in/out', path: '/check-in', description: 'Entrada y salida' },
+          { title: 'Servicios', path: '/amenities', description: 'Servicios adicionales del hotel' },
+          { title: 'Cupos', path: '/amenity-quotas', description: 'Disponibilidad de los servicios' },
+          { title: 'Precios de Servicios', path: '/amenity-prices', description: 'Vigencia y precio de cada servicio' },
+          { title: 'Consumos de Servicio', path: '/reservation-amenities', description: 'Servicios agregados a una reserva' },
+          { title: 'Tarifas Dinámicas', path: '/pricing-rules', description: 'Precio según ocupación y antelación' },
         ]
       : []),
-    ...(esAdmin
+    ...(isAdmin
       ? [
-          { title: 'Empleados', path: '/empleados', description: 'Personal del hotel' },
-          { title: 'Usuarios', path: '/usuarios', description: 'Cuentas y roles de acceso' },
+          { title: 'Empleados', path: '/employees', description: 'Personal del hotel' },
+          { title: 'Usuarios', path: '/users', description: 'Cuentas y roles de acceso' },
         ]
       : []),
   ];
@@ -48,14 +49,14 @@ export default function Dashboard() {
           <span className="eyebrow">Bienvenido</span>
           <h2>Una estadía a tu manera</h2>
           <div className="hero-actions">
-            <Link to="/mis-reservas" className="btn btn-hero-secondary">Mis Reservas</Link>
+            <Link to="/my-reservations" className="btn btn-hero-secondary">Mis Reservas</Link>
           </div>
         </div>
       </div>
 
       <BookingBar />
 
-      {!esStaff && <CategoriasShowcase />}
+      {!isStaff && <CategoryShowcase />}
 
       <div className="menu-grid">
         {menuItems.map((item) => (

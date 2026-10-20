@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { empleadoService } from '../services/recursos';
+import { employeeService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
 import '../styles/pages.scss';
 
-const emptyForm = { nombre: '', apellido: '', email: '', telefono: '', puesto: '', estado: 'activo' };
+// Stored values (data), shown to the user as "Activo" / "Inactivo".
+const EMPLOYEE_STATUS = { ACTIVE: 'activo', INACTIVE: 'inactivo' };
 
-export default function Empleados() {
+const emptyForm = { firstName: '', lastName: '', email: '', phone: '', position: '', status: EMPLOYEE_STATUS.ACTIVE };
+
+export default function Employees() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -15,14 +18,14 @@ export default function Empleados() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const { data: empleados, refetch: fetchEmpleados } = useQuery(
-    '/empleados',
-    () => empleadoService.listar(),
+  const { data: employees, refetch: fetchEmployees } = useQuery(
+    '/employees',
+    () => employeeService.list(),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-  const filteredEmpleados = empleados.filter((empleado) => {
-    const value = `${empleado.nombre} ${empleado.apellido} ${empleado.email} ${empleado.puesto}`.toLowerCase();
+  const filteredEmployees = employees.filter((employee) => {
+    const value = `${employee.fullName} ${employee.email} ${employee.position}`.toLowerCase();
     return searchTerm ? value.includes(searchTerm.toLowerCase()) : true;
   });
 
@@ -42,7 +45,7 @@ export default function Empleados() {
     setError(null);
     setMessage(null);
 
-    if (!formData.nombre.trim() || !formData.apellido.trim() || !formData.email.trim() || !formData.puesto.trim()) {
+    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || !formData.position.trim()) {
       setError('Nombre, apellido, email y puesto son requeridos.');
       return;
     }
@@ -50,22 +53,22 @@ export default function Empleados() {
     setLoading(true);
     try {
       const payload = {
-        nombre: formData.nombre.trim(),
-        apellido: formData.apellido.trim(),
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
         email: formData.email.trim(),
-        telefono: formData.telefono.trim() || null,
-        puesto: formData.puesto.trim(),
-        estado: formData.estado,
+        phone: formData.phone.trim() || null,
+        position: formData.position.trim(),
+        status: formData.status,
       };
       if (editingId) {
-        await empleadoService.actualizar(editingId, payload);
+        await employeeService.update(editingId, payload);
         setMessage('Empleado actualizado correctamente.');
       } else {
-        await empleadoService.crear(payload);
+        await employeeService.create(payload);
         setMessage('Empleado creado correctamente.');
       }
       resetForm();
-      fetchEmpleados();
+      fetchEmployees();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -73,16 +76,16 @@ export default function Empleados() {
     }
   };
 
-  const handleEdit = (empleado) => {
+  const handleEdit = (employee) => {
     setFormData({
-      nombre: empleado.nombre,
-      apellido: empleado.apellido,
-      email: empleado.email,
-      telefono: empleado.telefono || '',
-      puesto: empleado.puesto,
-      estado: empleado.estado,
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      email: employee.email,
+      phone: employee.phone || '',
+      position: employee.position,
+      status: employee.status,
     });
-    setEditingId(empleado.id);
+    setEditingId(employee.id);
     setShowForm(true);
     setMessage(null);
     setError(null);
@@ -94,10 +97,10 @@ export default function Empleados() {
     setMessage(null);
     setLoading(true);
     try {
-      await empleadoService.eliminar(id);
+      await employeeService.remove(id);
       setMessage('Empleado eliminado correctamente.');
       if (selected?.id === id) setSelected(null);
-      fetchEmpleados();
+      fetchEmployees();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -121,30 +124,30 @@ export default function Empleados() {
         <div className="form-container">
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Nombre</label>
-              <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" />
+              <label htmlFor="employee-first-name">Nombre</label>
+              <input id="employee-first-name" type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nombre" />
             </div>
             <div className="form-group">
-              <label>Apellido</label>
-              <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Apellido" />
+              <label htmlFor="employee-last-name">Apellido</label>
+              <input id="employee-last-name" type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Apellido" />
             </div>
             <div className="form-group">
-              <label>Email</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="empleado@hotel.com" />
+              <label htmlFor="employee-email">Email</label>
+              <input id="employee-email" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="empleado@hotel.com" />
             </div>
             <div className="form-group">
-              <label>Teléfono</label>
-              <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="123456789" />
+              <label htmlFor="employee-phone">Teléfono</label>
+              <input id="employee-phone" type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="123456789" />
             </div>
             <div className="form-group">
-              <label>Puesto</label>
-              <input type="text" name="puesto" value={formData.puesto} onChange={handleChange} placeholder="Ej: Recepcionista" />
+              <label htmlFor="employee-position">Puesto</label>
+              <input id="employee-position" type="text" name="position" value={formData.position} onChange={handleChange} placeholder="Ej: Recepcionista" />
             </div>
             <div className="form-group">
-              <label>Estado</label>
-              <select name="estado" value={formData.estado} onChange={handleChange}>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
+              <label htmlFor="employee-status">Estado</label>
+              <select id="employee-status" name="status" value={formData.status} onChange={handleChange}>
+                <option value={EMPLOYEE_STATUS.ACTIVE}>Activo</option>
+                <option value={EMPLOYEE_STATUS.INACTIVE}>Inactivo</option>
               </select>
             </div>
             <button type="submit" className="btn btn-success" disabled={loading}>
@@ -163,6 +166,7 @@ export default function Empleados() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por nombre, email o puesto"
+              aria-label="Buscar empleado por nombre, email o puesto"
             />
           </div>
         </div>
@@ -178,22 +182,22 @@ export default function Empleados() {
             </tr>
           </thead>
           <tbody>
-            {filteredEmpleados.map((empleado) => (
+            {filteredEmployees.map((employee) => (
               <tr
-                key={empleado.id}
-                className={selected?.id === empleado.id ? 'selected-row' : ''}
-                onClick={() => setSelected(empleado)}
+                key={employee.id}
+                className={selected?.id === employee.id ? 'selected-row' : ''}
+                onClick={() => setSelected(employee)}
               >
-                <td>{empleado.nombre} {empleado.apellido}</td>
-                <td>{empleado.email}</td>
-                <td>{empleado.telefono || '-'}</td>
-                <td>{empleado.puesto}</td>
-                <td><span className={`badge badge-${empleado.estado}`}>{empleado.estado}</span></td>
+                <td>{employee.fullName}</td>
+                <td>{employee.email}</td>
+                <td>{employee.phone || '-'}</td>
+                <td>{employee.position}</td>
+                <td><span className={`badge badge-${employee.status}`}>{employee.status}</span></td>
                 <td>
-                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(empleado); }}>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(employee); }}>
                     Editar
                   </button>
-                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(empleado.id); }} disabled={loading}>
+                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(employee.id); }} disabled={loading}>
                     Eliminar
                   </button>
                 </td>
@@ -205,11 +209,11 @@ export default function Empleados() {
         {selected && (
           <div className="details-card">
             <h4>Detalle del empleado</h4>
-            <p><strong>Nombre:</strong> {selected.nombre} {selected.apellido}</p>
+            <p><strong>Nombre:</strong> {selected.fullName}</p>
             <p><strong>Email:</strong> {selected.email}</p>
-            <p><strong>Teléfono:</strong> {selected.telefono || '-'}</p>
-            <p><strong>Puesto:</strong> {selected.puesto}</p>
-            <p><strong>Estado:</strong> {selected.estado}</p>
+            <p><strong>Teléfono:</strong> {selected.phone || '-'}</p>
+            <p><strong>Puesto:</strong> {selected.position}</p>
+            <p><strong>Estado:</strong> {selected.status}</p>
             <button className="btn btn-secondary" onClick={() => setSelected(null)}>Cerrar detalle</button>
           </div>
         )}

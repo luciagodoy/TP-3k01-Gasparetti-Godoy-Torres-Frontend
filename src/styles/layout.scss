@@ -255,7 +255,7 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-@include desde(sm) {
+@include breakpoint-up(sm) {
   .footer-columns {
     grid-template-columns: repeat(3, 1fr);
     text-align: left;
@@ -266,7 +266,7 @@
   padding: 0 1rem;
 }
 
-@include desde(md) {
+@include breakpoint-up(md) {
   .navbar-container {
     flex-direction: row;
     justify-content: flex-start;
@@ -316,7 +316,7 @@
 }
 
 
-@include desde(lg) {
+@include breakpoint-up(lg) {
   .navbar-container {
     padding: 0 1.5rem;
   }

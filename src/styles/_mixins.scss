@@ -1,13 +1,13 @@
 @use 'sass:map';
 @use 'tokens';
 
-// Media query mobile-first por nombre de breakpoint:
-//   @include desde(md) { ... }  =>  @media (min-width: 768px) { ... }
-// Un nombre mal escrito corta la compilación en vez de generar una media
-// query vacía que nadie nota.
-@mixin desde($breakpoint) {
+// Mobile-first media query by breakpoint name:
+//   @include breakpoint-up(md) { ... }  =>  @media (min-width: 768px) { ... }
+// A misspelled name stops the build instead of generating an empty media
+// query nobody notices.
+@mixin breakpoint-up($breakpoint) {
   @if not map.has-key(tokens.$breakpoints, $breakpoint) {
-    @error 'Breakpoint desconocido: "#{$breakpoint}". Opciones: #{map.keys(tokens.$breakpoints)}';
+    @error 'Unknown breakpoint: "#{$breakpoint}". Options: #{map.keys(tokens.$breakpoints)}';
   }
 
   @media (min-width: map.get(tokens.$breakpoints, $breakpoint)) {

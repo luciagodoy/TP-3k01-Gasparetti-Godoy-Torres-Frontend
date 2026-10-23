@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Reservation, User } from '.';
 
-// Real shape of GET /reservations/mine: MySQL DECIMALs arrive as strings.
+// Forma real de GET /reservations/mine: los DECIMAL de MySQL llegan como strings.
 const reservationJson = (changes = {}) => ({
   id: 7,
   startDate: '2026-11-01',

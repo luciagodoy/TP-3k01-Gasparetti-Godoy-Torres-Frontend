@@ -6,8 +6,8 @@ import '../styles/pages.scss';
 
 const emptyForm = { name: '', description: '', capacity: 1, imageUrls: '', pricePerNight: '' };
 
-// Public page: anyone can browse the categories; staff can also edit them
-// (POST/PUT/DELETE /room-categories are auth.staff on the backend).
+// Página pública: cualquiera puede ver las categorías; el personal además puede
+// editarlas (POST/PUT/DELETE /room-categories son auth.staff en el backend).
 export default function RoomCategories() {
   const { user } = useAuth();
   const canEdit = Boolean(user?.isStaff);
@@ -50,7 +50,6 @@ export default function RoomCategories() {
         name: formData.name.trim(),
         description: formData.description.trim() || null,
         capacity: formData.capacity,
-        // One URL per line in the textarea.
         imageUrls: formData.imageUrls.split('\n').map((url) => url.trim()).filter(Boolean),
         pricePerNight: parseFloat(formData.pricePerNight) || 0,
       };

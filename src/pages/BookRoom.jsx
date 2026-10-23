@@ -25,9 +25,6 @@ export default function BookRoom() {
   const [addedLines, setAddedLines] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  // The price is dynamic (occupancy and lead time), so it always comes from the
-  // backend; the page never computes it.
   const loadQuote = async (categoryId) => {
     const [found] = await pricingService.quote({ categoryId, startDate, endDate });
     setQuote(found ?? null);
@@ -57,14 +54,14 @@ export default function BookRoom() {
     setError(null);
     setLoading(true);
     try {
-      // expectedTotal: if the price changed since it was shown, the API answers
-      // 409 instead of charging a different amount.
+      // expectedTotal: si el precio cambió desde que se mostró, la API responde 409
+      // en vez de cobrar un monto distinto.
       setReservation(await reservationService.createMine({ roomId, startDate, endDate, expectedTotal: quote.total }));
       setAmenities(await amenityService.list());
       setStep('amenities');
     } catch (err) {
       if (err.status === 409) {
-        // Show the new price and let the guest confirm again.
+        // Mostrar el precio nuevo y dejar que el huésped confirme de nuevo.
         await loadQuote(room.categoryId).catch(() => {});
       }
       setError(err.message);
@@ -103,7 +100,6 @@ export default function BookRoom() {
         quotaId: Number(quotaId),
         quantity: Number(quantity),
       });
-      // The created line does not include the quota, so the name comes from the selected amenity.
       setAddedLines((prev) => [...prev, { line, amenityName: activeAmenity.name }]);
       setActiveAmenity(null);
       setQuotas([]);

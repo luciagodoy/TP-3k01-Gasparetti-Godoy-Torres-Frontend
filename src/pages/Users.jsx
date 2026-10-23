@@ -56,7 +56,7 @@ export default function Users() {
           username: formData.username.trim(),
           email: formData.email.trim(),
           role: formData.role,
-          // An empty password field means "keep the current one".
+          // Un campo de contraseña vacío significa "mantener la actual".
           ...(formData.password ? { password: formData.password } : {}),
         });
         setMessage('Usuario actualizado correctamente.');

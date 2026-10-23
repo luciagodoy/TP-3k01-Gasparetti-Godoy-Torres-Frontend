@@ -31,9 +31,9 @@ export default function Login() {
     try {
       const { token, user } = await authService.login(formData);
       await login(token, user);
-      // navigate() only takes pathname/search/hash from the target: the state
-      // has to be passed separately. Without this, the room and dates chosen
-      // when pressing "Reservar" logged out were lost and /book sent back to /search.
+      // navigate() sólo toma pathname/search/hash del destino: el state hay que
+      // pasarlo aparte. Sin esto, la habitación y las fechas elegidas al tocar
+      // "Reservar" sin sesión se perdían y /book mandaba de vuelta a /search.
       const from = location.state?.from;
       navigate(from ?? '/', { replace: true, state: from?.state });
     } catch (err) {

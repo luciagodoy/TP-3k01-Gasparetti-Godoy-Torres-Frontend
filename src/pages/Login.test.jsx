@@ -32,10 +32,6 @@ describe('Login', () => {
     expect(screen.getByText(/completa usuario y contraseña/i)).toBeInTheDocument();
     expect(login).not.toHaveBeenCalled();
   });
-
-  // Regression: "Reservar" without a session sends to the login with the
-  // selection in state.from.state. navigate(from) dropped that state, /book
-  // started without room or dates and sent the user back to /search.
   it('after logging in goes back to the origin page keeping its state', async () => {
     authService.login.mockResolvedValue({ token: 't', user: { id: 1, username: 'ana', role: 'huesped' } });
     const selection = { roomId: 5, startDate: '2026-11-01', endDate: '2026-11-03' };

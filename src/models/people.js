@@ -14,8 +14,6 @@ export class User extends BaseModel {
   get isAdmin() {
     return this.role === ROLES.ADMIN;
   }
-
-  /** Employee or admin: can run the hotel (reservations, check-in, rooms...). */
   get isStaff() {
     return STAFF_ROLES.includes(this.role);
   }

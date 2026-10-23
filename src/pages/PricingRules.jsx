@@ -14,8 +14,8 @@ const emptyForm = {
   active: true,
 };
 
-// Revenue management: tiers that raise or lower the nightly price of a category
-// depending on its occupancy that night and on how far ahead the guest books.
+// Revenue management: tramos que suben o bajan el precio por noche de una
+// categoría según su ocupación esa noche y con cuánta anticipación reserva el huésped.
 export default function PricingRules() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);

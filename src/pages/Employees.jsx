@@ -3,7 +3,6 @@ import { employeeService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
 import '../styles/pages.scss';
 
-// Stored values (data), shown to the user as "Activo" / "Inactivo".
 const EMPLOYEE_STATUS = { ACTIVE: 'activo', INACTIVE: 'inactivo' };
 
 const emptyForm = { firstName: '', lastName: '', email: '', phone: '', position: '', status: EMPLOYEE_STATUS.ACTIVE };

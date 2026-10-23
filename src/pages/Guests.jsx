@@ -149,7 +149,6 @@ export default function Guests() {
       {showForm && (
         <div className="form-container">
           <form onSubmit={handleSubmit}>
-            {/* The account fields only apply on creation: they belong to the user, not the guest profile. */}
             {!editingId && (
               <>
                 <div className="form-group">

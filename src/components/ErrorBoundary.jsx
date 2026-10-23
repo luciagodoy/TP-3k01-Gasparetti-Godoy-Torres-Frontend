@@ -1,9 +1,9 @@
 import { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-// Without an error boundary, any exception while rendering a page leaves the
-// whole app blank (React unmounts the entire tree). It has to be a class
-// component: getDerivedStateFromError / componentDidCatch have no hook version.
+// Sin un error boundary, cualquier excepción al renderizar una página deja toda
+// la app en blanco (React desmonta el árbol entero). Tiene que ser un componente
+// de clase: getDerivedStateFromError / componentDidCatch no tienen versión con hooks.
 export default class ErrorBoundary extends Component {
   state = { error: null };
 

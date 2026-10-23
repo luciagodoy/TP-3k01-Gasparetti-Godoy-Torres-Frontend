@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-// Photo carousel of a room category card.
 export default function ImageGallery({ images, alt }) {
   const [index, setIndex] = useState(0);
 
@@ -8,7 +7,6 @@ export default function ImageGallery({ images, alt }) {
     return <div className="room-card-image-placeholder">Sin imagen</div>;
   }
 
-  // stopPropagation: the gallery lives inside clickable cards.
   const previous = (e) => {
     e.stopPropagation();
     setIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));

@@ -98,7 +98,6 @@
     text-decoration: underline;
   }
 
-  // --muted is meant for light backgrounds: on --surface it is barely readable.
   .field-hint {
     color: var(--surface-muted);
   }
@@ -219,7 +218,6 @@
   border-bottom: none;
 }
 
-// First image of a category plus a "+N" counter for the rest.
 .table-thumbnail {
   display: flex;
   align-items: center;
@@ -368,12 +366,10 @@
   margin-bottom: 1rem;
 }
 
-// Inside a form group the hint sits under its input, not over the next field.
 .form-group .field-hint {
   margin: 0.5rem 0 0;
 }
 
-// A checkbox and its label on one line.
 .form-group-inline {
   flex-direction: row;
   align-items: center;
@@ -384,7 +380,6 @@
   }
 }
 
-// Short explanation under a page title.
 .page-intro {
   color: var(--muted);
   margin-top: -1rem;
@@ -392,7 +387,6 @@
   max-width: 70ch;
 }
 
-// Night-by-night breakdown of a dynamic price.
 .price-breakdown {
   list-style: none;
   padding: 0;

@@ -13,7 +13,7 @@ export default class Reservation extends BaseModel {
     /** @type {import('./types').IsoDate} */ this.startDate = startDate;
     /** @type {import('./types').IsoDate} */ this.endDate = endDate;
     /** @type {import('./types').ReservationStatus} */ this.status = status;
-    /** Lodging amount (amenities excluded). @type {number} */ this.totalAmount = toNumber(totalAmount);
+    /** @type {number} */ this.totalAmount = toNumber(totalAmount);
     /** @type {number} */ this.guestId = guestId;
     /** @type {number} */ this.roomId = roomId;
     /** @type {Guest | null} */ this.guest = Guest.fromJSON(guest);
@@ -22,8 +22,8 @@ export default class Reservation extends BaseModel {
   }
 
   /**
-   * Nights between two 'YYYY-MM-DD' dates. Same as the backend: the time is
-   * pinned to UTC so the local time zone does not shift a day.
+   * Noches entre dos fechas 'YYYY-MM-DD'. Igual que en el backend: la hora se
+   * fija en UTC para que la zona horaria local no corra un día.
    * @param {import('./types').IsoDate} startDate
    * @param {import('./types').IsoDate} endDate
    */
@@ -40,12 +40,10 @@ export default class Reservation extends BaseModel {
     return this.consumedAmenities.reduce((sum, line) => sum + (line.totalAmount ?? 0), 0);
   }
 
-  /** Lodging + consumed amenities. */
+  /** Alojamiento + servicios consumidos. */
   get total() {
     return (this.totalAmount ?? 0) + this.amenitiesTotal;
   }
-
-  // Same transitions the backend enforces.
   get canBeCancelled() {
     return this.status === RESERVATION_STATUS.PENDING;
   }

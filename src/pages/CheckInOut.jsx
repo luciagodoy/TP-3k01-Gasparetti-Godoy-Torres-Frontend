@@ -140,8 +140,6 @@ export default function CheckInOut() {
             <p><strong>ID:</strong> {reservation.id}</p>
             <p><strong>Huésped:</strong> {guest ? guest.user?.username : reservation.guestId}</p>
             <p><strong>Habitación:</strong> {reservation.room ? reservation.room.number : reservation.roomId}</p>
-            {/* Dates are shown as they come ('YYYY-MM-DD'): new Date('2026-11-01')
-                reads them as UTC midnight and in Argentina (UTC-3) showed the previous day. */}
             <p><strong>Inicio:</strong> {reservation.startDate}</p>
             <p><strong>Fin:</strong> {reservation.endDate} ({reservation.nights} {reservation.nights === 1 ? 'noche' : 'noches'})</p>
             <p><strong>Estado:</strong> {reservation.status}</p>

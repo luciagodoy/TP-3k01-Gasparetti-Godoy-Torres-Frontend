@@ -8,14 +8,9 @@ export class RoomCategory extends BaseModel {
     /** @type {string | null} */ this.description = description ?? null;
     /** @type {number} */ this.capacity = capacity;
     /** @type {string[]} */ this.imageUrls = imageUrls ?? [];
-    // Base price only: the price of a stay is dynamic and comes from the
-    // backend quote (pricingService.quote), never from multiplying this.
     /** @type {number} */ this.pricePerNight = toNumber(pricePerNight);
   }
 }
-
-// The most guests any room of the hotel takes: the upper limit of the guest
-// selector. undefined while the categories are not loaded yet.
 export const largestCapacity = (categories) =>
   categories.reduce((largest, category) => Math.max(largest, category.capacity || 0), 0) || undefined;
 

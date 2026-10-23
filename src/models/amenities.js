@@ -1,6 +1,6 @@
 import BaseModel, { toNumber } from './BaseModel';
 
-// An extra service the hotel offers (spa, breakfast, parking...).
+// Un servicio extra que ofrece el hotel (spa, desayuno, estacionamiento...).
 export class Amenity extends BaseModel {
   constructor({ id, name, description }) {
     super();
@@ -37,10 +37,10 @@ export class AmenityPrice extends BaseModel {
   }
 
   /**
-   * Same rule as the backend: valid from validFrom and, without an end date,
-   * still valid. 'YYYY-MM-DD' strings compare correctly as text, without going
-   * through Date (which would shift them a day depending on the time zone).
-   * @param {import('./types').IsoDate} [date] today by default
+   * Misma regla que el backend: vigente desde validFrom y, sin fecha de fin,
+   * sigue vigente. Los strings 'YYYY-MM-DD' se comparan bien como texto, sin
+   * pasar por Date (que los correría un día según la zona horaria).
+   * @param {import('./types').IsoDate} [date] hoy por defecto
    */
   isValidOn(date = new Date().toISOString().slice(0, 10)) {
     if (this.validFrom > date) return false;

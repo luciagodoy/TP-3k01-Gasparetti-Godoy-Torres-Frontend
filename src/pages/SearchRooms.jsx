@@ -30,9 +30,7 @@ export default function SearchRooms() {
   const { user, guest } = useAuth();
   const navigate = useNavigate();
 
-  // The search lives in the useQuery key: the initial load and the "Buscar"
-  // button go through the same path. The id grows on every click so searching
-  // again with the same filters still refetches.
+
   const [query, setQuery] = useState(() => ({
     filters: searchFilters(location.state || {}),
     id: 0,
@@ -49,13 +47,8 @@ export default function SearchRooms() {
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-  // Availability, price and the "Reservar" button all use the dates of the last
-  // search, not what is typed in the form: changing a date without searching
-  // again must not book a stay whose availability and price nobody checked.
   const { startDate: searchedStart, endDate: searchedEnd } = query.filters;
   const hasDates = Boolean(searchedStart && searchedEnd);
-
-  // Dynamic price of the stay for every category, in one request.
   const { data: quotes } = useQuery(
     `quotes:${query.id}:${searchedStart}:${searchedEnd}`,
     () => pricingService.quote({ startDate: searchedStart, endDate: searchedEnd }),
@@ -74,8 +67,8 @@ export default function SearchRooms() {
   };
 
   const handleBook = (group) => {
-    // The guest books "a room of this category": the first available one of the
-    // group is assigned, just like in a real hotel you don't pick the exact number.
+    // El huésped reserva "una habitación de esta categoría": se le asigna la primera
+    // disponible del grupo, igual que en un hotel real no se elige el número exacto.
     const selection = {
       roomId: group.rooms[0].id,
       startDate: searchedStart,
@@ -93,7 +86,7 @@ export default function SearchRooms() {
     navigate('/book', { state: selection });
   };
 
-  // Groups the rooms found by category.
+  // Agrupa por categoría las habitaciones encontradas.
   const groupsByCategory = rooms.reduce((groups, room) => {
     const categoryId = room.category?.id;
     if (!categoryId) return groups;

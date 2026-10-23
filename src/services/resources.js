@@ -4,8 +4,8 @@ import {
   Amenity, AmenityQuota, AmenityPrice, ReservationAmenity, Reservation, PricingRule, Quote,
 } from '../models';
 
-// Builds the query string skipping empty filters: an unselected <select> sends ''
-// and the API would read it as "filter by empty" instead of "no filter".
+// Arma el query string salteando los filtros vacíos: un <select> sin elegir manda
+// '' y la API lo leería como "filtrar por vacío" en vez de "sin filtro".
 const toQueryString = (filters) => {
   if (!filters) return '';
   const params = new URLSearchParams();
@@ -17,16 +17,16 @@ const toQueryString = (filters) => {
 };
 
 /**
- * Factory: creates the CRUD service of a REST resource. Every API entity has the
- * same shape (GET /x, GET /x/:id, POST, PUT /x/:id, DELETE /x/:id), so instead of
- * repeating those five functions per resource they are built here, each one
- * returning instances of its model.
+ * Factory: crea el servicio CRUD de un recurso REST. Todas las entidades de la
+ * API tienen la misma forma (GET /x, GET /x/:id, POST, PUT /x/:id, DELETE /x/:id),
+ * así que en vez de repetir esas cinco funciones por recurso se arman acá, y
+ * cada una devuelve instancias de su modelo.
  *
  * @template T
- * @param {string} endpoint base path, e.g. '/amenity-quotas'
+ * @param {string} endpoint ruta base, p. ej. '/amenity-quotas'
  * @param {{ fromJSON: (json: object) => T, listFromJSON: (list: object[]) => T[] }} Model
- * @param {{ envelope?: string }} [options] key under which the API returns the
- *   entity on create/update, when it does not return it directly (reservations: { message, reservation })
+ * @param {{ envelope?: string }} [options] clave bajo la que la API devuelve la
+ *   entidad al crear/actualizar, cuando no la devuelve directamente (reservations: { message, reservation })
  */
 export function createResourceService(endpoint, Model, { envelope } = {}) {
   const toModel = (json) => Model.fromJSON(envelope && json?.[envelope] ? json[envelope] : json);
@@ -57,8 +57,8 @@ export const pricingRuleService = createResourceService('/pricing-rules', Pricin
 
 export const pricingService = {
   /**
-   * Dynamic price of a stay, night by night. Without categoryId it quotes every
-   * category in one request (the search page needs them all).
+   * Precio dinámico de una estadía, noche a noche. Sin categoryId cotiza todas las
+   * categorías en una sola petición (la página de búsqueda las necesita todas).
    * @param {{ startDate: string, endDate: string, categoryId?: number }} filters
    * @returns {Promise<Quote[]>}
    */
@@ -67,7 +67,7 @@ export const pricingService = {
 
 export const guestService = {
   ...createResourceService('/guests', Guest),
-  /** Guest profile of the logged-in account (admins and employees have none). */
+  /** Perfil de huésped de la cuenta logueada (los admins y empleados no tienen). */
   myProfile: async () => Guest.fromJSON(await api.get('/guests/me')),
   /** @param {import('../models/types').GuestRegistration} data */
   register: (data) => api.post('/guests/register', data),
@@ -81,12 +81,12 @@ export const reservationService = {
   /** @param {import('../models/types').NewOwnReservation} data */
   createMine: async (data) => reservationOf(await api.post('/reservations/mine', data)),
   cancel: async (id) => reservationOf(await api.post(`/reservations/${id}/cancel`, {})),
-  // Dedicated endpoints and not a PUT with { status }: the backend validates the
-  // transition (pending -> check-in -> check-out) and occupies/frees the room.
+  // Endpoints dedicados y no un PUT con { status }: el backend valida la transición
+  // (pendiente -> check-in -> check-out) y ocupa/libera la habitación.
   checkIn: async (id) => reservationOf(await api.post(`/reservations/${id}/check-in`, {})),
-  /** The backend answers the check-out with the PDF receipt. @returns {Promise<Blob>} */
+  /** El backend responde el check-out con el comprobante PDF. @returns {Promise<Blob>} */
   checkOut: (id) => api.postFile(`/reservations/${id}/check-out`, {}),
-  /** Downloads the receipt of an already closed reservation again. @returns {Promise<Blob>} */
+  /** Vuelve a descargar el comprobante de una reserva ya cerrada. @returns {Promise<Blob>} */
   downloadReceipt: (id) => api.getFile(`/reservations/${id}/receipt`),
 };
 

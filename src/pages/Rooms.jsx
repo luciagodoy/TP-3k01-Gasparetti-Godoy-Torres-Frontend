@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { roomCategoryService, roomService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
 import '../styles/pages.scss';
-
-// Stored values (data); the labels shown to the user are Spanish.
 const ROOM_STATUS_OPTIONS = [
   { value: 'disponible', label: 'Disponible' },
   { value: 'ocupada', label: 'Ocupada' },

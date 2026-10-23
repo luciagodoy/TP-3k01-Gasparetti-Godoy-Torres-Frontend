@@ -1,6 +1,5 @@
-// Domain types shared by models, services and pages. The stored values come from
-// the backend and are kept in Spanish because they are data saved in the
-// database; the code always uses these constants instead of the raw strings.
+// Tipos de dominio compartidos por modelos, servicios y páginas. Los valores
+// guardados vienen del backend, el código siempre usa estas constantes en vez de los strings sueltos.
 
 /** @typedef {'huesped' | 'empleado' | 'admin'} Role */
 
@@ -10,16 +9,13 @@
 
 /** @typedef {'activo' | 'inactivo'} EmployeeStatus */
 
-/** Date without time, as the API sends it (DATEONLY): 'YYYY-MM-DD'. @typedef {string} IsoDate */
+/** @typedef {string} IsoDate */
 
 export const ROLES = Object.freeze({
   GUEST: 'huesped',
   EMPLOYEE: 'empleado',
   ADMIN: 'admin',
 });
-
-// Same split as the backend's auth.staff / auth.admin: employees and admins
-// run the hotel; only accounts and staff management is admin-only.
 export const STAFF_ROLES = Object.freeze([ROLES.EMPLOYEE, ROLES.ADMIN]);
 export const ADMIN_ROLES = Object.freeze([ROLES.ADMIN]);
 
@@ -29,8 +25,6 @@ export const RESERVATION_STATUS = Object.freeze({
   CHECKED_OUT: 'check-out',
   CANCELLED: 'cancelada',
 });
-
-// Dynamic pricing: what a rule measures and how it changes the price.
 export const PRICING_RULE_TYPE = Object.freeze({
   OCCUPANCY: 'ocupacion',
   LEAD_TIME: 'antelacion',
@@ -41,17 +35,16 @@ export const ADJUSTMENT_TYPE = Object.freeze({
   FIXED: 'fijo',
 });
 
-// --- Data sent in requests ---
 
 /**
  * @typedef {Object} LoginCredentials
- * @property {string} username Username or email
+ * @property {string} username Usuario o email
  * @property {string} password
  */
 
 /**
  * @typedef {Object} Session
- * @property {string} token JWT for the Authorization header
+ * @property {string} token JWT para el header Authorization
  * @property {import('./people').User} user
  */
 
@@ -60,8 +53,8 @@ export const ADJUSTMENT_TYPE = Object.freeze({
  * @property {number} roomId
  * @property {IsoDate} startDate
  * @property {IsoDate} endDate
- * @property {number} [expectedTotal] Total shown to the guest; the API answers
- *   409 if the dynamic price changed since then.
+ * @property {number} [expectedTotal] Total que se le mostró al huésped; la API
+ *   responde 409 si el precio dinámico cambió desde entonces.
  */
 
 /**

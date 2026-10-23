@@ -19,9 +19,6 @@ export default function MainLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  // Employees and admins run the hotel: they get the management menu instead of
-  // the guest options (it used to be admin-only, so an employee could reach
-  // none of what the backend allows their role).
   const isStaff = Boolean(user?.isStaff);
 
   const [managementOpen, setManagementOpen] = useState(false);
@@ -38,16 +35,10 @@ export default function MainLayout() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Closing on navigation happens in each item's onClick, not in an effect on
-  // location.pathname: the effect ran on every route change wherever it came
-  // from, and left closing at the mercy of render order.
   const closeManagement = ({ returnFocus = false } = {}) => {
     setManagementOpen(false);
     if (returnFocus) triggerRef.current?.focus();
   };
-
-  // Without this the menu is mouse-only: there was no way to close it or move
-  // through it with the keyboard.
   const handleManagementKeyDown = (e) => {
     if (e.key === 'Escape') {
       e.preventDefault();
@@ -57,9 +48,6 @@ export default function MainLayout() {
 
     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
     e.preventDefault();
-
-    // The menu is display:none while closed, so no item can be focused yet:
-    // the first arrow opens it and the next one moves.
     if (!managementOpen) {
       setManagementOpen(true);
       return;
@@ -156,8 +144,8 @@ export default function MainLayout() {
       </header>
 
       <main className="main-content">
-        {/* Keying the boundary by route remounts it on navigation: otherwise, once
-            a page fails, the fallback sticks even after changing section. */}
+        {/* Usar la ruta como key del boundary lo vuelve a montar al navegar: si no,
+            una vez que una página falla, el fallback queda fijo aunque se cambie de sección. */}
         <ErrorBoundary key={location.pathname}>
           <Suspense fallback={<div className="page-container">Cargando...</div>}>
             <Outlet />

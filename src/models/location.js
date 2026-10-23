@@ -17,7 +17,7 @@ export class City extends BaseModel {
     /** @type {Province | null} */ this.province = Province.fromJSON(province);
   }
 
-  /** "Rosario, Santa Fe" when the province came included; otherwise just the name. */
+  /** "Rosario, Santa Fe" cuando vino incluida la provincia; si no, sólo el nombre. */
   get fullName() {
     return this.province ? `${this.name}, ${this.province.name}` : this.name;
   }

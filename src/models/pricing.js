@@ -2,16 +2,11 @@ import BaseModel, { toNumber } from './BaseModel';
 import { RoomCategory } from './lodging';
 import { ADJUSTMENT_TYPE, PRICING_RULE_TYPE } from './types';
 
-// "+30%", "-10%", "+$25.00 por noche", "-$10.00 por noche": the sign goes
-// before the currency symbol, never "$-10.00".
 const formatAdjustment = (adjustmentType, value) => {
   const sign = value > 0 ? '+' : value < 0 ? '-' : '';
   const amount = Math.abs(value);
   return adjustmentType === ADJUSTMENT_TYPE.PERCENTAGE ? `${sign}${amount}%` : `${sign}$${amount.toFixed(2)} por noche`;
 };
-
-// One tier of the dynamic pricing: when the measure is in [from, to) the
-// nightly price is adjusted by `value`. `to` null = no upper limit.
 export class PricingRule extends BaseModel {
   constructor({ id, type, from, to, adjustmentType, value, active, categoryId, category }) {
     super();
@@ -30,7 +25,6 @@ export class PricingRule extends BaseModel {
     return this.type === PRICING_RULE_TYPE.OCCUPANCY;
   }
 
-  // Shown to the user, hence Spanish.
   get typeLabel() {
     return this.isOccupancy ? 'Ocupación' : 'Antelación';
   }
@@ -49,7 +43,6 @@ export class PricingRule extends BaseModel {
   }
 }
 
-/** Price of one night of a quote, with the adjustments that produced it. */
 export class NightQuote extends BaseModel {
   constructor({ date, occupancy, basePrice, price, occupancyAdjustment, leadTimeAdjustment }) {
     super();
@@ -64,8 +57,6 @@ export class NightQuote extends BaseModel {
   get isAdjusted() {
     return this.price !== this.basePrice;
   }
-
-  /** Human description of what changed the price, e.g. "ocupación +30% · antelación -10%". */
   get adjustmentSummary() {
     return [
       this.occupancyAdjustment && `ocupación ${formatAdjustment(this.occupancyAdjustment.adjustmentType, toNumber(this.occupancyAdjustment.value))}`,
@@ -73,8 +64,6 @@ export class NightQuote extends BaseModel {
     ].filter(Boolean).join(' · ');
   }
 }
-
-/** Dynamic price of a stay in one category, computed by the backend night by night. */
 export class Quote extends BaseModel {
   constructor({ categoryId, categoryName, startDate, endDate, leadDays, basePricePerNight, total, nights }) {
     super();
@@ -92,7 +81,6 @@ export class Quote extends BaseModel {
     return this.nights.length ? Math.round((this.total / this.nights.length) * 100) / 100 : 0;
   }
 
-  /** True when the rules moved the price away from the base price of the category. */
   get isAdjusted() {
     return this.nights.some((night) => night.isAdjusted);
   }

@@ -12,8 +12,8 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Only guest accounts have a guest profile: asking for it as admin or
-  // employee just produced a 404 on every page load.
+  // Sólo las cuentas de huésped tienen perfil de huésped: pedirlo como admin o
+  // empleado producía un 404 en cada carga de página.
   const fetchGuestProfile = async (account) => {
     if (!account.isGuest) {
       setGuest(null);
@@ -44,8 +44,8 @@ export function AuthProvider({ children }) {
           const { token: storedToken, user: storedUser } = JSON.parse(stored);
           api.setAuthToken(storedToken);
           setToken(storedToken);
-          // localStorage keeps plain JSON (getters like isStaff are not
-          // serialized): the instance is rebuilt when the session is restored.
+          // localStorage guarda JSON plano (los getters como isStaff no se serializan):
+          // la instancia se reconstruye al restaurar la sesión.
           const restoredUser = User.fromJSON(storedUser);
           setUser(restoredUser);
           await fetchGuestProfile(restoredUser);

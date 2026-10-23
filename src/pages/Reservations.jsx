@@ -13,9 +13,6 @@ const STATUS_OPTIONS = [
 ];
 
 const emptyForm = { roomId: '', guestId: '', startDate: '', endDate: '', totalAmount: '' };
-
-// Dates are shown as they come ('YYYY-MM-DD'): new Date('2026-11-01') reads
-// them as UTC midnight, which in Argentina (UTC-3) displays the previous day.
 export default function Reservations() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
@@ -44,8 +41,8 @@ export default function Reservations() {
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-  // The reservations listing does not include the guest, so the name comes
-  // from the guests already loaded for the form.
+  // El listado de reservas no incluye al huésped, así que el nombre sale de los
+  // huéspedes ya cargados para el formulario.
   const guestName = (guestId) => {
     const guest = guests.find((g) => g.id === guestId);
     return guest ? guest.user?.username || `#${guestId}` : guestId;
@@ -80,7 +77,7 @@ export default function Reservations() {
         guestId: Number(formData.guestId),
         startDate: formData.startDate,
         endDate: formData.endDate,
-        // Empty = the backend applies the dynamic rate; a value = agreed price.
+        // Vacío = el backend aplica la tarifa dinámica; con un valor = precio pactado.
         ...(formData.totalAmount !== '' && { totalAmount: parseFloat(formData.totalAmount) }),
       });
       setMessage('Reserva creada correctamente.');

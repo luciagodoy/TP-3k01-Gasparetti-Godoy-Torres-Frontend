@@ -2,8 +2,8 @@ import { useEffect, useId, useState } from 'react';
 import { cityService, provinceService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
 
-// Cascading selector: province first, then city (with text autocomplete).
-// Reports the chosen cityId to the parent through onChange; '' while there is no valid city.
+// Selector en cascada: primero la provincia, después la ciudad (con autocompletado de texto).
+// Informa al padre el cityId elegido por onChange; '' mientras no haya una ciudad válida.
 export default function LocationSelector({ cityId, onChange }) {
   const datalistId = useId();
   const provinceSelectId = useId();
@@ -15,9 +15,9 @@ export default function LocationSelector({ cityId, onChange }) {
     initialData: [],
   });
 
-  // When editing an existing guest only the city id arrives: that one city is
-  // fetched to learn its province and prefill the text, instead of downloading
-  // the whole country to look for it.
+  // Al editar un huésped existente sólo llega el id de la ciudad: se pide esa
+  // ciudad para conocer su provincia y precargar el texto, en vez de descargar
+  // todo el país para buscarla.
   useEffect(() => {
     if (!cityId || provinceId) return;
     cityService.get(cityId)
@@ -29,16 +29,14 @@ export default function LocationSelector({ cityId, onChange }) {
       .catch(() => {});
   }, [cityId, provinceId]);
 
-  // Cities are requested per province: the whole country is ~3900 rows (~1 MB)
-  // and this screen is public.
+  // Las ciudades se piden por provincia
+
   const { data: provinceCities } = useQuery(
     `/cities?provinceId=${provinceId}`,
     () => cityService.list({ provinceId }),
     { initialData: [], enabled: Boolean(provinceId) }
   );
 
-  // Derived instead of cleared in an effect: without a province there are no
-  // cities to offer, and the cached list must not reappear.
   const cities = provinceId ? provinceCities : [];
 
   const handleProvinceChange = (e) => {

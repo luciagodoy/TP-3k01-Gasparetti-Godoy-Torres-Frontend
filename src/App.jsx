@@ -40,8 +40,8 @@ function App() {
           <Route path="room-categories" element={<RoomCategories />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-          {/* Same levels as the backend: auth.staff (employee or admin) for the
-              hotel operation and auth.admin only for accounts and staff. */}
+          {/* Mismos niveles que el backend: auth.staff (empleado o admin) para la
+              operación del hotel y auth.admin sólo para cuentas y personal. */}
           <Route element={<ProtectedRoute roles={STAFF_ROLES} />}>
             <Route path="reservations" element={<Reservations />} />
             <Route path="rooms" element={<Rooms />} />

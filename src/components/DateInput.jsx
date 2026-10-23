@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import '../styles/datepicker.scss';
 
-// Shown to the user, hence Spanish.
+// Textos visibles para el usuario, en español.
 const WEEKDAYS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
 const MONTHS = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -24,15 +24,14 @@ const formatDisplay = (iso) => {
   return parsed ? `${pad(parsed.d)}/${pad(parsed.m)}/${parsed.y}` : '';
 };
 
-// 0 = Monday ... 6 = Sunday, so the grid starts the week on Monday.
+// 0 = lunes ... 6 = domingo, así la grilla empieza la semana el lunes.
 const firstWeekday = (y, m) => (new Date(y, m - 1, 1).getDay() + 6) % 7;
 
 const daysInMonth = (y, m) => new Date(y, m, 0).getDate();
 
-// Custom date picker: when open it only shows the days of the active month
-// (empty cells for the initial offset, no days from neighbour months) and
-// displays the selected value as dd/mm/yyyy. `id` goes on the trigger so a
-// <label htmlFor> points at it.
+// Selector de fecha propio: al abrirse muestra sólo los días del mes activo
+// (celdas vacías para el desfase inicial, sin días de los meses vecinos) y
+// muestra el valor elegido como dd/mm/aaaa.
 export default function DateInput({ id, name, value, onChange, min, max, placeholder = 'dd/mm/yyyy' }) {
   const [open, setOpen] = useState(false);
   const selected = parseISO(value);
@@ -40,9 +39,6 @@ export default function DateInput({ id, name, value, onChange, min, max, placeho
   const [viewYear, setViewYear] = useState(selected?.y ?? today.getFullYear());
   const [viewMonth, setViewMonth] = useState(selected?.m ?? today.getMonth() + 1);
   const containerRef = useRef(null);
-
-  // State adjusted during render. Doing it in an effect first painted a render
-  // with the calendar on the old month and only then corrected it.
   const [previousValue, setPreviousValue] = useState(value);
   if (value !== previousValue) {
     setPreviousValue(value);

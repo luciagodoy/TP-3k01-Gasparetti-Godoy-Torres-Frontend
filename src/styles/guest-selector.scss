@@ -1,5 +1,3 @@
-// Guest count selector: a trigger shaped like the date inputs and a light panel
-// with one room and a stepper.
 
 .guest-selector {
   position: relative;
@@ -43,7 +41,6 @@
   stroke-linecap: round;
 }
 
-// Long summaries get an ellipsis instead of widening the filter bar.
 .guest-selector-summary {
   min-width: 0;
   overflow: hidden;
@@ -129,7 +126,6 @@
   font-size: 1.05rem;
 }
 
-// Inside the dark booking bar of the home page, like its date inputs.
 .booking-bar .guest-selector-trigger {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.14);

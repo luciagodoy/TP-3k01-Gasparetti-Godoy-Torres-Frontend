@@ -1,15 +1,15 @@
-// HTTP client for the backend API.
+// Cliente HTTP para la API del backend.
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
-// Shown when fetch does not even reach the API (backend down, wrong CORS, no
-// internet). This service used to return mock data in that case, so the app
-// looked like it worked while showing made-up reservations: a visible error is
-// better than a silent lie. The text is shown to the user, hence Spanish.
+// Se muestra cuando fetch ni siquiera llega a la API (backend caído, CORS mal
+// configurado, sin internet). Antes este servicio devolvía datos de prueba en ese
+// caso.
 const NETWORK_ERROR_MESSAGE =
   'No pudimos conectarnos con el servidor. Verificá tu conexión e intentá de nuevo.';
 
-// The API answers errors as { error, message? }: `error` is a short title and
-// `message` explains it. Both are shown so the user knows what to fix.
+// La API responde los errores como { error, message? }: `error` es un título
+// corto y `message` lo explica. Se muestran los dos para que el usuario sepa qué
+// corregir.
 const errorMessageFrom = (body, status) =>
   [body.error, body.message].filter(Boolean).join(': ') || `HTTP Error: ${status}`;
 
@@ -21,8 +21,8 @@ class ApiService {
     };
   }
 
-  // readBody decides how a successful response is read: JSON by default, or a
-  // Blob for the endpoints that return a file (the PDF receipt).
+  // readBody decide cómo se lee una respuesta exitosa: JSON por defecto, o un Blob
+  // para los endpoints que devuelven un archivo (el comprobante PDF).
   async _request(endpoint, options, readBody) {
     let response;
     try {
@@ -63,13 +63,13 @@ class ApiService {
     return this._request(endpoint, { method: 'POST', body: JSON.stringify(data) }, (r) => r.blob());
   }
 
-  // Errors still arrive as JSON even when a file was requested: the backend only
-  // sends the PDF when the operation succeeded.
+  // Los errores llegan como JSON aunque se haya pedido un archivo: el backend sólo
+  // manda el PDF cuando la operación salió bien.
   async _handleResponse(response, readBody = (r) => r.json()) {
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
-      // 401 = the session is no longer valid. 403 (valid session, role not
-      // allowed) must not log the user out, it only shows the error.
+      // 401 = la sesión ya no es válida. 403 (sesión válida, rol no permitido) no debe
+      // cerrar la sesión, sólo muestra el error.
       if (response.status === 401 && this._onUnauthorized) {
         this._onUnauthorized();
       }
@@ -94,5 +94,5 @@ class ApiService {
   }
 }
 
-// Singleton: every service shares the same instance (and therefore the same token).
+// Singleton: todos los servicios comparten la misma instancia (y por lo tanto el mismo token).
 export default new ApiService();

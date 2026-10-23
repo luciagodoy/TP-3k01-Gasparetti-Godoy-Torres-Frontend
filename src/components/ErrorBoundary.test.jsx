@@ -11,8 +11,8 @@ const renderWithRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe('ErrorBoundary', () => {
   beforeEach(() => {
-    // React logs the caught error to the console; silence it so the test
-    // output does not look like a real failure.
+    // React registra en la consola el error capturado; se silencia para que la
+    // salida del test no parezca una falla real.
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 

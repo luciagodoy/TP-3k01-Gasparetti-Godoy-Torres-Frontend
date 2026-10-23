@@ -43,8 +43,6 @@ describe('ProtectedRoute', () => {
     expect(screen.getByText('Contenido privado')).toBeInTheDocument();
   });
 
-  // Regression: the management pages required roles={['admin']} and an employee,
-  // whom the backend does authorize (auth.staff), could not open any of them.
   it('lets an employee into the staff pages', () => {
     renderWithAuth({ user: { username: 'emp', role: ROLES.EMPLOYEE }, loading: false }, { roles: STAFF_ROLES });
     expect(screen.getByText('Contenido privado')).toBeInTheDocument();

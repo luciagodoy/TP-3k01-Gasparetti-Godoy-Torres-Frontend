@@ -3,8 +3,6 @@ import { useState } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import GuestSelector from './GuestSelector';
 
-// Controlled like the real forms: the parent keeps the value it gets from
-// onChange({ target: { name, value } }).
 function Harness({ initial = '', max = 4, onChange = () => {} }) {
   const [people, setPeople] = useState(initial);
   return (

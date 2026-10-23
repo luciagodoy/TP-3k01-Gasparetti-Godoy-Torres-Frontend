@@ -14,8 +14,6 @@
   min-width: 100%;
 }
 
-// Form labels are white for the dark surfaces of the forms; this bar sits on
-// the light page background, where they were invisible.
 .room-filters .form-group label {
   color: var(--text);
 }
@@ -163,8 +161,6 @@
   padding-top: 1rem;
 }
 
-// A disabled button does not fire mouse events in every browser, so the hint
-// (title) lives on this wrapper and the button lets the pointer through.
 .button-hint {
   display: inline-block;
 

@@ -2,12 +2,6 @@ import { useEffect, useId, useRef, useState } from 'react';
 import '../styles/guest-selector.scss';
 
 const guestsLabel = (count) => `${count} ${count === 1 ? 'huésped' : 'huéspedes'}`;
-
-// Number of guests for one room, as a button that opens a small panel with a
-// stepper (no adults/children split). Same contract as an <input>:
-// onChange({ target: { name, value } }), so forms keep their handleChange.
-// `id` goes on the trigger so a <label htmlFor> points at it. An empty value
-// (nothing chosen yet) is shown as 1 guest, which filters nothing.
 export default function GuestSelector({ id, name, value, onChange, max = 10 }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
@@ -19,7 +13,6 @@ export default function GuestSelector({ id, name, value, onChange, max = 10 }) {
 
   useEffect(() => {
     if (!open) return undefined;
-    // Focus inside the panel, so the keyboard can use the stepper right away.
     moreRef.current?.focus();
     const handleClickOutside = (e) => {
       if (containerRef.current && !containerRef.current.contains(e.target)) setOpen(false);
@@ -40,8 +33,6 @@ export default function GuestSelector({ id, name, value, onChange, max = 10 }) {
   const change = (delta) => {
     const next = count + delta;
     onChange({ target: { name, value: next } });
-    // The button just pressed becomes disabled at the limit and would drop the
-    // focus to <body>: move it to the other one.
     if (next <= 1) moreRef.current?.focus();
     if (next >= max) lessRef.current?.focus();
   };

@@ -22,10 +22,16 @@ export default function Reservations() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState(null);
+  const [range, setRange] = useState({ from: '', to: '' });
+
+  // The date range is filtered by the backend (GET /reservations?startDate=&endDate=
+  // returns the reservations that overlap it). It applies only with both dates.
+  const hasRange = Boolean(range.from && range.to);
+  const rangeFilters = hasRange ? { startDate: range.from, endDate: range.to } : undefined;
 
   const { data: reservations, refetch: fetchReservations } = useQuery(
-    '/reservations',
-    () => reservationService.list(),
+    `/reservations?${hasRange ? `${range.from}:${range.to}` : ''}`,
+    () => reservationService.list(rangeFilters),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -88,6 +94,23 @@ export default function Reservations() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRangeChange = (e) => {
+    const { name, value } = e.target;
+    setRange((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // The detail is requested from the backend: it brings the reservation with the
+  // full guest (account and location), the room with its category and the
+  // consumed amenities, none of which come in the listing.
+  const handleSelect = async (id) => {
+    setError(null);
+    try {
+      setSelected(await reservationService.get(id));
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -191,6 +214,24 @@ export default function Reservations() {
               ))}
             </select>
           </div>
+          <div className="filter-row">
+            <div className="form-group">
+              <label htmlFor="reservation-range-from">Desde</label>
+              <DateInput id="reservation-range-from" name="from" value={range.from} onChange={handleRangeChange} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="reservation-range-to">Hasta</label>
+              <DateInput id="reservation-range-to" name="to" value={range.to} onChange={handleRangeChange} min={range.from || undefined} />
+            </div>
+            {(range.from || range.to) && (
+              <button type="button" className="btn btn-small" onClick={() => setRange({ from: '', to: '' })}>
+                Limpiar fechas
+              </button>
+            )}
+          </div>
+          {(range.from || range.to) && !hasRange && (
+            <p className="field-hint">Elegí las dos fechas para filtrar por rango.</p>
+          )}
         </div>
         <table className="table">
           <thead>
@@ -209,7 +250,7 @@ export default function Reservations() {
             {filteredReservations.map((reservation) => (
               <tr
                 key={reservation.id}
-                onClick={() => setSelected(reservation)}
+                onClick={() => handleSelect(reservation.id)}
                 className={selected?.id === reservation.id ? 'selected-row' : ''}
               >
                 <td>{reservation.id}</td>
@@ -222,7 +263,7 @@ export default function Reservations() {
                 </td>
                 <td>{reservation.totalAmount ? `$${reservation.totalAmount.toFixed(2)}` : '-'}</td>
                 <td>
-                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); setSelected(reservation); }}>
+                  <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleSelect(reservation.id); }}>
                     Ver detalle
                   </button>
                   <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(reservation.id); }} disabled={loading}>
@@ -235,14 +276,42 @@ export default function Reservations() {
         </table>
         {selected && (
           <div className="details-card">
-            <h4>Detalle de la reserva seleccionada</h4>
-            <p><strong>ID:</strong> {selected.id}</p>
-            <p><strong>Huésped:</strong> {guestName(selected.guestId)}</p>
-            <p><strong>Habitación:</strong> {selected.room ? selected.room.number : selected.roomId}</p>
+            <h4>Reserva N° {selected.id}</h4>
+            <p><strong>Estado:</strong> <span className={`badge badge-${selected.status}`}>{selected.status}</span></p>
             <p><strong>Inicio:</strong> {selected.startDate}</p>
             <p><strong>Fin:</strong> {selected.endDate} ({selected.nights} {selected.nights === 1 ? 'noche' : 'noches'})</p>
-            <p><strong>Estado:</strong> {selected.status}</p>
-            <p><strong>Monto total:</strong> ${selected.totalAmount.toFixed(2)}</p>
+            <p>
+              <strong>Habitación:</strong> N° {selected.room ? selected.room.number : selected.roomId}
+              {selected.room && ` · Piso ${selected.room.floor}`}
+              {selected.room?.category && ` · ${selected.room.category.name}`}
+            </p>
+            <p><strong>Alojamiento:</strong> ${(selected.totalAmount ?? 0).toFixed(2)}</p>
+            {selected.consumedAmenities.length > 0 && (
+              <>
+                <p><strong>Servicios consumidos:</strong></p>
+                <ul>
+                  {selected.consumedAmenities.map((line) => (
+                    <li key={line.id}>
+                      {line.amenityName ?? `Cupo #${line.quotaId}`} × {line.quantity} — ${(line.totalAmount ?? 0).toFixed(2)}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <p><strong>Total:</strong> ${selected.total.toFixed(2)}</p>
+
+            <h4>Huésped</h4>
+            {selected.guest ? (
+              <>
+                <p><strong>Usuario:</strong> {selected.guest.user?.username ?? '-'}</p>
+                <p><strong>Email:</strong> {selected.guest.user?.email ?? '-'}</p>
+                <p><strong>Documento:</strong> {selected.guest.documentNumber}</p>
+                <p><strong>Teléfono:</strong> {selected.guest.phone || '-'}</p>
+                <p><strong>Ubicación:</strong> {selected.guest.city?.fullName ?? '-'}, {selected.guest.country}</p>
+              </>
+            ) : (
+              <p>{guestName(selected.guestId)}</p>
+            )}
             <button className="btn btn-secondary" onClick={() => setSelected(null)}>
               Cerrar detalle
             </button>

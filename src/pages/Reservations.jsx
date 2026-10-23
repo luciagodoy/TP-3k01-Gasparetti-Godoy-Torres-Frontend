@@ -24,8 +24,8 @@ export default function Reservations() {
   const [selected, setSelected] = useState(null);
   const [range, setRange] = useState({ from: '', to: '' });
 
-  // The date range is filtered by the backend (GET /reservations?startDate=&endDate=
-  // returns the reservations that overlap it). It applies only with both dates.
+  // El rango de fechas lo filtra el backend (GET /reservations?startDate=&endDate=
+  // devuelve las reservas que se superponen con él). Sólo aplica con ambas fechas.
   const hasRange = Boolean(range.from && range.to);
   const rangeFilters = hasRange ? { startDate: range.from, endDate: range.to } : undefined;
 
@@ -102,9 +102,9 @@ export default function Reservations() {
     setRange((prev) => ({ ...prev, [name]: value }));
   };
 
-  // The detail is requested from the backend: it brings the reservation with the
-  // full guest (account and location), the room with its category and the
-  // consumed amenities, none of which come in the listing.
+  // El detalle se pide al backend: trae la reserva con el huésped completo
+  // (cuenta y ubicación), la habitación con su categoría y los servicios
+  // consumidos, nada de lo cual viene en el listado.
   const handleSelect = async (id) => {
     setError(null);
     try {

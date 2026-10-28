@@ -266,9 +266,11 @@ export default function Reservations() {
                   <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleSelect(reservation.id); }}>
                     Ver detalle
                   </button>
-                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(reservation.id); }} disabled={loading}>
-                    Eliminar
-                  </button>
+                  <span title={reservation.canBeDeleted ? undefined : 'La estadía está en curso: hacé el check-out antes de eliminarla.'}>
+                    <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(reservation.id); }} disabled={loading || !reservation.canBeDeleted}>
+                      Eliminar
+                    </button>
+                  </span>
                 </td>
               </tr>
             ))}

@@ -197,7 +197,10 @@ export default function BookRoom() {
             <div className="form-container">
               <h4>{activeAmenity.name}</h4>
               {currentPrice ? (
-                <p>Precio actual: ${currentPrice.price.toFixed(2)} por unidad</p>
+                <p>
+                  Precio actual: ${currentPrice.price.toFixed(2)} por unidad por día. Se cobra por cada una de
+                  las {nights} {nights === 1 ? 'noche' : 'noches'} de tu estadía.
+                </p>
               ) : (
                 <p>Este servicio no tiene un precio vigente configurado.</p>
               )}
@@ -217,8 +220,14 @@ export default function BookRoom() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="book-quantity">Cantidad</label>
+                    <label htmlFor="book-quantity">Cantidad por día</label>
                     <input id="book-quantity" type="number" min="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+                    {currentPrice && Number(quantity) > 0 && (
+                      <p className="field-hint">
+                        Total: {quantity} × ${currentPrice.price.toFixed(2)} × {nights} {nights === 1 ? 'noche' : 'noches'} = $
+                        {(Number(quantity) * currentPrice.price * nights).toFixed(2)}
+                      </p>
+                    )}
                   </div>
                   <button className="btn btn-success" onClick={handleAddAmenity} disabled={loading || !currentPrice}>
                     {loading ? 'Agregando...' : 'Agregar'}
@@ -238,7 +247,8 @@ export default function BookRoom() {
                 <thead>
                   <tr>
                     <th>Servicio</th>
-                    <th>Cantidad</th>
+                    <th>Cantidad por día</th>
+                    <th>Noches</th>
                     <th>Precio Unitario</th>
                     <th>Subtotal</th>
                   </tr>
@@ -248,6 +258,7 @@ export default function BookRoom() {
                     <tr key={line.id}>
                       <td>{amenityName}</td>
                       <td>{line.quantity}</td>
+                      <td>{nights}</td>
                       <td>${line.unitPrice.toFixed(2)}</td>
                       <td>${line.totalAmount.toFixed(2)}</td>
                     </tr>

@@ -31,6 +31,11 @@
   --accent-soft: rgba(163, 137, 79, 0.18);
   --accent-green: #2f5d45;
   --accent-green-soft: rgba(47, 93, 69, 0.14);
+
+  // Errores de formulario: el borde va sobre el input claro y el texto sobre el panel oscuro.
+  --danger: #e0533f;
+  --danger-ring: rgba(224, 83, 63, 0.4);
+  --danger-on-surface: #ff9d8f;
 }
 
 * {

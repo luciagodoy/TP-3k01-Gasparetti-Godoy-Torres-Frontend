@@ -7,6 +7,9 @@ import {
 import { Reservation } from '../models';
 import '../styles/pages.scss';
 
+// Las unidades de un servicio son enteras: 1.5 desayunos por día no se puede cobrar.
+const isValidQuantity = (value) => Number.isInteger(Number(value)) && Number(value) >= 1;
+
 export default function BookRoom() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -88,8 +91,8 @@ export default function BookRoom() {
   };
 
   const handleAddAmenity = async () => {
-    if (!quotaId || !quantity) {
-      setError('Selecciona un cupo y una cantidad.');
+    if (!quotaId || !isValidQuantity(quantity)) {
+      setError('Seleccioná un cupo y una cantidad entera mayor a cero.');
       return;
     }
     setError(null);
@@ -222,7 +225,7 @@ export default function BookRoom() {
                   <div className="form-group">
                     <label htmlFor="book-quantity">Cantidad por día</label>
                     <input id="book-quantity" type="number" min="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-                    {currentPrice && Number(quantity) > 0 && (
+                    {currentPrice && isValidQuantity(quantity) && (
                       <p className="field-hint">
                         Total: {quantity} × ${currentPrice.price.toFixed(2)} × {nights} {nights === 1 ? 'noche' : 'noches'} = $
                         {(Number(quantity) * currentPrice.price * nights).toFixed(2)}

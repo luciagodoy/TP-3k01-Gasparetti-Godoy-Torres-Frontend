@@ -39,7 +39,10 @@ export default function LocationSelector({ cityId, onChange, error }) {
     { initialData: [], enabled: Boolean(provinceId) }
   );
 
-  const cities = provinceId ? provinceCities : [];
+  // useQuery conserva la lista de la provincia anterior mientras llega la nueva: se filtra por
+  // provincia para no elegir una ciudad homónima de otra (hay San Martín en varias).
+  const citiesOf = (list) => (provinceId ? list.filter((city) => String(city.provinceId) === provinceId) : []);
+  const cities = citiesOf(provinceCities);
 
   // Sin distinguir mayúsculas ni espacios de más: "rosario " es Rosario.
   const findCity = (list, text) => {
@@ -51,7 +54,7 @@ export default function LocationSelector({ cityId, onChange, error }) {
   // busca de nuevo cuando llega; si no, quedaba escrita pero sin elegir.
   useEffect(() => {
     if (cityId || !citySearch) return;
-    const match = findCity(provinceCities, citySearch);
+    const match = findCity(citiesOf(provinceCities), citySearch);
     if (match) onChange(match.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [provinceCities]);

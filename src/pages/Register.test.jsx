@@ -87,6 +87,21 @@ describe('Register', () => {
     expect(screen.getByLabelText('Usuario')).toHaveAttribute('aria-invalid', 'false');
   });
 
+  it('moves the focus to the location selector when only the city is missing', () => {
+    renderRegister();
+    type('Usuario', 'ana.perez');
+    type('Email', 'ana@example.com');
+    type('Contraseña', 'clave123');
+    type('Repetir contraseña', 'clave123');
+    type('Documento de Identidad', '30111222');
+
+    submit();
+
+    expect(screen.getByText('Elegí tu provincia y ciudad.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Elegir Rosario' })).toHaveFocus();
+    expect(guestService.register).not.toHaveBeenCalled();
+  });
+
   it('sends the trimmed data without the password confirmation', async () => {
     guestService.register.mockResolvedValue({ message: 'ok' });
     renderRegister();

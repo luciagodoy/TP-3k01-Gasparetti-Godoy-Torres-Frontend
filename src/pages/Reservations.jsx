@@ -266,7 +266,8 @@ export default function Reservations() {
                   <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleSelect(reservation.id); }}>
                     Ver detalle
                   </button>
-                  <span title={reservation.canBeDeleted ? undefined : 'La estadía está en curso: hacé el check-out antes de eliminarla.'}>
+                  {/* El clic sobre el botón deshabilitado no debe llegar a la fila (abre el detalle). */}
+                  <span title={reservation.canBeDeleted ? undefined : 'La estadía está en curso: hacé el check-out antes de eliminarla.'} onClick={(e) => e.stopPropagation()}>
                     <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(reservation.id); }} disabled={loading || !reservation.canBeDeleted}>
                       Eliminar
                     </button>

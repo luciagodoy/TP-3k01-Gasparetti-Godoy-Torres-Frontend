@@ -26,12 +26,19 @@ const FIELD_IDS = {
   confirmPassword: 'register-confirm-password',
   phone: 'register-phone',
   documentNumber: 'register-document',
+  // Contenedor del selector de provincia y ciudad: se enfoca su primer control habilitado.
+  cityId: 'register-location',
   country: 'register-country',
 };
 
 const focusFirstInvalid = (errors) => {
   const first = Object.keys(FIELD_IDS).find((name) => errors[name]);
-  if (first) document.getElementById(FIELD_IDS[first])?.focus();
+  if (!first) return;
+  const element = document.getElementById(FIELD_IDS[first]);
+  const target = element?.matches('input, select')
+    ? element
+    : element?.querySelector('input:not(:disabled), select:not(:disabled), button:not(:disabled)');
+  target?.focus();
 };
 
 export default function Register() {
@@ -148,11 +155,13 @@ export default function Register() {
             placeholder="12345678"
             hint="Sin puntos ni espacios."
           />
-          <LocationSelector
-            cityId={formData.cityId}
-            onChange={(cityId) => updateField('cityId', cityId)}
-            error={fieldErrors.cityId}
-          />
+          <div id={FIELD_IDS.cityId}>
+            <LocationSelector
+              cityId={formData.cityId}
+              onChange={(cityId) => updateField('cityId', cityId)}
+              error={fieldErrors.cityId}
+            />
+          </div>
           <FormField {...field('country')} label="País" type="text" placeholder="País" autoComplete="country-name" />
           <button type="submit" className="btn btn-success" disabled={loading}>
             {loading ? 'Creando cuenta...' : 'Crear cuenta'}

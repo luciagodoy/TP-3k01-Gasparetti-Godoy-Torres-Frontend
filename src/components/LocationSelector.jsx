@@ -1,10 +1,12 @@
 import { useEffect, useId, useState } from 'react';
 import { cityService, provinceService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
+import { FieldError } from './FormField';
 
 // Selector en cascada: primero la provincia, después la ciudad (con autocompletado de texto).
 // Informa al padre el cityId elegido por onChange; '' mientras no haya una ciudad válida.
-export default function LocationSelector({ cityId, onChange }) {
+// `error` (opcional) marca el control que falta completar.
+export default function LocationSelector({ cityId, onChange, error }) {
   const datalistId = useId();
   const provinceSelectId = useId();
   const cityInputId = useId();
@@ -37,7 +39,25 @@ export default function LocationSelector({ cityId, onChange }) {
     { initialData: [], enabled: Boolean(provinceId) }
   );
 
-  const cities = provinceId ? provinceCities : [];
+  // useQuery conserva la lista de la provincia anterior mientras llega la nueva: se filtra por
+  // provincia para no elegir una ciudad homónima de otra (hay San Martín en varias).
+  const citiesOf = (list) => (provinceId ? list.filter((city) => String(city.provinceId) === provinceId) : []);
+  const cities = citiesOf(provinceCities);
+
+  // Sin distinguir mayúsculas ni espacios de más: "rosario " es Rosario.
+  const findCity = (list, text) => {
+    const wanted = text.trim().toLowerCase();
+    return list.find((city) => city.name.toLowerCase() === wanted);
+  };
+
+  // Si la ciudad se escribió (o pegó) antes de que llegara la lista de la provincia, se
+  // busca de nuevo cuando llega; si no, quedaba escrita pero sin elegir.
+  useEffect(() => {
+    if (cityId || !citySearch) return;
+    const match = findCity(citiesOf(provinceCities), citySearch);
+    if (match) onChange(match.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [provinceCities]);
 
   const handleProvinceChange = (e) => {
     setProvinceId(e.target.value);
@@ -48,15 +68,25 @@ export default function LocationSelector({ cityId, onChange }) {
   const handleCityInput = (e) => {
     const text = e.target.value;
     setCitySearch(text);
-    const match = cities.find((city) => city.name === text);
+    const match = findCity(cities, text);
     onChange(match ? match.id : '');
   };
 
+  // El error se muestra en el control que falta completar: la provincia si no hay ninguna
+  // elegida, si no la ciudad.
+  const errorId = `${cityInputId}-error`;
+  const provinceError = error && !provinceId ? error : null;
+  const cityError = error && provinceId ? error : null;
+  const errorProps = (fieldError) => ({
+    'aria-invalid': Boolean(fieldError),
+    'aria-describedby': fieldError ? errorId : undefined,
+  });
+
   return (
     <>
-      <div className="form-group">
+      <div className={`form-group${provinceError ? ' has-error' : ''}`}>
         <label htmlFor={provinceSelectId}>Provincia</label>
-        <select id={provinceSelectId} value={provinceId} onChange={handleProvinceChange}>
+        <select id={provinceSelectId} value={provinceId} onChange={handleProvinceChange} {...errorProps(provinceError)}>
           <option value="">Seleccionar provincia</option>
           {provinces.map((province) => (
             <option key={province.id} value={province.id}>
@@ -64,8 +94,9 @@ export default function LocationSelector({ cityId, onChange }) {
             </option>
           ))}
         </select>
+        <FieldError id={errorId}>{provinceError}</FieldError>
       </div>
-      <div className="form-group">
+      <div className={`form-group${cityError ? ' has-error' : ''}`}>
         <label htmlFor={cityInputId}>Ciudad</label>
         <input
           id={cityInputId}
@@ -75,12 +106,14 @@ export default function LocationSelector({ cityId, onChange }) {
           onChange={handleCityInput}
           placeholder={provinceId ? 'Escribí para buscar...' : 'Elegí primero una provincia'}
           disabled={!provinceId}
+          {...errorProps(cityError)}
         />
         <datalist id={datalistId}>
           {cities.map((city) => (
             <option key={city.id} value={city.name} />
           ))}
         </datalist>
+        <FieldError id={errorId}>{cityError}</FieldError>
       </div>
     </>
   );

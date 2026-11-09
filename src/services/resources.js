@@ -83,9 +83,14 @@ export const reservationService = {
   cancel: async (id) => reservationOf(await api.post(`/reservations/${id}/cancel`, {})),
   // Endpoints dedicados y no un PUT con { status }: el backend valida la transición
   // (pendiente -> check-in -> check-out) y ocupa/libera la habitación.
-  checkIn: async (id) => reservationOf(await api.post(`/reservations/${id}/check-in`, {})),
-  /** El backend responde el check-out con el comprobante PDF. @returns {Promise<Blob>} */
-  checkOut: (id) => api.postFile(`/reservations/${id}/check-out`, {}),
+  /** @param {{ early?: boolean }} [options] early confirma un check-in antes de las 15:00. */
+  checkIn: async (id, options = {}) => reservationOf(await api.post(`/reservations/${id}/check-in`, options)),
+  /**
+   * El backend responde el check-out con el comprobante PDF.
+   * @param {{ late?: boolean }} [options] late confirma un check-out después de las 10:00.
+   * @returns {Promise<Blob>}
+   */
+  checkOut: (id, options = {}) => api.postFile(`/reservations/${id}/check-out`, options),
   /** Vuelve a descargar el comprobante de una reserva ya cerrada. @returns {Promise<Blob>} */
   downloadReceipt: (id) => api.getFile(`/reservations/${id}/receipt`),
 };

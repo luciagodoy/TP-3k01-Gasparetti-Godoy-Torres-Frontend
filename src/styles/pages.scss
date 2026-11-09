@@ -146,6 +146,34 @@
   min-height: 120px;
 }
 
+// Campo con error: borde rojo en el input y el mensaje debajo, con un ícono de alerta.
+.form-group.has-error {
+  input,
+  select,
+  textarea {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px var(--danger-ring);
+  }
+}
+
+.field-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  color: var(--danger-on-surface);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+
+  svg {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.1rem;
+  }
+}
+
 .alert {
   border-radius: var(--radius-md);
   padding: 1rem 1.25rem;

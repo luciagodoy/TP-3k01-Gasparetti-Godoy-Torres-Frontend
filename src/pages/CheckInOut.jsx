@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { guestService, reservationService } from '../services/resources';
+import confirmOutOfHours from '../utils/confirmOutOfHours';
 import downloadFile from '../utils/downloadFile';
 import '../styles/pages.scss';
 
@@ -24,7 +25,11 @@ export default function CheckInOut() {
 
     setLoading(true);
     try {
-      await reservationService.checkIn(checkInId);
+      const done = await confirmOutOfHours((flags) => reservationService.checkIn(checkInId, flags));
+      if (!done) {
+        setError('No se registró el check-in.');
+        return;
+      }
       setMessage('Check-in procesado correctamente.');
       setCheckInId('');
     } catch (err) {
@@ -75,7 +80,11 @@ export default function CheckInOut() {
 
     setLoading(true);
     try {
-      const receipt = await reservationService.checkOut(checkOutId);
+      const receipt = await confirmOutOfHours((flags) => reservationService.checkOut(checkOutId, flags));
+      if (!receipt) {
+        setError('No se registró el check-out.');
+        return;
+      }
       downloadFile(receipt, `comprobante-reserva-${checkOutId}.pdf`);
       setMessage('Check-out procesado correctamente. Se descargó el comprobante.');
       setReservation(null);
@@ -147,6 +156,7 @@ export default function CheckInOut() {
             {!reservation.canCheckOut && (
               <p className="field-hint">Sólo se puede hacer check-out de una reserva con check-in registrado.</p>
             )}
+            <p className="field-hint">El check-in es desde las 15:00 del día de inicio y el check-out hasta las 10:00 del día de salida. Fuera de horario se pide confirmación.</p>
             <button
               className="btn btn-primary"
               onClick={handleCheckOutSubmit}

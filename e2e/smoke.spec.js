@@ -11,7 +11,8 @@ test('the login validates the required fields before calling the API', async ({ 
   await page.goto('/login');
   await page.getByRole('button', { name: 'Ingresar' }).click();
 
-  await expect(page.getByText('Completa usuario y contraseña.')).toBeVisible();
+  await expect(page.getByText('Completá usuario y contraseña.')).toBeVisible();
+  await expect(page.getByLabel('Usuario o Email')).toHaveAttribute('aria-invalid', 'true');
   await expect(page).toHaveURL(/\/login$/);
 });
 

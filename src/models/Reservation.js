@@ -55,4 +55,9 @@ export default class Reservation extends BaseModel {
   get canCheckOut() {
     return this.status === RESERVATION_STATUS.CHECKED_IN;
   }
+
+  /** Una estadía en curso no se borra: primero hay que hacer el check-out. */
+  get canBeDeleted() {
+    return this.status !== RESERVATION_STATUS.CHECKED_IN;
+  }
 }

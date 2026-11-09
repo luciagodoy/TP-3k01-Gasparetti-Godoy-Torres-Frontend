@@ -75,6 +75,10 @@ class ApiService {
       }
       const error = new Error(errorMessageFrom(body, response.status));
       error.status = response.status;
+      // Algunos errores traen un código para reconocerlos (p. ej. LATE_CHECK_OUT).
+      if (body.code) error.code = body.code;
+      // Los formularios traen un mensaje por campo inválido: { email: '...' }.
+      if (body.fields) error.fields = body.fields;
       throw error;
     }
     if (response.status === 204) return null;

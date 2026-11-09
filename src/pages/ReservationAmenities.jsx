@@ -178,8 +178,9 @@ export default function ReservationAmenities() {
               </>
             )}
             <div className="form-group">
-              <label htmlFor="consumption-quantity">Cantidad</label>
+              <label htmlFor="consumption-quantity">Cantidad por día</label>
               <input id="consumption-quantity" type="number" name="quantity" min="1" value={formData.quantity} onChange={handleChange} />
+              <p className="field-hint">El total se calcula como cantidad × precio unitario × noches de la reserva.</p>
             </div>
             <div className="form-group">
               <label htmlFor="consumption-unit-price">Precio unitario</label>
@@ -210,7 +211,7 @@ export default function ReservationAmenities() {
             <tr>
               <th>Reserva</th>
               <th>Servicio</th>
-              <th>Cantidad</th>
+              <th>Cant. por día</th>
               <th>P. Unitario</th>
               <th>Total</th>
               <th>Acciones</th>
@@ -249,7 +250,7 @@ export default function ReservationAmenities() {
             <h4>Detalle del consumo</h4>
             <p><strong>Reserva:</strong> #{selected.reservationId}</p>
             <p><strong>Servicio:</strong> {selected.amenityName || '-'}</p>
-            <p><strong>Cantidad:</strong> {selected.quantity}</p>
+            <p><strong>Cantidad por día:</strong> {selected.quantity}</p>
             <p><strong>Precio unitario:</strong> ${selected.unitPrice.toFixed(2)}</p>
             <p><strong>Total:</strong> ${selected.totalAmount.toFixed(2)}</p>
             <button className="btn btn-secondary" onClick={() => setSelected(null)}>Cerrar detalle</button>

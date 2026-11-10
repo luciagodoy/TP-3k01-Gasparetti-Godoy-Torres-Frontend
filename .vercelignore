@@ -1,0 +1,8 @@
+# No subir a Vercel los .env locales (la CLI escribe ahí un VERCEL_OIDC_TOKEN). Las variables
+# de producción se configuran en el proyecto de Vercel.
+.env
+.env.*
+node_modules
+dist
+playwright-report
+test-results

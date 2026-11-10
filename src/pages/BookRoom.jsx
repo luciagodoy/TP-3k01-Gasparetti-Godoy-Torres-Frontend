@@ -5,10 +5,8 @@ import {
   reservationAmenityService, amenityService, pricingService,
 } from '../services/resources';
 import { Reservation } from '../models';
+import { isValidQuantity } from '../utils/quantity';
 import '../styles/pages.scss';
-
-// Las unidades de un servicio son enteras: 1.5 desayunos por día no se puede cobrar.
-const isValidQuantity = (value) => Number.isInteger(Number(value)) && Number(value) >= 1;
 
 export default function BookRoom() {
   const location = useLocation();

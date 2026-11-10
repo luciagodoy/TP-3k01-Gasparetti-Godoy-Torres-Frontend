@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { roomCategoryService, roomService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
+import Notice from '../components/Notice';
 import '../styles/pages.scss';
 const ROOM_STATUS_OPTIONS = [
   { value: 'disponible', label: 'Disponible' },
@@ -124,8 +125,8 @@ export default function Rooms() {
         </button>
       </div>
 
-      {message && <div role="status" className="alert alert-success">{message}</div>}
-      {error && <div role="alert" className="alert alert-error">{error}</div>}
+      <Notice type="success" onClose={() => setMessage(null)}>{message}</Notice>
+      <Notice type="error" onClose={() => setError(null)}>{error}</Notice>
 
       {showForm && (
         <div className="form-container">

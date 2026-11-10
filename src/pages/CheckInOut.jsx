@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { guestService, reservationService } from '../services/resources';
 import confirmOutOfHours from '../utils/confirmOutOfHours';
 import downloadFile from '../utils/downloadFile';
+import Notice from '../components/Notice';
 import '../styles/pages.scss';
 
 export default function CheckInOut() {
@@ -103,8 +104,8 @@ export default function CheckInOut() {
         <h2>Check-in / Check-out</h2>
       </div>
 
-      {message && <div role="status" className="alert alert-success">{message}</div>}
-      {error && <div role="alert" className="alert alert-error">{error}</div>}
+      <Notice type="success" onClose={() => setMessage(null)}>{message}</Notice>
+      <Notice type="error" onClose={() => setError(null)}>{error}</Notice>
 
       <div className="form-container">
         <h3>Procesar Check-in</h3>

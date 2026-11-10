@@ -6,6 +6,7 @@ import {
 } from '../services/resources';
 import { Reservation } from '../models';
 import { isValidQuantity } from '../utils/quantity';
+import Notice from '../components/Notice';
 import '../styles/pages.scss';
 
 export default function BookRoom() {
@@ -122,7 +123,7 @@ export default function BookRoom() {
         <h2>Confirmar Reserva</h2>
       </div>
 
-      {error && <div role="alert" className="alert alert-error">{error}</div>}
+      <Notice type="error" onClose={() => setError(null)}>{error}</Notice>
 
       {step === 'confirm' && (
         <div className="form-container">

@@ -55,6 +55,16 @@ describe('Reservation', () => {
     expect(checkedIn.canCheckOut).toBe(true);
   });
 
+  // Como el backend: sólo una estadía en curso no se borra (la habitación quedaría ocupada).
+  it.each([
+    ['pendiente', true],
+    ['check-in', false],
+    ['check-out', true],
+    ['cancelada', true],
+  ])('a reservation in status "%s" can be deleted: %s', (status, expected) => {
+    expect(Reservation.fromJSON(reservationJson({ status })).canBeDeleted).toBe(expected);
+  });
+
   it('listFromJSON tolerates an empty response', () => {
     expect(Reservation.listFromJSON(null)).toEqual([]);
   });

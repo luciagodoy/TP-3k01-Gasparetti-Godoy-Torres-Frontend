@@ -119,6 +119,11 @@ export default function CheckInOut() {
               placeholder="Ej: 1"
             />
           </div>
+          <p className="field-hint">
+            El check-in se puede hacer desde las 15:00 del día de inicio hasta las 00:00 del día de salida (antes de las
+            15:00 se pide confirmación). Si la reserva llega a su fecha de salida sin check-in, se cancela sola y la
+            habitación queda libre.
+          </p>
           <button type="submit" className="btn btn-success" disabled={loading}>
             {loading ? 'Procesando...' : 'Confirmar Check-in'}
           </button>
@@ -156,7 +161,7 @@ export default function CheckInOut() {
             {!reservation.canCheckOut && (
               <p className="field-hint">Sólo se puede hacer check-out de una reserva con check-in registrado.</p>
             )}
-            <p className="field-hint">El check-in es desde las 15:00 del día de inicio y el check-out hasta las 10:00 del día de salida. Fuera de horario se pide confirmación.</p>
+            <p className="field-hint">El check-out es hasta las 10:00 del día de salida. Después de esa hora se pide confirmación.</p>
             <button
               className="btn btn-primary"
               onClick={handleCheckOutSubmit}

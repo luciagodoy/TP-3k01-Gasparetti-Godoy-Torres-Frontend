@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { guestService } from '../services/resources';
 import FormField from '../components/FormField';
 import LocationSelector from '../components/LocationSelector';
+import Notice from '../components/Notice';
 import { hasErrors, PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN, validateRegistration } from '../utils/accountRules';
 import crestLogo from '../assets/crest-logo.png';
 import '../styles/pages.scss';
@@ -110,16 +111,12 @@ export default function Register() {
         <h2>Crear Cuenta</h2>
       </div>
 
-      {message && (
-        <div role="status" className="alert alert-success">
-          {message}
-        </div>
-      )}
-      {formError && (
-        <div role="alert" className="alert alert-error">
-          {formError}
-        </div>
-      )}
+      <Notice type="success" onClose={() => setMessage(null)}>
+        {message}
+      </Notice>
+      <Notice type="error" onClose={() => setFormError(null)}>
+        {formError}
+      </Notice>
 
       <div className="form-container">
         <form onSubmit={handleSubmit} noValidate>

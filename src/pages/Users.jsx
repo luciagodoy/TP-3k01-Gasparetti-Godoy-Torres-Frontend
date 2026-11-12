@@ -3,6 +3,7 @@ import { userService } from '../services/resources';
 import { ROLES } from '../models';
 import useQuery from '../hooks/useQuery';
 import { useAuth } from '../context/useAuth';
+import Notice from '../components/Notice';
 import '../styles/pages.scss';
 
 const emptyForm = { username: '', email: '', password: '', role: ROLES.GUEST };
@@ -131,8 +132,8 @@ export default function Users() {
         </button>
       </div>
 
-      {message && <div role="status" className="alert alert-success">{message}</div>}
-      {error && <div role="alert" className="alert alert-error">{error}</div>}
+      <Notice type="success" onClose={() => setMessage(null)}>{message}</Notice>
+      <Notice type="error" onClose={() => setError(null)}>{error}</Notice>
 
       {showForm && (
         <div className="form-container">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { reservationService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
+import Notice from '../components/Notice';
 import '../styles/pages.scss';
 
 export default function MyReservations() {
@@ -38,8 +39,8 @@ export default function MyReservations() {
         <Link className="btn btn-primary" to="/search">+ Nueva Reserva</Link>
       </div>
 
-      {message && <div role="status" className="alert alert-success">{message}</div>}
-      {error && <div role="alert" className="alert alert-error">{error}</div>}
+      <Notice type="success" onClose={() => setMessage(null)}>{message}</Notice>
+      <Notice type="error" onClose={() => setError(null)}>{error}</Notice>
 
       {reservations.length === 0 && <p>Todavía no tenés reservas.</p>}
 

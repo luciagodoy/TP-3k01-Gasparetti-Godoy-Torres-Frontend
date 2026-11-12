@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { Reservation, User } from '.';
 
 // Forma real de GET /reservations/mine: los DECIMAL de MySQL llegan como strings.
@@ -45,7 +45,13 @@ describe('Reservation', () => {
     expect(Reservation.calculateNights(undefined, '2026-04-01')).toBe(0);
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('only a pending reservation can be cancelled or checked in', () => {
+    // Durante la estadía (1 al 4 de noviembre), así canCheckIn no depende de la fecha real.
+    vi.useFakeTimers({ now: new Date('2026-11-02T18:00:00-03:00') });
     const pending = Reservation.fromJSON(reservationJson());
     const checkedIn = Reservation.fromJSON(reservationJson({ status: 'check-in' }));
     expect(pending.canBeCancelled).toBe(true);
@@ -63,6 +69,32 @@ describe('Reservation', () => {
     ['cancelada', true],
   ])('a reservation in status "%s" can be deleted: %s', (status, expected) => {
     expect(Reservation.fromJSON(reservationJson({ status })).canBeDeleted).toBe(expected);
+  });
+
+  // RN: el check-in vale hasta las 00:00 del día de salida; una pendiente sin check-in vence ese día.
+  it.each([
+    ['2026-11-03', false],
+    ['2026-11-04', true],
+    ['2026-11-05', true],
+  ])('a pending reservation ending 2026-11-04 is expired on %s: %s', (today, expected) => {
+    expect(Reservation.fromJSON(reservationJson()).isExpiredOn(today)).toBe(expected);
+  });
+
+  it('only a pending reservation expires', () => {
+    const checkedIn = Reservation.fromJSON(reservationJson({ status: 'check-in' }));
+    expect(checkedIn.isExpiredOn('2026-11-05')).toBe(false);
+  });
+
+  it('does not offer the check-in once the reservation expired', () => {
+    // 3 de noviembre 23:59 en Argentina: último minuto para el check-in.
+    vi.useFakeTimers({ now: new Date('2026-11-03T23:59:00-03:00') });
+    expect(Reservation.fromJSON(reservationJson()).canCheckIn).toBe(true);
+
+    // 00:00 del día de salida: ya venció.
+    vi.setSystemTime(new Date('2026-11-04T00:00:00-03:00'));
+    const expired = Reservation.fromJSON(reservationJson());
+    expect(expired.isExpired).toBe(true);
+    expect(expired.canCheckIn).toBe(false);
   });
 
   it('listFromJSON tolerates an empty response', () => {

@@ -8,6 +8,7 @@ import '../styles/layout.scss';
 const MANAGEMENT_LINKS = [
   { to: '/reservations', label: 'Reservas' },
   { to: '/rooms', label: 'Habitaciones' },
+  { to: '/occupied-rooms', label: 'Ocupadas hoy' },
   { to: '/guests', label: 'Huéspedes' },
   { to: '/room-categories', label: 'Categorías' },
   { to: '/check-in', label: 'Check-in/out' },

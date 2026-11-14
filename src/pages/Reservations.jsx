@@ -22,6 +22,7 @@ export default function Reservations() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState(null);
+  const [editingId, setEditingId] = useState(null);
   const [range, setRange] = useState({ from: '', to: '' });
 
   // El rango de fechas lo filtra el backend (GET /reservations?startDate=&endDate=
@@ -47,15 +48,16 @@ export default function Reservations() {
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
-  // El listado de reservas no incluye al huésped, así que el nombre sale de los
-  // huéspedes ya cargados para el formulario.
-  const guestName = (guestId) => {
+  // El listado ya trae al huésped; si faltara, el nombre sale de los huéspedes
+  // cargados para el formulario.
+  const guestName = (guestId, reservationGuest) => {
+    if (reservationGuest?.user?.username) return reservationGuest.user.username;
     const guest = guests.find((g) => g.id === guestId);
     return guest ? guest.user?.username || `#${guestId}` : guestId;
   };
 
   const filteredReservations = reservations.filter((reservation) => {
-    const searchValue = `${reservation.id} ${guestName(reservation.guestId) || ''} ${reservation.room?.number || reservation.roomId || ''} ${reservation.status || ''}`.toLowerCase();
+    const searchValue = `${reservation.id} ${guestName(reservation.guestId, reservation.guest) || ''} ${reservation.room?.number || reservation.roomId || ''} ${reservation.status || ''}`.toLowerCase();
     const matchesSearch = searchTerm ? searchValue.includes(searchTerm.toLowerCase()) : true;
     const matchesStatus = statusFilter ? reservation.status === statusFilter : true;
     return matchesSearch && matchesStatus;
@@ -66,7 +68,27 @@ export default function Reservations() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCreateReservation = async (e) => {
+  const resetForm = () => {
+    setFormData(emptyForm);
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  const handleEdit = (reservation) => {
+    setFormData({
+      roomId: reservation.roomId,
+      guestId: reservation.guestId,
+      startDate: reservation.startDate,
+      endDate: reservation.endDate,
+      totalAmount: reservation.totalAmount,
+    });
+    setEditingId(reservation.id);
+    setShowForm(true);
+    setMessage(null);
+    setError(null);
+  };
+
+  const handleSubmitReservation = async (e) => {
     e.preventDefault();
     setError(null);
     setMessage(null);
@@ -78,17 +100,29 @@ export default function Reservations() {
 
     setLoading(true);
     try {
-      await reservationService.create({
-        roomId: Number(formData.roomId),
-        guestId: Number(formData.guestId),
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        // Vacío = el backend aplica la tarifa dinámica; con un valor = precio pactado.
-        ...(formData.totalAmount !== '' && { totalAmount: parseFloat(formData.totalAmount) }),
-      });
-      setMessage('Reserva creada correctamente.');
-      setFormData(emptyForm);
-      setShowForm(false);
+      // Vacío = el backend aplica la tarifa dinámica; con un valor = precio pactado.
+      const totalAmount = formData.totalAmount !== '' && { totalAmount: parseFloat(formData.totalAmount) };
+      if (editingId) {
+        // El huésped no se cambia: para eso se cancela y se crea otra reserva.
+        await reservationService.update(editingId, {
+          roomId: Number(formData.roomId),
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          ...totalAmount,
+        });
+        setMessage('Reserva actualizada correctamente.');
+        if (selected?.id === editingId) setSelected(await reservationService.get(editingId));
+      } else {
+        await reservationService.create({
+          roomId: Number(formData.roomId),
+          guestId: Number(formData.guestId),
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          ...totalAmount,
+        });
+        setMessage('Reserva creada correctamente.');
+      }
+      resetForm();
       fetchReservations();
     } catch (err) {
       setError(err.message);
@@ -135,7 +169,7 @@ export default function Reservations() {
     <div className="page-container">
       <div className="page-header">
         <h2>Gestión de Reservas</h2>
-        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+        <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(!showForm); }}>
           {showForm ? 'Cancelar' : '+ Nueva Reserva'}
         </button>
       </div>
@@ -145,7 +179,7 @@ export default function Reservations() {
 
       {showForm && (
         <div className="form-container">
-          <form onSubmit={handleCreateReservation}>
+          <form onSubmit={handleSubmitReservation}>
             <div className="form-group">
               <label htmlFor="reservation-room">Habitación</label>
               <select id="reservation-room" name="roomId" value={formData.roomId} onChange={handleInputChange}>
@@ -159,7 +193,7 @@ export default function Reservations() {
             </div>
             <div className="form-group">
               <label htmlFor="reservation-guest">Huésped</label>
-              <select id="reservation-guest" name="guestId" value={formData.guestId} onChange={handleInputChange}>
+              <select id="reservation-guest" name="guestId" value={formData.guestId} onChange={handleInputChange} disabled={Boolean(editingId)}>
                 <option value="">Seleccionar huésped</option>
                 {guests.map((guest) => (
                   <option key={guest.id} value={guest.id}>
@@ -187,10 +221,14 @@ export default function Reservations() {
                 onChange={handleInputChange}
                 placeholder="Vacío = tarifa dinámica"
               />
-              <p className="field-hint">Si lo dejás vacío se cobra la tarifa del día según ocupación y antelación.</p>
+              <p className="field-hint">
+                {editingId
+                  ? 'Si cambiás las fechas, revisá el monto: no se recalcula solo.'
+                  : 'Si lo dejás vacío se cobra la tarifa del día según ocupación y antelación.'}
+              </p>
             </div>
             <button type="submit" className="btn btn-success" disabled={loading}>
-              {loading ? 'Guardando...' : 'Guardar'}
+              {loading ? 'Guardando...' : editingId ? 'Actualizar' : 'Guardar'}
             </button>
           </form>
         </div>
@@ -254,7 +292,7 @@ export default function Reservations() {
                 className={selected?.id === reservation.id ? 'selected-row' : ''}
               >
                 <td>{reservation.id}</td>
-                <td>{guestName(reservation.guestId)}</td>
+                <td>{guestName(reservation.guestId, reservation.guest)}</td>
                 <td>{reservation.room ? reservation.room.number : reservation.roomId}</td>
                 <td>{reservation.startDate}</td>
                 <td>{reservation.endDate}</td>
@@ -266,6 +304,11 @@ export default function Reservations() {
                   <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleSelect(reservation.id); }}>
                     Ver detalle
                   </button>
+                  {reservation.canBeEdited && (
+                    <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(reservation); }} disabled={loading}>
+                      Editar
+                    </button>
+                  )}
                   {/* El clic sobre el botón deshabilitado no debe llegar a la fila (abre el detalle). */}
                   <span title={reservation.canBeDeleted ? undefined : 'La estadía está en curso: hacé el check-out antes de eliminarla.'} onClick={(e) => e.stopPropagation()}>
                     <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(reservation.id); }} disabled={loading || !reservation.canBeDeleted}>

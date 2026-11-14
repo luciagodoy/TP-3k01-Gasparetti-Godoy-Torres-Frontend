@@ -23,6 +23,7 @@ export default function Dashboard() {
       ? [
           { title: 'Reservas', path: '/reservations', description: 'Gestionar reservas' },
           { title: 'Habitaciones', path: '/rooms', description: 'Administrar habitaciones' },
+          { title: 'Ocupadas hoy', path: '/occupied-rooms', description: 'Habitaciones con estadía hoy y estado del check-in' },
           { title: 'Huéspedes', path: '/guests', description: 'Gestionar huéspedes' },
           { title: 'Categorías', path: '/room-categories', description: 'Categorías de habitación' },
           { title: 'Check-in/out', path: '/check-in', description: 'Entrada y salida' },

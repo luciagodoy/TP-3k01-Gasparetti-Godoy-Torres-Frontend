@@ -16,6 +16,7 @@ import './App.scss';
 const Reservations = lazy(() => import('./pages/Reservations'));
 const Rooms = lazy(() => import('./pages/Rooms'));
 const Guests = lazy(() => import('./pages/Guests'));
+const OccupiedRooms = lazy(() => import('./pages/OccupiedRooms'));
 const CheckInOut = lazy(() => import('./pages/CheckInOut'));
 const Amenities = lazy(() => import('./pages/Amenities'));
 const Employees = lazy(() => import('./pages/Employees'));
@@ -45,6 +46,7 @@ function App() {
           <Route element={<ProtectedRoute roles={STAFF_ROLES} />}>
             <Route path="reservations" element={<Reservations />} />
             <Route path="rooms" element={<Rooms />} />
+            <Route path="occupied-rooms" element={<OccupiedRooms />} />
             <Route path="guests" element={<Guests />} />
             <Route path="check-in" element={<CheckInOut />} />
             <Route path="amenities" element={<Amenities />} />

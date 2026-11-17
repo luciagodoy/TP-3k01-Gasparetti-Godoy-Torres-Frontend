@@ -7,6 +7,7 @@ import CategorySelector from '../components/CategorySelector';
 import DateInput from '../components/DateInput';
 import GuestSelector from '../components/GuestSelector';
 import ImageGallery from '../components/ImageGallery';
+import Notice from '../components/Notice';
 import { largestCapacity } from '../models';
 import '../styles/pages.scss';
 import '../styles/rooms.scss';
@@ -104,7 +105,7 @@ export default function SearchRooms() {
         <h2>Buscar Habitaciones</h2>
       </div>
 
-      {error && <div role="alert" className="alert alert-error">{error}</div>}
+      <Notice type="error" onClose={() => setError(null)}>{error}</Notice>
 
       <div className="room-filters">
         <div className="form-group">

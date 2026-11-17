@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { authService } from '../services/resources';
 import { useAuth } from '../context/useAuth';
 import FormField from '../components/FormField';
+import Notice from '../components/Notice';
 import { hasErrors, validateLogin } from '../utils/accountRules';
 import crestLogo from '../assets/crest-logo.png';
 import '../styles/pages.scss';
@@ -73,11 +74,9 @@ export default function Login() {
         <h2>Iniciar Sesión</h2>
       </div>
 
-      {formError && (
-        <div id={FORM_ERROR_ID} role="alert" className="alert alert-error">
-          {formError}
-        </div>
-      )}
+      <Notice type="error" id={FORM_ERROR_ID} onClose={() => setFormError(null)}>
+        {formError}
+      </Notice>
 
       <div className="form-container">
         <form onSubmit={handleSubmit} noValidate>

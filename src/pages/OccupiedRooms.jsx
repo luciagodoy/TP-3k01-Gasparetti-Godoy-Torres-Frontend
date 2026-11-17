@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { reservationService } from '../services/resources';
 import { RESERVATION_STATUS } from '../models';
 import useQuery from '../hooks/useQuery';
+import Notice from '../components/Notice';
 import '../styles/pages.scss';
 
 const STAY_LABELS = {
@@ -38,7 +39,7 @@ export default function OccupiedRooms() {
         </button>
       </div>
 
-      {error && <div role="alert" className="alert alert-error">{error}</div>}
+      <Notice type="error" onClose={() => setError(null)}>{error}</Notice>
 
       <div className="list-container">
         <div className="list-header">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { roomCategoryService } from '../services/resources';
 import { useAuth } from '../context/useAuth';
 import useQuery from '../hooks/useQuery';
+import Notice from '../components/Notice';
 import '../styles/pages.scss';
 
 const emptyForm = { name: '', description: '', capacity: 1, imageUrls: '', pricePerNight: '' };
@@ -103,8 +104,8 @@ export default function RoomCategories() {
         <h2>Categorías</h2>
       </div>
 
-      {message && <div role="status" className="alert alert-success">{message}</div>}
-      {error && <div role="alert" className="alert alert-error">{error}</div>}
+      <Notice type="success" onClose={() => setMessage(null)}>{message}</Notice>
+      <Notice type="error" onClose={() => setError(null)}>{error}</Notice>
 
       {canEdit && (
         <div className="form-container">

@@ -56,6 +56,11 @@ export default class Reservation extends BaseModel {
     return this.status === RESERVATION_STATUS.CHECKED_IN;
   }
 
+  /** Una estadía cerrada (con check-out o cancelada) ya no admite cambios de fechas ni de habitación. */
+  get canBeEdited() {
+    return this.status === RESERVATION_STATUS.PENDING || this.status === RESERVATION_STATUS.CHECKED_IN;
+  }
+
   /** Una estadía en curso no se borra: primero hay que hacer el check-out. */
   get canBeDeleted() {
     return this.status !== RESERVATION_STATUS.CHECKED_IN;

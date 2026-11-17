@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { roomCategoryService, roomService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
+import DateInput from '../components/DateInput';
 import Notice from '../components/Notice';
 import '../styles/pages.scss';
 const ROOM_STATUS_OPTIONS = [
@@ -10,6 +11,7 @@ const ROOM_STATUS_OPTIONS = [
 ];
 
 const emptyForm = { number: '', floor: '', categoryId: '', status: 'disponible' };
+const emptyFilters = { categoryId: '', people: '', startDate: '', endDate: '' };
 
 export default function Rooms() {
   const [showForm, setShowForm] = useState(false);
@@ -22,9 +24,20 @@ export default function Rooms() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState(null);
 
+  const [filters, setFilters] = useState(emptyFilters);
+
+  // Categoría, personas y disponibilidad entre fechas las resuelve el backend
+  // (GET /rooms?categoryId=&people=&startDate=&endDate=). Las fechas sólo aplican de a pares.
+  const hasDates = Boolean(filters.startDate && filters.endDate);
+  const serverFilters = {
+    categoryId: filters.categoryId,
+    people: filters.people,
+    ...(hasDates && { startDate: filters.startDate, endDate: filters.endDate }),
+  };
+
   const { data: rooms, refetch: fetchRooms } = useQuery(
-    '/rooms',
-    () => roomService.list(),
+    `/rooms?${JSON.stringify(serverFilters)}`,
+    () => roomService.list(serverFilters),
     { initialData: [], onError: (err) => setError(err.message) }
   );
 
@@ -44,6 +57,11 @@ export default function Rooms() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   const resetForm = () => {
@@ -183,6 +201,37 @@ export default function Rooms() {
               ))}
             </select>
           </div>
+          <div className="filter-row">
+            <div className="form-group">
+              <label htmlFor="rooms-filter-category">Categoría</label>
+              <select id="rooms-filter-category" name="categoryId" value={filters.categoryId} onChange={handleFilterChange}>
+                <option value="">Todas</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>{category.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="rooms-filter-people">Personas</label>
+              <input id="rooms-filter-people" type="number" min="1" name="people" value={filters.people} onChange={handleFilterChange} placeholder="Cantidad" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="rooms-filter-start">Disponible desde</label>
+              <DateInput id="rooms-filter-start" name="startDate" value={filters.startDate} onChange={handleFilterChange} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="rooms-filter-end">Hasta</label>
+              <DateInput id="rooms-filter-end" name="endDate" value={filters.endDate} onChange={handleFilterChange} min={filters.startDate || undefined} />
+            </div>
+            {Object.values(filters).some(Boolean) && (
+              <button type="button" className="btn btn-small" onClick={() => setFilters(emptyFilters)}>
+                Limpiar filtros
+              </button>
+            )}
+          </div>
+          {(filters.startDate || filters.endDate) && !hasDates && (
+            <p className="field-hint">Elegí las dos fechas para filtrar por disponibilidad.</p>
+          )}
         </div>
         <table className="table">
           <thead>
@@ -190,6 +239,7 @@ export default function Rooms() {
               <th>Número</th>
               <th>Piso</th>
               <th>Categoría</th>
+              <th>Precio por noche</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
@@ -204,6 +254,7 @@ export default function Rooms() {
                 <td>{room.number}</td>
                 <td>{room.floor}</td>
                 <td>{room.category ? room.category.name : room.categoryId}</td>
+                <td>{room.category ? `$${room.category.pricePerNight.toFixed(2)}` : '-'}</td>
                 <td><span className={`badge badge-${room.status}`}>{room.status}</span></td>
                 <td>
                   <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); setSelected(room); }}>
@@ -212,9 +263,12 @@ export default function Rooms() {
                   <button className="btn btn-small" onClick={(e) => { e.stopPropagation(); handleEdit(room); }}>
                     Editar
                   </button>
-                  <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(room.id); }} disabled={loading}>
-                    Eliminar
-                  </button>
+                  {/* El clic sobre el botón deshabilitado no debe llegar a la fila (abre el detalle). */}
+                  <span title={room.status === 'ocupada' ? 'La habitación está ocupada: hacé el check-out antes de eliminarla.' : undefined} onClick={(e) => e.stopPropagation()}>
+                    <button className="btn btn-small btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(room.id); }} disabled={loading || room.status === 'ocupada'}>
+                      Eliminar
+                    </button>
+                  </span>
                 </td>
               </tr>
             ))}
@@ -229,6 +283,7 @@ export default function Rooms() {
             <p><strong>Categoría:</strong> {selected.category?.name || selected.categoryId}</p>
             <p><strong>Estado:</strong> {selected.status}</p>
             <p><strong>Capacidad:</strong> {selected.category?.capacity ?? '-'}</p>
+            <p><strong>Precio por noche:</strong> {selected.category ? `$${selected.category.pricePerNight.toFixed(2)}` : '-'}</p>
             <button className="btn btn-secondary" onClick={() => setSelected(null)}>
               Cerrar detalle
             </button>

@@ -149,7 +149,10 @@ describe('api: sesión, red y respuestas sin cuerpo', () => {
 
     const receipt = await api.getFile('/reservations/7/receipt');
 
-    expect(receipt).toBeInstanceOf(Blob);
+    // Sin instanceof: en jsdom el Blob global no es la misma clase que el de Node (el que
+    // devuelve Response), y en Linux la comparación falla aunque sea un Blob válido.
+    expect(Object.prototype.toString.call(receipt)).toBe('[object Blob]');
+    expect(receipt.type).toBe('application/pdf');
     expect(await receipt.text()).toBe('%PDF-1.4');
   });
 });

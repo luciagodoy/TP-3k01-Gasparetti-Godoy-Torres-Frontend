@@ -66,8 +66,9 @@ export default class Reservation extends BaseModel {
     return this.status === RESERVATION_STATUS.PENDING && !this.isExpired;
   }
 
+  // El check-out es justamente lo que cierra una estadía en curso.
   get canCheckOut() {
-    return this.status === RESERVATION_STATUS.CHECKED_IN;
+    return this.isInStay;
   }
 
   /**

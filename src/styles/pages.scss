@@ -278,6 +278,16 @@
   box-shadow: var(--shadow-lifted);
 }
 
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 .btn-primary {
   background: var(--primary);
   color: white;

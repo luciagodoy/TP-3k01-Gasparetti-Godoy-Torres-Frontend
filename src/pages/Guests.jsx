@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { guestService } from '../services/resources';
+import { guestService, reservationService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
 import LocationSelector from '../components/LocationSelector';
 import '../styles/pages.scss';
@@ -13,6 +13,47 @@ const emptyForm = {
   cityId: '',
   country: 'Argentina',
 };
+
+function GuestHistory({ guestId }) {
+  const { data: reservations, loading, error } = useQuery(
+    `/reservations?guestId=${guestId}`,
+    () => reservationService.list({ guestId }),
+    { initialData: [] }
+  );
+
+  return (
+    <>
+      <h4>Historial de reservas</h4>
+      {error && <p role="alert">{error.message}</p>}
+      {loading && <p>Cargando...</p>}
+      {!loading && !error && reservations.length === 0 && <p>Este huésped todavía no tiene reservas.</p>}
+      {reservations.length > 0 && (
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Reserva</th>
+              <th>Inicio</th>
+              <th>Fin</th>
+              <th>Habitación</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reservations.map((reservation) => (
+              <tr key={reservation.id}>
+                <td>{reservation.id}</td>
+                <td>{reservation.startDate}</td>
+                <td>{reservation.endDate}</td>
+                <td>{reservation.room ? reservation.room.number : reservation.roomId}</td>
+                <td><span className={`badge badge-${reservation.status}`}>{reservation.status}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </>
+  );
+}
 
 export default function Guests() {
   const [showForm, setShowForm] = useState(false);
@@ -250,6 +291,7 @@ export default function Guests() {
             <p><strong>Ciudad:</strong> {selected.city?.name}</p>
             <p><strong>Provincia:</strong> {selected.city?.province?.name}</p>
             <p><strong>País:</strong> {selected.country}</p>
+            <GuestHistory key={selected.id} guestId={selected.id} />
             <button className="btn btn-secondary" onClick={() => setSelected(null)}>
               Cerrar detalle
             </button>

@@ -78,8 +78,12 @@ const reservationOf = (response) => Reservation.fromJSON(response?.reservation);
 export const reservationService = {
   ...createResourceService('/reservations', Reservation, { envelope: 'reservation' }),
   mine: async () => Reservation.listFromJSON(await api.get('/reservations/mine')),
+  /** Estadías vigentes hoy (con check-in o pendientes), con su habitación y huésped. */
+  occupiedToday: async () => Reservation.listFromJSON(await api.get('/reservations/occupied-today')),
   /** @param {import('../models/types').NewOwnReservation} data */
   createMine: async (data) => reservationOf(await api.post('/reservations/mine', data)),
+  /** Cambia las fechas de una reserva propia pendiente; el backend vuelve a cotizar el total. */
+  updateMine: async (id, data) => reservationOf(await api.put(`/reservations/mine/${id}`, data)),
   cancel: async (id) => reservationOf(await api.post(`/reservations/${id}/cancel`, {})),
   // Endpoints dedicados y no un PUT con { status }: el backend valida la transición
   // (pendiente -> check-in -> check-out) y ocupa/libera la habitación.

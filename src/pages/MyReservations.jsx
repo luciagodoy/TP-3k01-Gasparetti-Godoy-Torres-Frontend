@@ -4,6 +4,7 @@ import { reservationService } from '../services/resources';
 import useQuery from '../hooks/useQuery';
 import DateInput from '../components/DateInput';
 import Notice from '../components/Notice';
+import { displayDate } from '../utils/hotelDate';
 import '../styles/pages.scss';
 
 export default function MyReservations() {
@@ -108,6 +109,12 @@ export default function MyReservations() {
                 <p>
                   <span className={`badge badge-${reservation.status}`}>{reservation.status}</span>
                 </p>
+                {reservation.canCheckIn && (
+                  <p className="field-hint">
+                    Check-in desde las 15:00 del {displayDate(reservation.startDate)} hasta las 00:00 del{' '}
+                    {displayDate(reservation.endDate)}. Si no hacés el check-in antes, la reserva se cancela.
+                  </p>
+                )}
                 {amenities.length > 0 && (
                   <div>
                     <strong>Servicios:</strong>

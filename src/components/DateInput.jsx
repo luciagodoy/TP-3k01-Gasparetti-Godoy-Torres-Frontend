@@ -32,7 +32,7 @@ const daysInMonth = (y, m) => new Date(y, m, 0).getDate();
 // Selector de fecha propio: al abrirse muestra sólo los días del mes activo
 // (celdas vacías para el desfase inicial, sin días de los meses vecinos) y
 // muestra el valor elegido como dd/mm/aaaa.
-export default function DateInput({ id, name, value, onChange, min, max, placeholder = 'dd/mm/yyyy' }) {
+export default function DateInput({ id, name, value, onChange, min, max, placeholder = 'dd/mm/yyyy', disabled = false }) {
   const [open, setOpen] = useState(false);
   const selected = parseISO(value);
   const today = new Date();
@@ -93,11 +93,11 @@ export default function DateInput({ id, name, value, onChange, min, max, placeho
 
   return (
     <div className="date-input" ref={containerRef}>
-      <button id={id} type="button" className="date-input-trigger" onClick={() => setOpen((o) => !o)}>
+      <button id={id} type="button" className="date-input-trigger" onClick={() => setOpen((o) => !o)} disabled={disabled}>
         {value ? formatDisplay(value) : <span className="date-input-placeholder">{placeholder}</span>}
       </button>
 
-      {open && (
+      {open && !disabled && (
         <div className="date-input-popup">
           <div className="date-input-header">
             <button type="button" onClick={() => changeMonth(-1)} aria-label="Mes anterior">‹</button>

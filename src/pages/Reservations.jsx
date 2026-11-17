@@ -24,6 +24,8 @@ export default function Reservations() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  // Estadía en curso: sólo se puede cambiar la salida (el backend rechaza habitación e inicio).
+  const [editingInStay, setEditingInStay] = useState(false);
   const [range, setRange] = useState({ from: '', to: '' });
 
   // El rango de fechas lo filtra el backend (GET /reservations?startDate=&endDate=
@@ -72,6 +74,7 @@ export default function Reservations() {
   const resetForm = () => {
     setFormData(emptyForm);
     setEditingId(null);
+    setEditingInStay(false);
     setShowForm(false);
   };
 
@@ -84,6 +87,7 @@ export default function Reservations() {
       totalAmount: reservation.totalAmount,
     });
     setEditingId(reservation.id);
+    setEditingInStay(reservation.isInStay);
     setShowForm(true);
     setMessage(null);
     setError(null);
@@ -181,9 +185,15 @@ export default function Reservations() {
       {showForm && (
         <div className="form-container">
           <form onSubmit={handleSubmitReservation}>
+            {editingInStay && (
+              <p className="field-hint">
+                La estadía está en curso: sólo se puede cambiar la fecha de salida. Para mover al huésped de habitación,
+                hacé el check-out y creá una reserva nueva.
+              </p>
+            )}
             <div className="form-group">
               <label htmlFor="reservation-room">Habitación</label>
-              <select id="reservation-room" name="roomId" value={formData.roomId} onChange={handleInputChange}>
+              <select id="reservation-room" name="roomId" value={formData.roomId} onChange={handleInputChange} disabled={editingInStay}>
                 <option value="">Seleccionar habitación</option>
                 {rooms.map((room) => (
                   <option key={room.id} value={room.id}>
@@ -205,7 +215,7 @@ export default function Reservations() {
             </div>
             <div className="form-group">
               <label htmlFor="reservation-start">Fecha de Inicio</label>
-              <DateInput id="reservation-start" name="startDate" value={formData.startDate} onChange={handleInputChange} />
+              <DateInput id="reservation-start" name="startDate" value={formData.startDate} onChange={handleInputChange} disabled={editingInStay} />
             </div>
             <div className="form-group">
               <label htmlFor="reservation-end">Fecha de Fin</label>

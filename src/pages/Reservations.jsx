@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { guestService, reservationService, roomService } from '../services/resources';
-import { RESERVATION_STATUS } from '../models';
+import { RESERVATION_STATUS, Reservation } from '../models';
 import useQuery from '../hooks/useQuery';
+import { addDays, hotelToday } from '../utils/hotelDate';
 import DateInput from '../components/DateInput';
 import Notice from '../components/Notice';
 import '../styles/pages.scss';
@@ -14,6 +15,9 @@ const STATUS_OPTIONS = [
 ];
 
 const emptyForm = { roomId: '', guestId: '', startDate: '', endDate: '', totalAmount: '' };
+const IN_STAY_HINT_ID = 'reservation-in-stay-hint';
+const laterDate = (a, b) => (a > b ? a : b);
+
 export default function Reservations() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
@@ -24,6 +28,8 @@ export default function Reservations() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  // El monto se recalcula al cambiar las fechas hasta que el staff lo escribe a mano.
+  const [amountTouched, setAmountTouched] = useState(false);
   const [range, setRange] = useState({ from: '', to: '' });
 
   // El rango de fechas lo filtra el backend (GET /reservations?startDate=&endDate=
@@ -64,14 +70,36 @@ export default function Reservations() {
     return matchesSearch && matchesStatus;
   });
 
+  // Lo que se está editando sale del listado, así no hay un segundo estado que mantener.
+  const editingReservation = editingId ? reservations.find((r) => r.id === editingId) : undefined;
+  // Estadía en curso: sólo se puede cambiar la salida (el backend rechaza habitación e inicio).
+  const editingInStay = Boolean(editingReservation?.isInStay);
+  // El backend no recotiza el alojamiento al cambiar las fechas: se mantiene la tarifa por
+  // noche pactada, así extender la estadía cobra las noches nuevas.
+  const nightlyRate = editingReservation?.nights > 0 ? editingReservation.totalAmount / editingReservation.nights : null;
+  // Con el huésped adentro, la salida no puede quedar en un día que ya pasó.
+  const minEndDate = editingInStay
+    ? laterDate(addDays(formData.startDate, 1), hotelToday())
+    : formData.startDate || undefined;
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'totalAmount') setAmountTouched(true);
+    setFormData((prev) => {
+      const next = { ...prev, [name]: value };
+      const datesChanged = name === 'startDate' || name === 'endDate';
+      if (datesChanged && nightlyRate !== null && !amountTouched) {
+        const nights = Reservation.calculateNights(next.startDate, next.endDate);
+        if (nights > 0) next.totalAmount = Math.round(nightlyRate * nights * 100) / 100;
+      }
+      return next;
+    });
   };
 
   const resetForm = () => {
     setFormData(emptyForm);
     setEditingId(null);
+    setAmountTouched(false);
     setShowForm(false);
   };
 
@@ -84,6 +112,7 @@ export default function Reservations() {
       totalAmount: reservation.totalAmount,
     });
     setEditingId(reservation.id);
+    setAmountTouched(false);
     setShowForm(true);
     setMessage(null);
     setError(null);
@@ -96,6 +125,10 @@ export default function Reservations() {
 
     if (!formData.roomId || !formData.guestId || !formData.startDate || !formData.endDate) {
       setError('Completa todos los campos requeridos.');
+      return;
+    }
+    if (editingInStay && formData.endDate < minEndDate) {
+      setError('La estadía está en curso: la salida no puede ser anterior a hoy.');
       return;
     }
 
@@ -181,9 +214,15 @@ export default function Reservations() {
       {showForm && (
         <div className="form-container">
           <form onSubmit={handleSubmitReservation}>
+            {editingInStay && (
+              <p id={IN_STAY_HINT_ID} className="field-hint">
+                La estadía está en curso: sólo se puede cambiar la fecha de salida. Para mover al huésped de habitación,
+                hacé el check-out y creá una reserva nueva.
+              </p>
+            )}
             <div className="form-group">
               <label htmlFor="reservation-room">Habitación</label>
-              <select id="reservation-room" name="roomId" value={formData.roomId} onChange={handleInputChange}>
+              <select id="reservation-room" name="roomId" value={formData.roomId} onChange={handleInputChange} disabled={editingInStay} aria-describedby={editingInStay ? IN_STAY_HINT_ID : undefined}>
                 <option value="">Seleccionar habitación</option>
                 {rooms.map((room) => (
                   <option key={room.id} value={room.id}>
@@ -205,11 +244,11 @@ export default function Reservations() {
             </div>
             <div className="form-group">
               <label htmlFor="reservation-start">Fecha de Inicio</label>
-              <DateInput id="reservation-start" name="startDate" value={formData.startDate} onChange={handleInputChange} />
+              <DateInput id="reservation-start" name="startDate" value={formData.startDate} onChange={handleInputChange} disabled={editingInStay} describedBy={editingInStay ? IN_STAY_HINT_ID : undefined} />
             </div>
             <div className="form-group">
               <label htmlFor="reservation-end">Fecha de Fin</label>
-              <DateInput id="reservation-end" name="endDate" value={formData.endDate} onChange={handleInputChange} min={formData.startDate || undefined} />
+              <DateInput id="reservation-end" name="endDate" value={formData.endDate} onChange={handleInputChange} min={minEndDate} />
             </div>
             <div className="form-group">
               <label htmlFor="reservation-amount">Monto Total (opcional)</label>
@@ -223,9 +262,11 @@ export default function Reservations() {
                 placeholder="Vacío = tarifa dinámica"
               />
               <p className="field-hint">
-                {editingId
-                  ? 'Si cambiás las fechas, revisá el monto: no se recalcula solo.'
-                  : 'Si lo dejás vacío se cobra la tarifa del día según ocupación y antelación.'}
+                {!editingId
+                  ? 'Si lo dejás vacío se cobra la tarifa del día según ocupación y antelación.'
+                  : nightlyRate !== null
+                    ? `Si cambiás las fechas, el monto se recalcula con la tarifa pactada ($${nightlyRate.toFixed(2)} por noche). Podés corregirlo a mano.`
+                    : 'Si cambiás las fechas, revisá el monto.'}
               </p>
             </div>
             <button type="submit" className="btn btn-success" disabled={loading}>

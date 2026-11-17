@@ -66,7 +66,17 @@ export default class Reservation extends BaseModel {
     return this.status === RESERVATION_STATUS.PENDING && !this.isExpired;
   }
 
+  // El check-out es justamente lo que cierra una estadía en curso.
   get canCheckOut() {
+    return this.isInStay;
+  }
+
+  /**
+   * Estadía en curso (con check-in): el huésped ya está en la habitación, así que sólo se
+   * puede cambiar la fecha de salida. El backend rechaza cambiar la habitación
+   * (ROOM_CHANGE_DURING_STAY) o el inicio (START_DATE_DURING_STAY).
+   */
+  get isInStay() {
     return this.status === RESERVATION_STATUS.CHECKED_IN;
   }
 

@@ -16,8 +16,13 @@
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.date-input-trigger:hover {
+.date-input-trigger:hover:not(:disabled) {
   border-color: var(--primary);
+}
+
+.date-input-trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .date-input-trigger:focus-visible {

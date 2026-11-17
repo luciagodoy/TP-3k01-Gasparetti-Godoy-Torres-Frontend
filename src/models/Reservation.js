@@ -3,6 +3,7 @@ import { Room } from './lodging';
 import { Guest } from './people';
 import { ReservationAmenity } from './amenities';
 import { RESERVATION_STATUS } from './types';
+import { hotelToday } from '../utils/hotelDate';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -48,8 +49,21 @@ export default class Reservation extends BaseModel {
     return this.status === RESERVATION_STATUS.PENDING;
   }
 
+  /**
+   * El check-in se puede hacer hasta las 00:00 del día de salida. Una reserva pendiente que
+   * llega a esa fecha sin check-in vence: el backend la da de baja (pasa a cancelada).
+   * @param {import('./types').IsoDate} [today] fecha del hotel; por defecto, hoy.
+   */
+  isExpiredOn(today = hotelToday()) {
+    return this.status === RESERVATION_STATUS.PENDING && Boolean(this.endDate) && today >= this.endDate;
+  }
+
+  get isExpired() {
+    return this.isExpiredOn();
+  }
+
   get canCheckIn() {
-    return this.status === RESERVATION_STATUS.PENDING;
+    return this.status === RESERVATION_STATUS.PENDING && !this.isExpired;
   }
 
   get canCheckOut() {
